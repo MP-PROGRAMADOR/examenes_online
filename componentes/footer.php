@@ -42,6 +42,26 @@
     </div>
     <![endif]-->
     <!-- Warning Section Ends -->
+
+
+
+
+<!-- datatables -->
+
+
+<script src="../assets/js/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+
+
+
+<script>
+    $('#example').DataTable();
+</script>
+
+
+
+
     
     <!-- Required Jquery -->
     <script type="text/javascript" src="../assets/js/jquery/jquery.min.js"></script>

@@ -254,10 +254,12 @@ include '../componentes/menu_admin.php';
 
 
 
+
+
                       
                       <?php
 
-include '../formularios/formulario_registro_usuarios.php';
+include '../formularios/tabla_usuarios.php';
 
 
 ?>
