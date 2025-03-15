@@ -24,7 +24,7 @@
                                   <div class="form-group form-primary">
                                       <input type="text" name="footer-email" class="form-control" required="">
                                       <span class="form-bar"></span>
-                                      <label class="float-label"><i class="fa fa-search m-r-10"></i>Search Friend</label>
+                                      <label class="float-label"><i class="fa fa-search m-r-10"></i>BUsqueda Rápida</label>
                                   </div>
                               </form>
                           </div>
