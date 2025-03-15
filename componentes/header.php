@@ -43,7 +43,7 @@
   <!-- css datables nuevo -->
 
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
- 
+  
   <script src="../assets/js/jquery.js"></script>
 
 
