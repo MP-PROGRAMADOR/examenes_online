@@ -4,10 +4,11 @@ include '../conexion/conexion.php'; // Conexión a la BD
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nombre = trim($_POST["nombre"]);
     $edad = trim($_POST["edad"]);
-    $rol = trim($_POST["rol"]);
+    $tipo_usuario = trim($_POST["tipo_usuario"]);
     $fecha_registro = trim($_POST["fecha_registro"]);
     $centro_procedencia = trim($_POST["centro"]);
     $dip = trim($_POST["dip"]);
+    $edad = trim($_POST["edad"]);
    
 
     // Verificar si el usuario ya está registrado
@@ -28,12 +29,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
    
 
     // Insertar el nuevo usuario en la base de datos
-    $stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, password, rol) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $nombre, $email, $password_plano, $rol);
+    $stmt = $conn->prepare("INSERT INTO usuarios (nombre, password, tipo_usuario, id_centro, dip, edad) VALUES (?, ?, ?, ?,?,?)");
+    $stmt->bind_param("ssssss", $nombre, $password_plano, $tipo_usuario, $centro_procedencia,$dip,$edad);
 
     if ($stmt->execute()) {
-        echo "Usuario registrado con éxito.<br>";
-        echo "Su contraseña es: <strong>$password_plano</strong> (Recomiende cambiarla en el primer acceso)";
+        
+        header('Location: ../admin/usuarios.php?mensaje=insertado');
     } else {
         echo "Error al registrar el usuario.";
     }
