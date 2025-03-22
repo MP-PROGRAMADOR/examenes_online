@@ -212,7 +212,7 @@ include '../componentes/header.php';
 
               <?php
 
-include '../componentes/menu_admin.php';
+include '../componentes/menu_examinador.php';
 
 
 ?>

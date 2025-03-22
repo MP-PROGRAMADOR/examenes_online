@@ -1,7 +1,20 @@
-<!-- End Navbar -->
 <?php
 
+require '../conexion/conexion.php';
 
+$sqlusuarios = "SELECT * FROM usuarios";
+
+$usuarios = $conn->query($sqlusuarios);
+
+
+
+// iniciando la sesion
+
+// session_start();
+// if(!isset($_SESSION['usuario'])){
+
+//   header('Location:../login.php');
+// }
 
 
 ?>
@@ -14,7 +27,7 @@
 
 
 
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalusuario">
                         Añadir Usuarios
                     </button>
 
@@ -85,22 +98,32 @@
                                 <th>Acciones</th>
                             </thead>
                             <tbody>
+                                <?php while ($row_pacientes = $usuarios->fetch_assoc()) {  ?>
+
+                                    <tr>
+                                        <td> <?= $row_pacientes['id']; ?></td>
+                                        <td> <?= $row_pacientes['nombre']; ?></td>
+                                        <td> <?= $row_pacientes['password']; ?></td>
+                                        <td> <?= $row_pacientes['tipo_usuario']; ?></td>
+                                        <td> <?= $row_pacientes['fecha_registro']; ?></td>
+                                        <td> <?= $row_pacientes['id_centro']; ?></td>
+
+                                        <td> <?= $row_pacientes['dip']; ?></td>
+                                        <td> <?= $row_pacientes['edad']; ?></td>
+                                        
+
+                                        <td>
+
+                                            <a href="#" class="btn btn-sm btn-success">Editar</a>
 
 
-                                <tr>
-                                    <th>0</th>
-                                    <td>1</td>
-                                    <td>2</td>
-                                    <td>3</td>
-                                    <td>4</td>
-                                    <td>5</td>
-                                    <td>6</td>
-                                    <td>7</td>
-                                    <td><a href="" class="btn btn-primary btn-sm">Editar</a></td>
-                                </tr>
 
 
+                                        </td>
+                                    </tr>
 
+
+                                <?php } ?>
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -124,26 +147,3 @@
     <script>
         $('#example').DataTable();
     </script>
-
-
-
-
-
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
