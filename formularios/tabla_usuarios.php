@@ -70,10 +70,6 @@
 
 
 
-
-
-
-
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
                         <table id="example" class="table table-striped p-4" style="width:100%">
