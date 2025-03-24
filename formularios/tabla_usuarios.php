@@ -22,17 +22,11 @@ $usuarios = $conn->query($sqlusuarios);
     <div class="row">
         <div class="col-12">
             <div class="card mb-4">
-                <div class="card-header pb-0">
-
-
-
-
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalusuario">
+                <div class="card-header pb-0"> 
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#modalusuario">
                         Añadir Usuarios
-                    </button>
-
-
-
+                    </button> 
                 </div>
 
 
@@ -42,7 +36,7 @@ $usuarios = $conn->query($sqlusuarios);
 
                 <?php
                 if (isset($_GET['mensaje']) and $_GET['mensaje'] == 'insertado') {
-                ?>
+                    ?>
 
                     <div class="alert alert-info alert-dismissible fade show" role="alert">
                         <i class="fas fa-info-circle"></i>
@@ -53,7 +47,7 @@ $usuarios = $conn->query($sqlusuarios);
                 <?php } ?>
                 <?php
                 if (isset($_GET['mensaje']) and $_GET['mensaje'] == 'actualizado') {
-                ?>
+                    ?>
 
                     <div class="alert alert-warning alert-dismissible fade show" role="alert">
                         <i class="fas fa-info-circle"></i>
@@ -68,7 +62,7 @@ $usuarios = $conn->query($sqlusuarios);
 
                 <?php
                 if (isset($_GET['mensaje']) and $_GET['mensaje'] == 'igual') {
-                ?>
+                    ?>
 
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         <i class="fas fa-info-circle"></i>
@@ -98,7 +92,7 @@ $usuarios = $conn->query($sqlusuarios);
                                 <th>Acciones</th>
                             </thead>
                             <tbody>
-                                <?php while ($row_pacientes = $usuarios->fetch_assoc()) {  ?>
+                                <?php while ($row_pacientes = $usuarios->fetch_assoc()) { ?>
 
                                     <tr>
                                         <td> <?= $row_pacientes['id']; ?></td>
@@ -110,7 +104,7 @@ $usuarios = $conn->query($sqlusuarios);
 
                                         <td> <?= $row_pacientes['dip']; ?></td>
                                         <td> <?= $row_pacientes['edad']; ?></td>
-                                        
+
 
                                         <td>
 

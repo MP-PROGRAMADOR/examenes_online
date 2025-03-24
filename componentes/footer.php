@@ -59,7 +59,56 @@
     $('#example').DataTable();
 </script>
 
+<!-- CODIGO PARA VISUALIZAR MODAL DE REGISTRO DE PREGUNTAS-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+        const tipoPregunta = document.getElementById('tipoPregunta');
+        const opcionesDiv = document.getElementById('opcionesDiv');
+        const labelVerdaderoFalso = document.getElementById('labelVerdaderoFalso');
+        const respuestaVerdaderoFalso = document.getElementById('respuestaVerdaderoFalso');
+        const labelRespuestaCorta = document.getElementById('labelRespuestaCorta');
+        const respuestaCorta = document.getElementById('respuestaCorta');
+        const labelRespuestaEnsayo = document.getElementById('labelRespuestaEnsayo');
+        const respuestaEnsayo = document.getElementById('respuestaEnsayo');
 
+        tipoPregunta.addEventListener('change', function() {
+            if (this.value === 'opcionMultiple') {
+                opcionesDiv.style.display = 'block';
+                labelVerdaderoFalso.style.display = 'none';
+                respuestaVerdaderoFalso.style.display = 'none';
+                labelRespuestaCorta.style.display = 'none';
+                respuestaCorta.style.display = 'none';
+                labelRespuestaEnsayo.style.display = 'none';
+                respuestaEnsayo.style.display = 'none';
+            } else if (this.value === 'verdaderoFalso') {
+                opcionesDiv.style.display = 'none';
+                labelVerdaderoFalso.style.display = 'block';
+                respuestaVerdaderoFalso.style.display = 'block';
+                labelRespuestaCorta.style.display = 'none';
+                respuestaCorta.style.display = 'none';
+                labelRespuestaEnsayo.style.display = 'none';
+                respuestaEnsayo.style.display = 'none';
+            } else if (this.value === 'respuestaCorta') {
+                opcionesDiv.style.display = 'none';
+                labelVerdaderoFalso.style.display = 'none';
+                respuestaVerdaderoFalso.style.display = 'none';
+                labelRespuestaCorta.style.display = 'block';
+                respuestaCorta.style.display = 'block';
+                labelRespuestaEnsayo.style.display = 'none';
+                respuestaEnsayo.style.display = 'none';
+            } else if (this.value === 'ensayo') {
+                opcionesDiv.style.display = 'none';
+                labelVerdaderoFalso.style.display = 'none';
+                respuestaVerdaderoFalso.style.display = 'none';
+                labelRespuestaCorta.style.display = 'none';
+                respuestaCorta.style.display = 'none';
+                labelRespuestaEnsayo.style.display = 'block';
+                respuestaEnsayo.style.display = 'block';
+            }
+        });
+    </script>
+
+    <!--FIN CODIGO PARA VISUALIZAR MODAL DE REGISTRO DE PREGUNTAS-->
 
 
     

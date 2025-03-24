@@ -1,3 +1,8 @@
+<?php
+
+require "../formularios/formulario_registro_examen.php";
+?>
+
 <nav class="pcoded-navbar">
     <div class="sidebar_toggle"><a href="#"><i class="icon-close icons"></i></a></div>
     <div class="pcoded-inner-navbar main-menu">
@@ -31,24 +36,31 @@
                     <span class="pcoded-mcaret"></span>
                 </a>
             </li>
-               
+
         </ul>
         <ul class="pcoded-item pcoded-left-item">
             <li>
                 <a href="chart.html" class="waves-effect waves-dark">
                     <span class="pcoded-micon"><i class="ti-layers"></i><b>PE</b></span>
                     <span class="pcoded-mtext" data-i18n="nav.form-components.main">Programar examen
-                    <span class="pcoded-mcaret"></span>
+                        <span class="pcoded-mcaret"></span>
                 </a>
             </li>
         </ul>
         <ul class="pcoded-item pcoded-left-item">
             <li>
-                <a href="../examinador/examenes.php" class="waves-effect waves-dark">
+                <a  class="waves-effect waves-dark">
                     <span class="pcoded-micon"><i class="ti-layers"></i><b>RP</b></span>
-                    <span class="pcoded-mtext" data-i18n="nav.form-components.main">Registrar preguntas</span>
+                    <span class="pcoded-mtext" data-i18n="nav.form-components.main" data-bs-toggle="modal" data-bs-target="#preguntaModal">Registrar preguntas</span>
                     <span class="pcoded-mcaret"></span>
                 </a>
+                <!-- Button trigger modal 
+                 
+                <button type="button" class="btn btn-primary" >
+                    Launch demo modal
+                </button>
+                -->
+
             </li>
         </ul>
         <ul class="pcoded-item pcoded-left-item">

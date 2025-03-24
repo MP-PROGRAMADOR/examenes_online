@@ -48,18 +48,13 @@ $centro = $conn->query($sqlcentro);
 
 
                     <div class="d-flex flex-row justify-content-center">
-
-
-
-
+ 
                         <div class="p-2 col-lg-5">
 
                             <label for="fecha_registro" class="form-label">FECHA DE REGISTRO</label>
                             <input type="date" class="form-control" name="fecha_registro" id="fecha_registro" required>
-                        </div>
-
-
-                        <div class="p-2 col-lg-5">
+                        </div>  
+                       <div class="p-2 col-lg-5">
                             <label for="centro" class="form-label">CENTRO DE PROCEDENCIA</label>
 
                             <select class="form-control" aria-label=".form-select-lg example" id="centro" name="centro" required>
