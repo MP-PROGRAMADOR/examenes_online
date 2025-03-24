@@ -37,7 +37,7 @@ $centro = $conn->query($sqlcentro);
                         <div class="p-2 col-lg-5">
                             <label for="tipo_usuario" class="form-label">TIPO DE USUARIO</label>
                             <select class="form-control" aria-label=".form-select-lg example" id="tipo_usuario" name="tipo_usuario" required>
-                                <option selected value="">seleccione.....</option>
+                                <option selected value="">seleccione....</option>
                                 <option value="admin">ADMINISTRADOR</option>
                                 <option value="examinador">EXAMINADOR</option>
                                 <option value="aspirante">ASPIRANTE</option>
@@ -113,8 +113,6 @@ $centro = $conn->query($sqlcentro);
 
 
             </div>
-
-
 
         </div>
     </div>

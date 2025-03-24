@@ -119,7 +119,7 @@ include '../componentes/header.php';
                               <ul class="show-notification">
                                   <li>
                                       <h6>Notifications</h6>
-                                      <label class="label label-danger">New</label>
+                                      <label class="label label-danger">Nuevo</label>
                                   </li>
                                   <li class="waves-effect waves-light">
                                       <div class="media">
@@ -127,7 +127,7 @@ include '../componentes/header.php';
                                           <div class="media-body">
                                               <h5 class="notification-user">John Doe</h5>
                                               <p class="notification-msg">Lorem ipsum dolor sit amet, consectetuer elit.</p>
-                                              <span class="notification-time">30 minutes ago</span>
+                                              <span class="notification-time">30 min despues</span>
                                           </div>
                                       </div>
                                   </li>
@@ -259,8 +259,8 @@ include '../componentes/menu_examinador.php';
                       
                       <?php
 
-include '../formularios/tabla_usuarios.php';
-include '../formularios/formulario_registro_usuarios.php';
+include '../formularios/crear_preguntas.php';
+//include '../formularios/formulario_registro_usuarios.php';
 
 
 

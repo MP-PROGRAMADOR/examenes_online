@@ -7,6 +7,12 @@
 -- Versión del servidor: 10.4.25-MariaDB
 -- Versión de PHP: 8.1.10
 
+drop database if exists examenes_online;
+
+CREATE database examenes_online;
+
+use examenes_online;
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
