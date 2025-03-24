@@ -6,11 +6,16 @@ include '../conexion/conexion.php'; // Conexión a la BD
 // Obtener datos del formulario
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+    if (isset($_POST["username"]) === "" && isset( $_POST["password"]) === "") {
+        
+    }
+
+
     $username = $_POST['username'];
     $password = $_POST['password'];
     
     // Consultar la base de datos
-    $sql = "SELECT * FROM usuarios WHERE username = '$username'";
+    $sql = "SELECT * FROM aspirantes WHERE username = '$username'";
     $result = $conn->query($sql);
     
     if ($result->num_rows > 0) {
