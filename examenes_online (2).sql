@@ -6,16 +6,89 @@
 -- Tiempo de generación: 17-03-2025 a las 13:17:47
 -- Versión del servidor: 10.4.25-MariaDB
 -- Versión de PHP: 8.1.10
+-- Verificar si la base de datos "examenes_online" existe
+CREATE DATABASE IF NOT EXISTS examenes_online;
 
-drop database if exists examenes_online;
-
-CREATE database examenes_online;
-
-use examenes_online;
+-- Usar la base de datos "examenes_online"
+USE examenes_online;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
+
+-- Verificar y crear la tabla "preguntas"
+DROP TABLE IF EXISTS respuestas_grafico;
+DROP TABLE IF EXISTS opciones;
+DROP TABLE IF EXISTS respuestas_cortas;
+DROP TABLE IF EXISTS respuestas_verdadero_falso;
+DROP TABLE IF EXISTS respuestas_ensayo;
+DROP TABLE IF EXISTS preguntas;
+DROP TABLE IF EXISTS usuarios;
+DROP TABLE IF EXISTS aspirantes;
+DROP TABLE IF EXISTS centro_procedencia;
+DROP TABLE IF EXISTS examenes;
+DROP TABLE IF EXISTS logs;
+DROP TABLE IF EXISTS opciones;
+
+ 
+
+CREATE TABLE aspirantes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
+INSERT INTO aspirantes (username, password) VALUES ('usuario', '$2y$10$Qx99.Yy.D5uE59/X5y7y5e.f8X/r7r5.539P.J539.y7r5.539P.J539'); -- La contraseña es "contraseña" hasheada con bcrypt
+INSERT INTO aspirantes (username, password) VALUES ('alumno', '$2y$10$Qx99.Yy.D5uE59/X5y7y5e.f8X/r7r5.539P.J539.y7r5.539P.J539'); -- La contraseña es "clave" hasheada con bcrypt
+
+CREATE TABLE preguntas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tipo_pregunta VARCHAR(20) NOT NULL,
+    texto_pregunta TEXT NOT NULL,
+    url_grafico VARCHAR(255) NULL
+);
+
+-- Verificar y crear la tabla "opciones"
+CREATE TABLE opciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pregunta_id INT NOT NULL,
+    texto_opcion VARCHAR(255) NOT NULL,
+    es_correcta BOOLEAN NOT NULL DEFAULT 0,
+    FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
+);
+
+-- Verificar y crear la tabla "respuestas_cortas"
+CREATE TABLE respuestas_cortas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pregunta_id INT NOT NULL,
+    respuesta_correcta VARCHAR(255) NOT NULL,
+    FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
+);
+
+-- Verificar y crear la tabla "respuestas_verdadero_falso"
+CREATE TABLE respuestas_verdadero_falso (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pregunta_id INT NOT NULL,
+    respuesta_correcta BOOLEAN NOT NULL,
+    FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
+);
+
+-- Verificar y crear la tabla "respuestas_ensayo"
+CREATE TABLE respuestas_ensayo (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pregunta_id INT NOT NULL,
+    respuesta_guia TEXT NOT NULL,
+    FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
+);
+
+-- Verificar y crear la tabla "respuestas_grafico"
+CREATE TABLE respuestas_grafico (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pregunta_id INT NOT NULL,
+    respuesta_correcta VARCHAR(255) NOT NULL,
+    FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
+);
+
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -72,50 +145,7 @@ CREATE TABLE `logs` (
   `fecha` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `opciones`
---
-
-CREATE TABLE `opciones` (
-  `id` int(11) NOT NULL,
-  `pregunta_id` int(11) DEFAULT NULL,
-  `texto_opcion` text NOT NULL,
-  `es_correcta` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `preguntas`
---
-
-CREATE TABLE `preguntas` (
-  `id` int(11) NOT NULL,
-  `examen_id` int(11) DEFAULT NULL,
-  `pregunta` text NOT NULL,
-  `tipo_pregunta` enum('opcion_multiple','verdadero_falso','completacion','imagen') NOT NULL,
-  `imagen_url` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `respuestas`
---
-
-CREATE TABLE `respuestas` (
-  `id` int(11) NOT NULL,
-  `usuario_id` int(11) DEFAULT NULL,
-  `examen_id` int(11) DEFAULT NULL,
-  `fecha` timestamp NOT NULL DEFAULT current_timestamp(),
-  `puntaje` int(11) DEFAULT NULL,
-  `aprobado` tinyint(1) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
+ 
 --
 -- Estructura de tabla para la tabla `respuestas_usuario`
 --

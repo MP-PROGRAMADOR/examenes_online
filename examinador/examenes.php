@@ -260,7 +260,7 @@ include '../componentes/menu_examinador.php';
                       <?php
 
 include '../formularios/crear_preguntas.php';
-//include '../formularios/formulario_registro_usuarios.php';
+include '../formularios/formulario_registro_usuarios.php';
 
 
 
