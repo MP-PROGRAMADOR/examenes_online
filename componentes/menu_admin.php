@@ -41,6 +41,7 @@
                     <span class="pcoded-mcaret"></span>
                 </a>
                 <ul class="pcoded-submenu">
+                    <!--
                     <li class=" ">
                         <a href="#" class="waves-effect waves-dark">
                             <span class="pcoded-micon"><i class="ti-angle-right"></i></span>
@@ -48,6 +49,7 @@
                             <span class="pcoded-mcaret"></span>
                         </a>
                     </li>
+-->
                     <li class="pcoded-hasmenu ">
                         <a href="javascript:void(0)" class="waves-effect waves-dark">
                             <span class="pcoded-micon"><i class="ti-direction-alt"></i></span>

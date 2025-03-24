@@ -57,7 +57,7 @@ $usuarios = $conn->query($sqlusuarios);
 
                     <div class="alert alert-warning alert-dismissible fade show" role="alert">
                         <i class="fas fa-info-circle"></i>
-                        <strong> Hola!</strong> su registro ha sido actualizado.
+                        <strong> Hola!</strong> su registro ha sido actualizado correctamente.
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
 
