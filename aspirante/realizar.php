@@ -11,7 +11,7 @@
 <body class="d-flex flex-column min-vh-100">
     <header class="bg-white shadow-sm">
         <nav class="navbar navbar-expand-lg navbar-light container">
-            <a class="navbar-brand" href="index.html">
+            <a class="navbar-brand" href="./portal.php">
                 <img src="logo.png" alt="Logo Autoescuela" height="40"> Autoescuela Online
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,17 +20,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html">Inicio</a>
+                        <a class="nav-link" href="./portal.php">Inicio</a>
                     </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="examenes.html">Exámenes</a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="#">Contacto</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-outline-primary" href="#">Acceder</a>
-                    </li>
+                   
                 </ul>
             </div>
         </nav>

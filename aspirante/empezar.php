@@ -22,17 +22,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html">Inicio</a>
+                        <a class="nav-link" href="./portal.php">Inicio</a>
                     </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#">Exámenes</a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="#">Contacto</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-outline-primary" href="#">Acceder</a>
-                    </li>
+                    
                 </ul>
             </div>
         </nav>
@@ -57,7 +53,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Simulacro Completo</h5>
                             <p class="card-text">Evalúa tu nivel de preparación.</p>
-                            <a href="./realizar.php" class="btn btn-primary">Realizar Simulacro</a>
+                            <a href="./login_aspirante.php" class="btn btn-primary">Realizar Simulacro</a>
                         </div>
                     </div>
                 </div>

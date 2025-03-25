@@ -1,3 +1,4 @@
+
 /* ... (resto de los estilos) ... */
 
 .card {
@@ -18,25 +19,7 @@
     margin-bottom: 1rem;
 }
 
-.carousel-card {
-    border: none;
-    border-radius: 10px;
-    overflow: hidden; /* Evita que las imágenes se desborden de la tarjeta */
-}
-
 .carousel-item img {
     max-height: 200px;
     object-fit: cover;
-    transition: transform 0.5s ease-in-out; /* Agrega una transición suave */
-}
-
-.carousel-item.active img {
-    transform: scale(1.05); /* Aplica un ligero zoom a la imagen activa */
-}
-
-/* Media Queries para Responsividad */
-@media (max-width: 768px) {
-    .carousel-item img {
-        max-height: 150px; /* Reduce la altura en pantallas pequeñas */
-    }
 }

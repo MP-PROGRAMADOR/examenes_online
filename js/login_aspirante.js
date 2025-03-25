@@ -5,7 +5,9 @@ authForm.addEventListener('submit', (event) => {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    fetch('login.php', {
+    console.log("datos enviados: ",username," ", password)
+
+    fetch('../php/login_aspirante.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -15,7 +17,7 @@ authForm.addEventListener('submit', (event) => {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.href = 'test_examen.html';
+            window.location.href = '../aspirante/folio_test.php';
         } else {
             alert(data.message);
         }
