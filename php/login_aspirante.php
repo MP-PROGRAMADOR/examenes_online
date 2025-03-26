@@ -9,8 +9,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Consulta SQL para buscar al usuario
     $sql = "SELECT * FROM aspirantes WHERE username = '$username'";
-    $result = $conn->query($sql);
-
+    $result = $conn->query($sql); 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         // Verificar contraseña (usando password_verify si hasheaste la contraseña)
