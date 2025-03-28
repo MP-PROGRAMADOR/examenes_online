@@ -1,0 +1,117 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+}
+.navbar-brand {
+    font-weight: 600;
+}
+.nav-link {
+    font-weight: 500;
+    color: #555 !important;
+}
+.jumbotron {
+    background-color: #e9ecef;
+}
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+.feature-box {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+.feature-box h3 {
+    color: #007bff;
+    font-weight: 600;
+}
+.testimonial-box {
+    background-color: #fff;
+    padding: 30px;
+    border-left: 5px solid #28a745;
+    margin-bottom: 20px;
+}
+.testimonial-box p {
+    font-style: italic;
+    color: #777;
+}
+.testimonial-box .author {
+    font-weight: bold;
+    color: #555;
+    margin-top: 10px;
+}
+.cta-section {
+    background-color: #007bff;
+    color: white;
+    padding: 50px 0;
+    text-align: center;
+    border-radius: 8px;
+    margin-top: 50px;
+}
+.cta-section h2 {
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+.autoescuela-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+.autoescuela-card h4 {
+    color: #007bff;
+    font-weight: bold;
+}
+.review-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+.review-box .rating {
+    color: #ffc107;
+}
+.modalidad-carousel .owl-nav button.owl-prev,
+.modalidad-carousel .owl-nav button.owl-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5) !important;
+    color: white !important;
+    margin: 0 10px;
+    border-radius: 5px;
+    padding: 10px 15px !important;
+    font-size: 20px !important;
+}
+.modalidad-carousel .owl-nav button.owl-prev {
+    left: 0;
+}
+.modalidad-carousel .owl-nav button.owl-next {
+    right: 0;
+}
+.modalidad-item img {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.modalidad-item h4 {
+    margin-top: 15px;
+}
+.modalidad-item p {
+    color: #777;
+}
+.footer {
+    background-color: #f4f7f6;
+    border-top: 1px solid #ddd;
+    padding: 20px 0;
+    text-align: center;
+    color: #777;
+}

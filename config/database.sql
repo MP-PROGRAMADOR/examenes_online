@@ -1,42 +1,57 @@
+
+
+-- Verificar si la base de datos "examenes_online" existe
+DROP DATABASE IF EXISTS examenes_online;
+CREATE DATABASE IF NOT EXISTS examenes_online;
+
+-- Usar la base de datos "examenes_online"
+USE examenes_online;
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+ 
+
 --Tablas Principales:
 /*
 1. users: Almacena la información de los usuarios que interactúan con la plataforma (principalmente administradores).
 
 ***/
-CREATE TABLE users (
+CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role ENUM('admin') NOT NULL DEFAULT 'admin', -- Limitado a administradores
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 /*
 2. subjects: Almacena las áreas temáticas de los exámenes (ej: Normativa, Señales, Mecánica).
 ***/
-CREATE TABLE subjects (
+CREATE TABLE tematica_examenes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
     description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 /****
 3. exams: Almacena la información de los exámenes.
 
 **/
-CREATE TABLE exams (
+CREATE TABLE examenes (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    subject_id INT NOT NULL REFERENCES subjects(id) ON DELETE CASCADE,
+    tematica_examenes_id INT NOT NULL REFERENCES tematica_examenes(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
     description TEXT,
     duration_minutes INT,
     start_time DATETIME,
     end_time DATETIME,
-    created_by INT NOT NULL REFERENCES users(id) ON DELETE RESTRICT, -- Quién creó el examen
+    created_by INT NOT NULL REFERENCES usuarios(id) ON DELETE RESTRICT, -- Quién creó el examen
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -46,7 +61,7 @@ CREATE TABLE exams (
 
 ***/
 
-CREATE TABLE questions (
+CREATE TABLE preguntas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     exam_id INT NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
     question_text TEXT NOT NULL,
@@ -73,7 +88,7 @@ CREATE TABLE multiple_choice_options (
 6. true_false_options: Almacena la respuesta correcta para las preguntas de verdadero/falso.
 **/
 
-CREATE TABLE true_false_options (
+CREATE TABLE falso_verdad_options (
     id INT AUTO_INCREMENT PRIMARY KEY,
     question_id INT NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
     is_correct BOOLEAN NOT NULL,
@@ -159,14 +174,14 @@ Modificaciones en las Tablas Existentes:
 exams: Relacionar los exámenes con las categorías de carné.
 */
 
-ALTER TABLE exams
+ALTER TABLE examenes
 ADD COLUMN driving_license_category_id INT REFERENCES driving_license_categories(id) ON DELETE RESTRICT;
 
 /*
 questions: Relacionar las preguntas con las categorías de carné. Esto permite que una pregunta sea específica para una o varias categorías.
 Opción 1: Una pregunta pertenece a una única categoría principal.
 */
-ALTER TABLE questions
+ALTER TABLE preguntas
 ADD COLUMN driving_license_category_id INT REFERENCES driving_license_categories(id) ON DELETE RESTRICT;
 
 /*
@@ -184,7 +199,7 @@ CREATE TABLE question_driving_license_categories (
 2. users: Podría almacenar información adicional relacionada con los administradores que gestionan el sistema.
 */
 
-ALTER TABLE users
+ALTER TABLE usuarios
 ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE,
 ADD COLUMN last_login TIMESTAMP NULL;
 
