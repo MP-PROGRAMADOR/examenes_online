@@ -18,14 +18,49 @@ SET time_zone = "+00:00";
 1. users: Almacena la información de los usuarios que interactúan con la plataforma (principalmente administradores).
 
 ***/
-CREATE TABLE usuarios (
+DROP TABLE usuarios;
+ CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role ENUM('admin') NOT NULL DEFAULT 'admin', -- Limitado a administradores
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    roles_id INT NOT NULL,
+    FOREIGN KEY REFERENCES roles(id) 
+    ON UPDATE CASCADE 
+    ON DELETE NO ACTION
+);
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    roles_id INT NOT NULL,
+    CONSTRAINT usuarios_roles_fk
+    FOREIGN KEY (roles_id)
+    REFERENCES roles(id)
+    ON UPDATE CASCADE
+    ON DELETE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS estudiantes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    apellido VARCHAR(255) NOT NULL,
+    numero_identificacion VARCHAR(50) UNIQUE NOT NULL, -- DNI, cédula, pasaporte, etc. (debe ser único)
+    fecha_nacimiento DATE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    telefono VARCHAR(20),
+    direccion VARCHAR(255),
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ultima_conexion TIMESTAMP,
+    autoescuela VARCHAR(500) not null,
+    
+   
 );
 
 /*
@@ -234,4 +269,44 @@ CREATE TABLE email_queue (
     error_message TEXT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+/**
+    ASPIRANTES AL EXAMEN
+**/
+
+CREATE TABLE IF NOT EXISTS estudiantes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    apellido VARCHAR(255) NOT NULL,
+    numero_identificacion VARCHAR(50) UNIQUE NOT NULL, -- DNI, cédula, pasaporte, etc. (debe ser único)
+    fecha_nacimiento DATE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    telefono VARCHAR(20),
+    direccion VARCHAR(255),
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ultima_conexion TIMESTAMP,
+    activo BOOLEAN DEFAULT TRUE, -- Indica si el estudiante está activo en el sistema
+    
+    -- Posibles campos para relacionar con otros módulos:
+    -- grupo_id INT,
+    -- carrera_id INT,
+    -- nivel_id INT,
+    -- FOREIGN KEY (grupo_id) REFERENCES grupos(id),
+    -- FOREIGN KEY (carrera_id) REFERENCES carreras(id),
+    -- FOREIGN KEY (nivel_id) REFERENCES niveles(id),
+    INDEX (numero_identificacion), -- Añadir índices para búsquedas frecuentes
+    INDEX (email)
+);
+
+CREATE TABLE IF NOT EXISTS inscripciones_examenes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    estudiante_id INT NOT NULL,
+    examen_id INT NOT NULL,
+    fecha_inscripcion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    estado VARCHAR(50) DEFAULT 'pendiente', -- Ejemplo: pendiente, completado, ausente
+    calificacion DECIMAL(5, 2),
+    FOREIGN KEY (estudiante_id) REFERENCES estudiantes(id),
+    FOREIGN KEY (examen_id) REFERENCES examenes(id),
+    UNIQUE KEY estudiante_examen (estudiante_id, examen_id) -- Evita inscripciones duplicadas al mismo examen
 );
