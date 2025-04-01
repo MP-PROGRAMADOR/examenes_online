@@ -327,7 +327,7 @@
                     <p class="lead">Accede a información clave y recursos para superar con éxito tu examen. ¡Conduce
                         hacia tu futuro!</p>
                        
-                    <a class="btn btn-light btn-lg" href="./modulos/login/view_login_aspirante.php" role="button">Empezar Examen</a>
+                    <a class="btn btn-light btn-lg" href="./modulos/login/login.php" role="button">Empezar Examen</a>
                 </section>
 
                 <section class="card py-5" id="importancia">

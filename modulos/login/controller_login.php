@@ -31,17 +31,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!empty($get_user) || !empty($get_estudent)) {
             //validacion de usuario con rol (admin, docente)
             if ($email == $get_user['email'] && $password == $get_user['password'] ) {
-                header("Location: ../admin/index_admin.php");
                 $_SESSION['usuario_rol'] = $get_user['rol']; 
+                header("Location: ../admin/index_admin.php");
+                die();
                 // validacion de estudiante
             }else if ($email == $get_estudent['email'] && $password == $get_estudent['codigo_registro_examen']) {
                 $_SESSION['estudiante_id'] = $get_estudent['numero_identificacion'];
                 header("Location: ../aspirantes/preseleccion_de_examen.php");
+                die();
+            }else{
+                header('location: ./login.php');
+                die();
             }
- 
-        } 
+            
+        } else{
+            $_SESSION["error"] = 'usuarios o contraseñas incorrectas';
+            header('location: ./login.php');
+            die();
+
+        }
     } else {
+        $_SESSION["error"] = 'Campos vacios';
         header('location: ./login.php');
+        die();
 
     }
  

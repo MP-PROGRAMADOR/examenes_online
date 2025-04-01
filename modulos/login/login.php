@@ -1,4 +1,8 @@
  
+ <?php
+    session_start();
+ ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -191,6 +195,14 @@
         .form-links a:hover {
             text-decoration: underline;
         }
+        .error-alert {
+            color: red;
+            margin-bottom: 10px;
+            border: 1px solid red;
+            padding: 10px;
+            background-color: #ffe0e0;
+            border-radius: 5px;
+        }
 
         /* Estilos para pantallas más pequeñas (opcional) */
         @media (max-width: 768px) {
@@ -218,6 +230,9 @@
     </style>
 </head>
 <body>
+    <?php 
+        
+    ?>
     <div class="login-container">
         <div class="carousel-container">
             <div class="carousel-slide">
@@ -263,6 +278,7 @@
                 </div>
             </form>
         </div>
+        
     </div>
     <script src="script.js"></script>
     <script>
