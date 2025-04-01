@@ -66,7 +66,7 @@
         }
 
         .content {
-            margin-left: 250px;
+            margin-left: 210px;
             padding: 30px;
         }
 
@@ -147,7 +147,7 @@
         </ul>
     </div>
 
-    <div class="content">
+    <div class="content ">
         <div class="top-bar">
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNavbar"
@@ -179,14 +179,25 @@
                                 <li><a class="dropdown-item" href="../login/logout.php">Cerrar Sesión</a></li>
                             </ul>
                         </li>
+
+                    </ul>
+                    <ul class="nav nav-tabs card-header-tabs float-end">
+                         
+                        <li class="nav-item">
+                        <a href="listar.php" class="btn btn-primary " type="button"><i class="fas fa-list me-2"></i> Visualizar</a> 
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Opción
+                                Deshabilitada</a>
+                        </li>
                     </ul>
                 </div>
             </nav>
         </div>
-        <div class="container-fluid mt-5">
-            <h1>Dashboard</h1>
-            <div class="row">
-                <div class="card p-5 mt-5">
+        <div class="container-fluid  mt-5 pt-2">
+
+            <div class="row d-flex justify-content-center align-items-center">
+                <div class="card p-5 mt-5 w-50">
                     <div class="form-container">
                         <h2>Registrar Escuela de Conducción</h2>
                         <form action="/ruta-a-tu-servidor" method="POST">
@@ -213,18 +224,6 @@
                                 <label for="email" class="form-label">Correo Electrónico</label>
                                 <input type="email" class="form-control" id="email" name="email" required>
                             </div>
-
-                            <!-- Campo Entidad de Tráfico -->
-                            <div class="mb-3">
-                                <label for="entidad_trafico" class="form-label">Entidad de Tráfico</label>
-                                <select id="entidad_trafico" name="entidad_trafico_id" class="form-select" required>
-                                    <option value="">Seleccione una entidad</option>
-                                    <!-- Aquí puedes insertar las entidades dinámicamente -->
-                                    <option value="1">Entidad 1</option>
-                                    <option value="2">Entidad 2</option>
-                                </select>
-                            </div>
-
                             <!-- Botón de Enviar -->
                             <div class="mb-3 text-center">
                                 <button type="submit" class="btn btn-primary">Registrar Escuela</button>
@@ -232,51 +231,49 @@
                         </form>
                     </div>
                 </div>
-            </div>
-            </div>
+            </div> 
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable();
+        });
+    </script>
 
-     
-</div>
-        <script>
-            $(document).ready(function () {
-                $('#example').DataTable();
-            });
-        </script>
+    <!-- Scripts optimizados -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var examStatsData = {
+                labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+                datasets: [{
+                    label: 'Exámenes Completados',
+                    data: [65, 59, 80, 81, 56, 55],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            };
 
-        <!-- Scripts optimizados -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                var examStatsData = {
-                    labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
-                    datasets: [{
-                        label: 'Exámenes Completados',
-                        data: [65, 59, 80, 81, 56, 55],
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }]
-                };
-
-                var examStatsConfig = {
-                    type: 'bar',
-                    data: examStatsData,
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
+            var examStatsConfig = {
+                type: 'bar',
+                data: examStatsData,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
                         }
                     }
-                };
+                }
+            };
 
-                var examStatsChart = new Chart(
-                    document.getElementById('examStatsChart'),
-                    examStatsConfig
-                );
-            });
-        </script>
+            var examStatsChart = new Chart(
+                document.getElementById('examStatsChart'),
+                examStatsConfig
+            );
+        });
+    </script>
 
 </body>
 

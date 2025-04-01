@@ -145,6 +145,8 @@
                 <a href="../login/logout.php"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
             </li>
         </ul>
+        <ul class="nav nav-tabs card-header-tabs float-end">
+
     </div>
 
     <div class="content">
@@ -180,53 +182,65 @@
                             </ul>
                         </li>
                     </ul>
+                    <ul class="nav nav-tabs card-header-tabs float-end">
+                        <li class="nav-item"> 
+                                    <a href="crear.php" class="btn btn-primary " type="button"><i class="fas fa-plus-circle me-2"></i>Crear Nuevo</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Opción
+                                Deshabilitada</a>
+                        </li>
+                    </ul>
                 </div>
             </nav>
         </div>
-        <div class="container-fluid mt-5">
-    <h1>Dashboard</h1>
-    <div class="row">
-       
-        <table id="example" class="display">
-            <div class="row border-b">
-                <h2 class="text-center">LISTA DE ESCUELAS</h2>
-            </div>
-    
-            <thead>
-                <p> <a href="crear.php" class="btn btn-primary" type="button">Crear Nuevo</a></p>
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Fecha de Registro</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Aquí puedes insertar los datos dinámicamente -->
-                <tr>
-                    <td>1</td>
-                    <td>Juan Pérez</td>
-                    <td>juan@example.com</td>
-                    <td>2025-04-01</td>
-                    <td> <button class="btn btn-outline-primary" type="button">edital</button> <button
-                            class="btn btn-outline-danger" type="button">eliminar</button></td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Ana Gómez</td>
-                    <td>ana@example.com</td>
-                    <td>2025-04-02</td>
-                    <td> <button class="btn btn-outline-primary" type="button">edital</button> <button
-                            class="btn btn-outline-danger" type="button">eliminar</button></td>
-                </tr>
-                <!-- Agrega más filas según sea necesario -->
-            </tbody>
-        </table>
-    </div>
+        <div class="container-fluid border  mt-5"> 
+            <div class="row p-2 mt-2">
 
-     
-</div>
+                <h1>Dashboard</h1>
+            </div>
+               
+
+                    <table id="example" class="display border">
+                        <div class="row border-b">
+                            <h2 class="text-center">LISTA DE ESCUELAS</h2>
+                        </div>
+
+                        <thead>
+                            <p> <a href="crear.php" class="btn btn-primary" type="button">Crear Nuevo</a></p>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Fecha de Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Aquí puedes insertar los datos dinámicamente -->
+                            <tr>
+                                <td>1</td>
+                                <td>Juan Pérez</td>
+                                <td>juan@example.com</td>
+                                <td>2025-04-01</td>
+                                <td> <button class="btn btn-outline-primary" type="button">edital</button> <button
+                                        class="btn btn-outline-danger" type="button">eliminar</button></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Ana Gómez</td>
+                                <td>ana@example.com</td>
+                                <td>2025-04-02</td>
+                                <td> <button class="btn btn-outline-primary" type="button">edital</button> <button
+                                        class="btn btn-outline-danger" type="button">eliminar</button></td>
+                            </tr>
+                            <!-- Agrega más filas según sea necesario -->
+                        </tbody>
+                    </table>
+          
+
+        </div>
         <script>
             $(document).ready(function () {
                 $('#example').DataTable();

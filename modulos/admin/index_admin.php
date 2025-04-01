@@ -138,6 +138,12 @@
             <li class="sidebar-menu-item">
                 <a href="./escuelas/listar.php"><i class="fas fa-user-shield"></i> Gestión de escuelas</a>
             </li>
+            <li class="sidebar-menu-item">
+                <a href="./escuelas/listar.php"><i class="fas fa-users"></i> Gestión de estudiantes</a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="./escuelas/listar.php"><i class="fas fa-user"></i> Gestión de usuarios</a>
+            </li>
             <!-- Añadir más ítems de menú según sea necesario -->
             <li class="sidebar-menu-item">
                 <a href="ajustes.html"><i class="fas fa-cog"></i> Ajustes</a>
