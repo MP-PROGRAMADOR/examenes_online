@@ -20,8 +20,7 @@ CREATE TABLE IF NOT EXISTS entidades_trafico (
 CREATE TABLE IF NOT EXISTS escuelas_conduccion (
     id INT AUTO_INCREMENT PRIMARY KEY,
     entidad_trafico_id INT NOT NULL,
-    nombre VARCHAR(255) NOT NULL UNIQUE,
-    codigo_escuela VARCHAR(20) UNIQUE,
+    nombre VARCHAR(255) NOT NULL UNIQUE, 
     direccion VARCHAR(255),
     telefono VARCHAR(20),
     email VARCHAR(255) UNIQUE,
