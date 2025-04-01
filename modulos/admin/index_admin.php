@@ -227,6 +227,9 @@ if (isset($versesionStudent)) {
                  <a href="gestion_resultados.html"><i class="fas fa-poll"></i> Resultados</a>
              </li>
              <li class="sidebar-menu-item">
+                 <a href="gestion_resultados.html"><i class="fas fa-poll"></i> gestion de escuelas</a>
+             </li>
+             <li class="sidebar-menu-item">
                  <a href="gestion_codigos.html"><i class="fas fa-key"></i> Gestión de Códigos</a>
              </li>
              <li class="sidebar-menu-item">
