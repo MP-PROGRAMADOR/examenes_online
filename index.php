@@ -1,3 +1,8 @@
+<?php 
+//seguridad de sessiones paginacion
+ 
+
+?>
 <!DOCTYPE html>
 <html lang="es">
 

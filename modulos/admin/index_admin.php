@@ -1,3 +1,23 @@
+<?php 
+//seguridad de sessiones paginacion
+session_start();
+error_reporting(0);
+$versesion = $_SESSION['usuario_rol'];
+$versesionStudent = $_SESSION['numero_identificacion'];
+
+if ($versesion == '' || $versesion == null) {
+    header('location: ../login/login.php');
+    die();
+}
+if ($versesion == 'docente') {
+    header('../examinador/index_examinador.php');
+    die();
+}
+if (isset($versesionStudent)) {
+    header('location: ../aspirantes/preseleccion_de_examen.php');
+    die();
+}
+?>
 <!DOCTYPE html>
  <html lang="es">
 
@@ -213,7 +233,7 @@
                  <a href="ajustes.html"><i class="fas fa-cog"></i> Ajustes</a>
              </li>
              <li class="sidebar-menu-item">
-                 <a href="logout.html"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+                 <a href="../login/logout.php"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
              </li>
          </ul>
      </div>
@@ -246,7 +266,7 @@
                              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                                  <a class="dropdown-item" href="perfil.html">Perfil</a>
                                  <div class="dropdown-divider"></div>
-                                 <a class="dropdown-item" href="logout.html">Cerrar Sesión</a>
+                                 <a class="dropdown-item" href="../login/logout.php">Cerrar Sesión</a>
                              </div>
                          </li>
                      </ul>

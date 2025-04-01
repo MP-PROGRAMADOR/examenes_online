@@ -1,3 +1,23 @@
+<?php 
+//seguridad de sessiones paginacion
+session_start();
+error_reporting(0);
+$versesion = $_SESSION['usuario_rol']; 
+
+if ($versesion == '' || $versesion == null) {
+    header('location: ../login/login.php');
+    die();
+}
+if ($versesion == 'docente') {
+    header('../examinador/index_examinador.php');
+    die();
+}
+if ($versesion == 'admin') {
+    header('../admin/index_admin.php');
+    die();
+}
+
+?>
 <!DOCTYPE html>
  <html lang="es">
 

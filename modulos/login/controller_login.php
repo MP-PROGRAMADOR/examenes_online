@@ -1,8 +1,13 @@
 <?php
-// Configuración de la base de datos
-require '../../config/conexion.php'; // Conexión a la BD
-require "./modelo_login.php";
 
+require '../../config/conexion.php';
+require "./modelo_login.php";
+session_start();
+/**
+ * ../../config/conexion.php -> importamos el objeto conexion de la db
+ * ./modelo_login.php -> importamos el objeto consulta usuario y estudiantes
+ * $conexion = $pdo->getConexion() -> obtenemos la conexion PDO
+ */
 $conexion = $pdo->getConexion();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -12,79 +17,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST["password"];
     $email = trim($email);
     $password = trim($password);
-
     // Consulta SQL para buscar al usuario
     if (!empty($email) && !empty($password)) {
         //SERIALIZAMOS CONTRA ataques XSS
         $email = htmlspecialchars($email);
         $password = htmlspecialchars($password);
-
         //llamar a la funcion optener usuarios del modelo_login
-        $get_user = new Modelo_login($conexion);
-        $get_user = $get_user->getuser();
+        $get_user = new Modelo_login($conexion, $email);
+        $get_user = $get_user->getuser(); //empaqueta el resultado de la consulta en como un array
+        $get_estudent = new Modelo_login($conexion, $email);
+        $get_estudent = $get_estudent->getAspirantes(); //empaqueta el resultado de la consulta en como un array
 
-
-        foreach ($get_user as $row) {
-            echo "Email: " . $row['email'] . ", Password: " . $row["password"] . ", Rol: " . $row["rol"];
-            if ($email == $row['email'] && $password == $row['password'] && $row['rol'] == "admin") {
+        if (!empty($get_user) || !empty($get_estudent)) {
+            //validacion de usuario con rol (admin, docente)
+            if ($email == $get_user['email'] && $password == $get_user['password'] ) {
                 header("Location: ../admin/index_admin.php");
-            } else if ($email == $row['email'] && $password == $row['password'] && $row['role'] == "docente") {
-                header("Location: ../examinador/index_examinador.php");
-            }  
-        }
-
-        //busqueda de un estudiante 
-        $get_estudent = new Modelo_login($conexion);
-        $get_estudent = $get_estudent->getAspirantes() ;
-        foreach ($get_estudent as $row) {
-            echo "Email: " . $row['email'] . ", codigo de registro: " . $row["codigo_registro_examen"];
-            if ($email == $row['email'] && $password == $row['codigo_registro_examen']  ) {
+                $_SESSION['usuario_rol'] = $get_user['rol']; 
+                // validacion de estudiante
+            }else if ($email == $get_estudent['email'] && $password == $get_estudent['codigo_registro_examen']) {
+                $_SESSION['estudiante_id'] = $get_estudent['numero_identificacion'];
                 header("Location: ../aspirantes/preseleccion_de_examen.php");
-            }  
-        }
+            }
+ 
+        } 
+    } else {
+        header('location: ./login.php');
 
-
-
-        /**
-         * INICIO CREDENCIALES ADMINISTRADOR
-         */
-        //credenciales para usuario admin
-        // if ($email == 'admin@gmail.com') {
-        //     header('Location: ../admin/index_admin.php');
-        // }
-
-        //FIN CREDENCIALES ADMIN
-
-
-        /**
-         * INICIO CREDENCIALES EXAMINADOR
-         */
-
-        // if ($email == 'examinador@gmail.com') {
-        //     header('Location: ../examinador/index_examinador.php');
-        //  }
-
-        //FIN CREDENCIALES DE EXAMINADOR
-
-
-        /**
-         * INICIO CREDENNCIALES USUARIO
-         */
-
-        // if ($email == 'usuario@gmail.com') {
-        //claves de acceso al examen validos
-        //    header("Location: ../aspirantes/preseleccion_de_examen.php");
-        //    exit(); // Importante: detener la ejecución del script después de la redirección
-
-        // }
-        // if ($email == 'sir@gmail.com') {
-        //ya ha agotado sus intentos de acceso al examen
-        //     header("Location: ../aspirantes/intentos_agotados.php");
-        //     exit(); // Importante: detener la ejecución del script después de la redirección
-        //  }
-
-        //Fin DEL PROSAMIENTO DE LOGIN USUARIO
     }
+ 
 }
 
 
