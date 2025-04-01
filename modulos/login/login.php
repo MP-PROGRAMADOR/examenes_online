@@ -3,17 +3,13 @@
 
 require 'conexion/conexion.php';
 
+$conn = $pdo->getConexion();
 
 
 
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
-
-    $usuario=mysqli_real_escape_string($conn, $_POST['usuario'] ) ;
-    
-    $password=mysqli_real_escape_string($conn, $_POST['password'] )  ;
-
-
+ 
 
     if(!$usuario){
         echo 'porfavor el usuario es necesario';
@@ -27,8 +23,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
     if($usuario!=""){
         $sql="SELECT `usuarios`.`nombre_usuario`, `usuarios`.`password_usuario`, `roles`.`nombre` FROM `usuarios` LEFT JOIN `roles` ON `usuarios`.`id_rol` = `roles`.`id_rol` where nombre_usuario='${usuario}'";
-        $resultado= mysqli_query($conn,$sql);
-
+        $sentencia = $conn->prepare($sql);
+        $sentencia->bindParam(":email", $email, PDO::PARAM_STR);
+        $sentencia->execute();
+       $result= $sentencia->fetch(PDO::FETCH_ASSOC);
        
 
      
