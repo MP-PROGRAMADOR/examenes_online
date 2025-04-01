@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS estudiantes (
     email VARCHAR(255) NOT NULL UNIQUE,
     telefono VARCHAR(20),
     direccion VARCHAR(255),
+    categoria_carne VARCHAR(10) NOT NULL,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     codigo_registro_examen VARCHAR(100) UNIQUE NOT NULL, -- Código único para acceder al examen
     examen_realizado BOOLEAN DEFAULT FALSE, -- Indica si el estudiante ya realizó el examen
@@ -135,7 +136,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE,
-    rol ENUM('admin', 'entidad_admin', 'entidad_staff') NOT NULL,
+    rol ENUM('admin', 'docente') NOT NULL,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ultimo_login TIMESTAMP NULL,
     activo BOOLEAN DEFAULT TRUE,
