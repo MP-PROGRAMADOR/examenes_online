@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+
+
+
+<?php
+
+
+include '../componentes/head_admin.php';
+
+
+
+?>
+
+
+
+
+
+<body>
+
+
+
+
+<?php
+
+
+include '../componentes/menu_admin.php';
+
+
+
+?>
+
+ 
+
+
+
+
+    <div class="content">
+        <div class="top-bar">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNavbar"
+                    aria-controls="topNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="topNavbar">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-bell"></i> <span class="badge bg-danger">3</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="alertsDropdown">
+                                <li><a class="dropdown-item" href="#">Nueva inscripción de aspirante</a></li>
+                                <li><a class="dropdown-item" href="#">Examen teórico finalizado</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle"></i> Admin User
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="perfil.html">Perfil</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="../login/logout.php">Cerrar Sesión</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+<div class="container-fluid mt-5">
+    <h1>Dashboard</h1>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="widget">
+                <div class="widget-icon text-primary"><i class="fas fa-users"></i></div>
+                <div class="widget-value">150</div>
+                <div class="widget-title">Aspirantes Registrados</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="widget">
+                <div class="widget-icon text-success"><i class="fas fa-file-alt"></i></div>
+                <div class="widget-value">25</div>
+                <div class="widget-title">Exámenes Activos</div>
+            </div>
+        </div>
+        <!-- Añadir más widgets según sea necesario -->
+    </div>
+
+     
+</div>
+
+<!-- Scripts optimizados -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var examStatsData = {
+            labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+            datasets: [{
+                label: 'Exámenes Completados',
+                data: [65, 59, 80, 81, 56, 55],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        var examStatsConfig = {
+            type: 'bar',
+            data: examStatsData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+
+        var examStatsChart = new Chart(
+            document.getElementById('examStatsChart'),
+            examStatsConfig
+        );
+    });
+</script>
+
+</body>
+
+</html>
