@@ -131,10 +131,7 @@ include '../componentes/head_admin.php';
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="email" class="form-label">Email:</label>
-                                        <input type="email" name="email" class="form-control" required>
-                                    </div>
+                                     
                                     <div class="mb-3">
                                         <label for="telefono" class="form-label">Teléfono:</label>
                                         <input type="number" name="telefono" class="form-control" pattern="\d{9,15}"

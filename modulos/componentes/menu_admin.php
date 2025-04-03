@@ -16,6 +16,9 @@
                 <a href="../admin/examenes.php"><i class="fas fa-user-shield"></i> Gestión de examenes</a>
             </li>
             <li class="sidebar-menu-item">
+                <a href="../admin/preguntas.php"><i class="fas fa-user-shield"></i> Gestión de preguntas</a>
+            </li>
+            <li class="sidebar-menu-item">
                 <a href="../admin/estudiantes.php"><i class="fas fa-users"></i> Gestión de estudiantes</a>
             </li>
             <li class="sidebar-menu-item">

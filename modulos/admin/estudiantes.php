@@ -11,7 +11,7 @@ try {
 
 
     // Preparar la consulta para obtener los datos
-    $sql = "SELECT id, escuela_id, numero_identificacion, nombre, apellido, fecha_nacimiento, email, telefono, direccion, categoria_carne, codigo_registro_examen FROM estudiantes";
+    $sql = "SELECT id, escuela_id, numero_identificacion, nombre, apellido, fecha_nacimiento, telefono, direccion, categoria_carne, codigo_registro_examen FROM estudiantes";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
 
@@ -131,7 +131,7 @@ include '../componentes/head_admin.php';
                             <th>Nombre</th>
                             <th>Apellido</th>
                             <th>Fecha Nacimiento</th>
-                            <th>Email</th>
+                          
                             <th>Teléfono</th>
                             <th>Dirección</th>
                             <th>Categoría Carné</th>
@@ -149,7 +149,7 @@ include '../componentes/head_admin.php';
                                     <td><?= htmlspecialchars($estudiante['nombre'], ENT_QUOTES, 'UTF-8') ?></td>
                                     <td><?= htmlspecialchars($estudiante['apellido'], ENT_QUOTES, 'UTF-8') ?></td>
                                     <td><?= htmlspecialchars($estudiante['fecha_nacimiento'], ENT_QUOTES, 'UTF-8') ?></td>
-                                    <td><?= htmlspecialchars($estudiante['email'], ENT_QUOTES, 'UTF-8') ?></td>
+                                   
                                     <td><?= htmlspecialchars($estudiante['telefono'], ENT_QUOTES, 'UTF-8') ?></td>
                                     <td><?= htmlspecialchars($estudiante['direccion'], ENT_QUOTES, 'UTF-8') ?></td>
                                     <td><?= htmlspecialchars($estudiante['categoria_carne'], ENT_QUOTES, 'UTF-8') ?></td>

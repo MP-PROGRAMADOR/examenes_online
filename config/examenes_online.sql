@@ -7,45 +7,6 @@ USE examenes_online;
 --
  
 
--- Tabla: escuelas_conduccion
-CREATE TABLE IF NOT EXISTS escuelas_conduccion (
-    id INT AUTO_INCREMENT PRIMARY KEY, 
-    nombre VARCHAR(255) NOT NULL, 
-    direccion VARCHAR(255),
-    telefono VARCHAR(20),
-    email VARCHAR(255) NULL, 
-);
-
--- Tabla: estudiantes
-CREATE TABLE IF NOT EXISTS estudiantes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    escuela_id INT NOT NULL,
-    numero_identificacion VARCHAR(50) UNIQUE NOT NULL,
-    nombre VARCHAR(255) NOT NULL,
-    apellido VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NULL,
-    fecha_nacimiento DATE, 
-    telefono VARCHAR(20),
-    direccion VARCHAR(255),
-    categoria_carne VARCHAR(10) NOT NULL,
-    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    codigo_registro_examen VARCHAR(100) UNIQUE NOT NULL, 
-    examen_realizado BOOLEAN DEFAULT FALSE,  
-    FOREIGN KEY (escuela_id) REFERENCES escuelas_conduccion(id) ON UPDATE CASCADE ON DELETE NO ACTION,
-    INDEX (numero_identificacion), 
-    INDEX (codigo_registro_examen)
-);
-
-CREATE TABLE IF NOT EXISTS usuarios (
-    id INT AUTO_INCREMENT PRIMARY KEY, 
-    nombre_usuario VARCHAR(50) NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    rol ENUM('admin', 'docente') NOT NULL,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
-    activo BOOLEAN DEFAULT TRUE,
-   
-);
 
 -- Tabla: examenes
 CREATE TABLE IF NOT EXISTS examenes (
@@ -127,28 +88,52 @@ CREATE TABLE IF NOT EXISTS resultados_detallados (
 
 /*************************************/
 -- Tabla de Administradores
-
--- Tabla de Estudiantes
-CREATE TABLE IF NOT EXISTS estudiantes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    numero_identificacion VARCHAR(20) NOT NULL UNIQUE,
-    nombre VARCHAR(100) NOT NULL,
-    apellido VARCHAR(100) NOT NULL,
-    fecha_nacimiento DATE,
-    email VARCHAR(255) UNIQUE,
-    telefono VARCHAR(20),
-    direccion VARCHAR(255),
-    categoria_carne VARCHAR(50) NOT NULL,
-    codigo_acceso VARCHAR(100) NOT NULL UNIQUE,
-    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    activo BOOLEAN DEFAULT TRUE
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY, 
+    nombre_usuario VARCHAR(50) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    rol ENUM('admin', 'docente') NOT NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    activo BOOLEAN DEFAULT TRUE,
+   
 );
+-- Tabla: escuelas_conduccion
+CREATE TABLE IF NOT EXISTS escuelas_conduccion (
+    id INT AUTO_INCREMENT PRIMARY KEY, 
+    nombre VARCHAR(255) NOT NULL, 
+    direccion VARCHAR(255),
+    telefono VARCHAR(20),
+    email VARCHAR(255) NULL, 
+);
+
 
 -- Tabla de Categorías de Carné
 CREATE TABLE IF NOT EXISTS categorias_carne (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE,
     descripcion TEXT
+);
+
+-- Tabla: estudiantes
+
+CREATE TABLE IF NOT EXISTS estudiantes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    escuela_id INT NOT NULL,
+    numero_identificacion VARCHAR(50) UNIQUE NOT NULL,
+    nombre VARCHAR(255) NOT NULL,
+    apellido VARCHAR(255) NOT NULL,     
+    fecha_nacimiento DATE, 
+    telefono VARCHAR(20),
+    direccion VARCHAR(255),
+    categoria_carne_id INT NOT NULL,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    codigo_registro_examen VARCHAR(100) UNIQUE NOT NULL, 
+    examen_realizado BOOLEAN DEFAULT FALSE,  
+    FOREIGN KEY (categoria_carne_id) REFERENCES categoria_carne(id) ON UPDATE CASCADE ON DELETE NO ACTION,
+    FOREIGN KEY (escuela_id) REFERENCES escuelas_conduccion(id) ON UPDATE CASCADE ON DELETE NO ACTION,
+    INDEX (numero_identificacion), 
+    INDEX (codigo_registro_examen)
 );
 
 -- Tabla de Exámenes
@@ -173,7 +158,7 @@ CREATE TABLE IF NOT EXISTS preguntas (
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     activo BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (examen_id) REFERENCES examenes(id)
-        ON DELETE CASCADE -- Si se elimina un examen, se eliminan sus preguntas
+        ON DELETE CASCADE 
         ON UPDATE CASCADE
 );
 
@@ -184,7 +169,7 @@ CREATE TABLE IF NOT EXISTS opciones_pregunta (
     texto_opcion TEXT NOT NULL,
     es_correcta BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
-        ON DELETE CASCADE -- Si se elimina una pregunta, se eliminan sus opciones
+        ON DELETE CASCADE  
         ON UPDATE CASCADE
 );
 
