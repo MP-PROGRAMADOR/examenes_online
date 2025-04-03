@@ -8,11 +8,11 @@
 <?php
 require '../../config/conexion.php';
 
+$conn=$pdo->getConexion();
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
-        $conn=$pdo->getConexion();
 
         // Verificar que los datos requeridos están presentes y no están vacíos
         if (empty($_POST['escuela_id']) || empty($_POST['numero_identificacion']) || empty($_POST['nombre']) || empty($_POST['apellido']) || empty($_POST['fecha_nacimiento']) || empty($_POST['email']) || empty($_POST['categoria_carne'])) {

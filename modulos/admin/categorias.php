@@ -8,14 +8,14 @@ $conn = $pdo->getConexion();
 
 
 try {
-    $sql = "SELECT id, nombre, telefono, direccion FROM escuelas_conduccion";
+    $sql = "SELECT * FROM categorias_carne";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
 
-    $escuelas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     error_log("Error en la consulta: " . $e->getMessage());
-    echo "Ocurrió un error al recuperar los Escuelas.";
+    echo "Ocurrió un error al recuperar los categorias.";
     exit;
 }
 
@@ -112,50 +112,49 @@ include '../componentes/head_admin.php';
         <div class="container-fluid py-5">
             <div class="row mb-4">
                 <div class="col mt-5">
-                    <h2 class="text-center mb-0">LISTA DE ESCUELAS</h2>
+                    <h2 class="text-center mb-0">LISTA DE categorias</h2>
                 </div>
             </div>
 
             <div class="row justify-content-end mb-3">
                 <div class="col-auto">
-                    <a href="registrar_escuelas.php" class="btn btn-primary">
+                    <a href="registrar_categorias.php" class="btn btn-primary">
                         <i class="bi bi-plus-circle me-2"></i>Crear Nuevo
                     </a>
                 </div>
             </div>
 
             <div class="table-responsive">
-                <table id="escuelas-table" class="table table-striped table-bordered">
+                <table id="categorias-table" class="table table-striped table-bordered">
                     <thead class="table-light">
                         <tr>
                             <th>ID</th>
                             <th>Nombre</th>
-                            <th>Dirección</th>
-                            <th>Teléfono</th>
+                            <th>descripcion</th> 
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (!empty($escuelas)): ?>
-                            <?php foreach ($escuelas as $escuela): ?>
+                        <?php if (!empty($categorias)): ?>
+                            <?php foreach ($categorias as $categoria): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($escuela['id'], ENT_QUOTES, 'UTF-8') ?></td>
-                                    <td><?= htmlspecialchars($escuela['nombre'], ENT_QUOTES, 'UTF-8') ?></td>
-                                    <td><?= htmlspecialchars($escuela['direccion'], ENT_QUOTES, 'UTF-8') ?></td>
-                                    <td><?= htmlspecialchars($escuela['telefono'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td><?= htmlspecialchars($categoria['id'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td><?= htmlspecialchars($categoria['nombre'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td><?= htmlspecialchars($categoria['descripcion'], ENT_QUOTES, 'UTF-8') ?></td>
+                                     
                                     <td>
-                                        <a href="editar_escuela.php?id=<?= htmlspecialchars($escuela['id'], ENT_QUOTES, 'UTF-8') ?>"
+                                        <a href="editar_categoria.php?id=<?= htmlspecialchars($categoria['id'], ENT_QUOTES, 'UTF-8') ?>"
                                             class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i> Editar</a>
-                                        <button type="button" class="btn btn-sm btn-danger btn-eliminar-escuela"
-                                            data-id="<?= htmlspecialchars($escuela['id'], ENT_QUOTES, 'UTF-8') ?>"
-                                            data-nombre="<?= htmlspecialchars($escuela['nombre'], ENT_QUOTES, 'UTF-8') ?>"><i
+                                        <button type="button" class="btn btn-sm btn-danger btn-eliminar-categoria"
+                                            data-id="<?= htmlspecialchars($categoria['id'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-nombre="<?= htmlspecialchars($categoria['nombre'], ENT_QUOTES, 'UTF-8') ?>"><i
                                                 class="bi bi-trash"></i> Eliminar</button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="5" class="text-center">No hay escuelas registradas.</td>
+                                <td colspan="5" class="text-center">No hay categorias registradas.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -171,7 +170,7 @@ include '../componentes/head_admin.php';
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            ¿Está seguro de que desea eliminar la escuela <span id="nombre-escuela-eliminar"></span>?
+                            ¿Está seguro de que desea eliminar la categoria <span id="nombre-categoria-eliminar"></span>?
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -200,25 +199,25 @@ include '../componentes/head_admin.php';
 
         <script>
             $(document).ready(function () {
-                $('#escuelas-table').DataTable({
+                $('#categorias-table').DataTable({
                     language: {
                         url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
                     }
                 });
 
                 // Manejo del botón de eliminar con modal de confirmación
-                $('.btn-eliminar-escuela').on('click', function () {
-                    const escuelaId = $(this).data('id');
-                    const escuelaNombre = $(this).data('nombre');
-                    $('#nombre-escuela-eliminar').text(escuelaNombre);
-                    $('#btn-confirmar-eliminar').data('id', escuelaId);
+                $('.btn-eliminar-categoria').on('click', function () {
+                    const categoriaId = $(this).data('id');
+                    const categoriaNombre = $(this).data('nombre');
+                    $('#nombre-categoria-eliminar').text(categoriaNombre);
+                    $('#btn-confirmar-eliminar').data('id', categoriaId);
                     $('#confirmarEliminarModal').modal('show');
                 });
 
                 $('#btn-confirmar-eliminar').on('click', function () {
-                    const escuelaId = $(this).data('id');
-                    // Redirigir o enviar una petición AJAX para eliminar la escuela
-                    window.location.href = 'eliminar_escuela.php?id=' + escuelaId; // Ejemplo de redirección
+                    const categoriaId = $(this).data('id');
+                    // Redirigir o enviar una petición AJAX para eliminar la categoria
+                    window.location.href = 'eliminar_categoria.php?id=' + categoriaId; // Ejemplo de redirección
                     $('#confirmarEliminarModal').modal('hide');
                 });
             });

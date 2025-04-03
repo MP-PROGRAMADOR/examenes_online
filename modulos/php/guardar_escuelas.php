@@ -3,7 +3,7 @@
 
 require '../../config/conexion.php';
 
-$conn=$pdo->getConexion();
+$conn = $pdo->getConexion();
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {

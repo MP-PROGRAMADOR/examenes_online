@@ -95,39 +95,10 @@ include '../componentes/menu_admin.php';
 </div>
 
 <!-- Scripts optimizados -->
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var examStatsData = {
-            labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
-            datasets: [{
-                label: 'Exámenes Completados',
-                data: [65, 59, 80, 81, 56, 55],
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        };
-
-        var examStatsConfig = {
-            type: 'bar',
-            data: examStatsData,
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        };
-
-        var examStatsChart = new Chart(
-            document.getElementById('examStatsChart'),
-            examStatsConfig
-        );
-    });
-</script>
+ 
+ 
 
 </body>
 
