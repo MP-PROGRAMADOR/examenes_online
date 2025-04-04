@@ -9,15 +9,18 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
 $preguntas = [];
 
 try {
-    $sql = "SELECT
-                p.id,
-                p.texto_pregunta,
-                p.tipo_pregunta, 
-                p.fecha_creacion,
-                e.titulo AS examen_titulo
-            FROM preguntas p
-            INNER JOIN examenes e ON p.examen_id = e.id
-            ORDER BY p.fecha_creacion DESC";
+    $sql = "
+    SELECT 
+        p.id,
+        e.titulo AS examen,
+        p.texto_pregunta,
+        p.tipo_pregunta,
+        p.tipo_contenido,
+        p.fecha_creacion
+    FROM preguntas p
+    JOIN examenes e ON p.examen_id = e.id
+    ORDER BY p.fecha_creacion DESC
+";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $preguntas = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -125,7 +128,7 @@ include '../componentes/head_admin.php';
             <!-- Título centrado -->
             <div class="row mb-4">
                 <div class="col mt-5">
-                    <h2 class="text-center mb-0">LISTA DE PREGUNTAS</h2>
+                    <h2 class="text-center mb-0">📋 LISTA DE PREGUNTAS</h2>
                 </div>
             </div>
 
@@ -138,96 +141,58 @@ include '../componentes/head_admin.php';
                 </div>
             </div>
 
-            <!-- Mensajes de acción -->
-            <?php if (isset($mensaje) && $mensaje === 'exito'): ?>
-                <div class="alert alert-success">Pregunta guardada exitosamente.</div>
-            <?php endif; ?>
 
-            <?php if (isset($mensaje) && $mensaje === 'editado'): ?>
-                <div class="alert alert-success">Pregunta editada exitosamente.</div>
-            <?php endif; ?>
-
-            <?php if (isset($mensaje) && $mensaje === 'eliminado'): ?>
-                <div class="alert alert-success">Pregunta eliminada exitosamente.</div>
-            <?php endif; ?>
-
-            <?php if (isset($_GET['mensaje']) && strpos($_GET['mensaje'], 'error') === 0): ?>
-                <div class="alert alert-danger">
-                    Error: <?php echo htmlspecialchars(str_replace('error_', '', $_GET['mensaje']), ENT_QUOTES, 'UTF-8'); ?>
-                </div>
-            <?php endif; ?>
-
-            <?php if (isset($mensaje_error_listado)): ?>
-                <div class="alert alert-danger">
-                    <?php echo htmlspecialchars($mensaje_error_listado, ENT_QUOTES, 'UTF-8'); ?>
-                </div>
-            <?php endif; ?>
-
-            <!-- Tabla de preguntas -->
-            <?php if (!empty($preguntas)): ?>
-                <table class="table table-striped table-bordered">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Examen</th>
-                            <th>Pregunta</th>
-                            <th>Tipo</th>
-                            <th>Fecha de Creación</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($preguntas as $pregunta): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($pregunta['id'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?php echo htmlspecialchars($pregunta['examen_titulo'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?php echo htmlspecialchars($pregunta['texto_pregunta'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?php echo htmlspecialchars(str_replace('_', ' ', $pregunta['tipo_pregunta']), ENT_QUOTES, 'UTF-8'); ?>
-                                </td>
-                                <td><?php echo htmlspecialchars($pregunta['fecha_creacion'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td>
-                                    <a href="editar_pregunta.php?id=<?php echo urlencode($pregunta['id']); ?>"
-                                        class="btn btn-sm btn-warning">
-                                        <i class="bi bi-pencil"></i> Editar
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-danger"
-                                        onclick="confirmarEliminar(
-                                <?php echo htmlspecialchars(json_encode($pregunta['id']), ENT_QUOTES, 'UTF-8'); ?>,
-                                '<?php echo htmlspecialchars(addslashes(mb_substr($pregunta['texto_pregunta'], 0, 50, 'UTF-8')), ENT_QUOTES, 'UTF-8'); ?>...')">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+            <!-- Verificación si hay resultados -->
+            <?php if (empty($preguntas)): ?>
+                <div class="alert alert-warning text-center">⚠️ No hay preguntas registradas actualmente.</div>
             <?php else: ?>
-                <p class="lead">No hay preguntas registradas.</p>
-            <?php endif; ?>
-        </div>
-
-        <!-- Modal de confirmación -->
-        <div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <!-- Encabezado -->
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="confirmarEliminarModalLabel">Confirmar Eliminación</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <!-- Cuerpo -->
-                    <div class="modal-body">
-                        ¿Está seguro de que desea eliminar la pregunta con texto:
-                        "<span id="texto-pregunta-eliminar"></span>"?
-                    </div>
-                    <!-- Pie -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <a href="#" id="enlace-eliminar" class="btn btn-danger">Eliminar</a>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th>#ID</th>
+                                <th>Examen</th>
+                                <th>Pregunta</th>
+                                <th>Tipo de Pregunta</th>
+                                <th>Contenido</th>
+                                <th>Fecha de Registro</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($preguntas as $pregunta): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($pregunta['id'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td><?= htmlspecialchars($pregunta['examen'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td><?= nl2br(htmlspecialchars($pregunta['texto_pregunta'], ENT_QUOTES, 'UTF-8')) ?></td>
+                                    <td class="text-center">
+                                        <?php
+                                        $tipos = [
+                                            'multiple_choice' => 'Opción Múltiple',
+                                            'respuesta_unica' => 'Respuesta Única',
+                                            'verdadero_falso' => 'Verdadero / Falso'
+                                        ];
+                                        echo $tipos[$pregunta['tipo_pregunta']] ?? 'Desconocido';
+                                        ?>
+                                    </td>
+                                    <td class="text-center">
+                                        <?php
+                                        $contenidos = [
+                                            'texto' => 'Solo Texto',
+                                            'imagen' => 'Con Ilustración'
+                                        ];
+                                        echo $contenidos[$pregunta['tipo_contenido']] ?? 'No definido';
+                                        ?>
+                                    </td>
+                                    <td class="text-center"><?= date('d/m/Y H:i', strtotime($pregunta['fecha_creacion'])) ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            <?php endif; ?>
+
+
         </div>
 
 
