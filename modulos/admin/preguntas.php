@@ -119,104 +119,116 @@ include '../componentes/head_admin.php';
 
 
 
+        <!-- Contenedor principal con espaciado -->
         <div class="container-fluid py-5">
-            <div>
-                <div class="row mb-4">
-                    <div class="col mt-5">
-                        <h2 class="text-center mb-0">LISTA DE PREGUNTAS</h2>
-                    </div>
+
+            <!-- Título centrado -->
+            <div class="row mb-4">
+                <div class="col mt-5">
+                    <h2 class="text-center mb-0">LISTA DE PREGUNTAS</h2>
                 </div>
-
-                <div class="row justify-content-end mb-3">
-                    <div class="col-auto">
-                        <a href="registrar_preguntas.php" class="btn btn-primary">
-                            <i class="bi bi-plus-circle me-2"></i>Crear Nuevo
-                        </a>
-                    </div>
-                </div>
-
-
-
-                <?php if ($mensaje === 'exito'): ?>
-                    <div class="alert alert-success">Pregunta guardada exitosamente.</div>
-                <?php endif; ?>
-                <?php if ($mensaje === 'editado'): ?>
-                    <div class="alert alert-success">Pregunta editada exitosamente.</div>
-                <?php endif; ?>
-                <?php if ($mensaje === 'eliminado'): ?>
-                    <div class="alert alert-success">Pregunta eliminada exitosamente.</div>
-                <?php endif; ?>
-                <?php if (isset($_GET['mensaje']) && strpos($_GET['mensaje'], 'error') === 0): ?>
-                    <div class="alert alert-danger">Error:
-                        <?php echo htmlspecialchars(str_replace('error_', '', $_GET['mensaje'])); ?>
-                    </div>
-                <?php endif; ?>
-
-                <?php if (isset($mensaje_error_listado)): ?>
-                    <div class="alert alert-danger"><?php echo htmlspecialchars($mensaje_error_listado); ?></div>
-                <?php endif; ?>
-
-               
-
-                <?php if (!empty($preguntas)): ?>
-                    <table class="table table-striped table-bordered">
-                        <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Examen</th>
-                                <th>Pregunta</th>
-                                <th>Tipo</th>
-
-                                <th>Fecha de Creación</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($preguntas as $pregunta): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($pregunta['id']); ?></td>
-                                    <td><?php echo htmlspecialchars($pregunta['examen_titulo']); ?></td>
-                                    <td><?php echo htmlspecialchars($pregunta['texto_pregunta']); ?></td>
-                                    <td><?php echo htmlspecialchars(str_replace('_', ' ', $pregunta['tipo_pregunta'])); ?></td>
-
-                                    <td><?php echo htmlspecialchars($pregunta['fecha_creacion']); ?></td>
-                                    <td>
-                                        <a href="editar_pregunta.php?id=<?php echo htmlspecialchars($pregunta['id']); ?>"
-                                            class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i> Editar</a>
-                                        <button type="button" class="btn btn-sm btn-danger"
-                                            onclick="confirmarEliminar(<?php echo htmlspecialchars($pregunta['id']); ?>, '<?php echo htmlspecialchars(substr($pregunta['texto_pregunta'], 0, 50)); ?>...')"><i
-                                                class="bi bi-trash"></i> Eliminar</button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p class="lead">No hay preguntas registradas.</p>
-                <?php endif; ?>
             </div>
 
-            <div class="modal fade" id="confirmarEliminarModal" tabindex="-1"
-                aria-labelledby="confirmarEliminarModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="confirmarEliminarModalLabel">Confirmar Eliminación</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            ¿Está seguro de que desea eliminar la pregunta con texto: "<span
-                                id="texto-pregunta-eliminar"></span>"?
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <a href="#" id="enlace-eliminar" class="btn btn-danger">Eliminar</a>
-                        </div>
+            <!-- Botón de Crear Nueva Pregunta -->
+            <div class="row justify-content-end mb-3">
+                <div class="col-auto">
+                    <a href="registrar_preguntas.php" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Crear Nuevo
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mensajes de acción -->
+            <?php if (isset($mensaje) && $mensaje === 'exito'): ?>
+                <div class="alert alert-success">Pregunta guardada exitosamente.</div>
+            <?php endif; ?>
+
+            <?php if (isset($mensaje) && $mensaje === 'editado'): ?>
+                <div class="alert alert-success">Pregunta editada exitosamente.</div>
+            <?php endif; ?>
+
+            <?php if (isset($mensaje) && $mensaje === 'eliminado'): ?>
+                <div class="alert alert-success">Pregunta eliminada exitosamente.</div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['mensaje']) && strpos($_GET['mensaje'], 'error') === 0): ?>
+                <div class="alert alert-danger">
+                    Error: <?php echo htmlspecialchars(str_replace('error_', '', $_GET['mensaje']), ENT_QUOTES, 'UTF-8'); ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($mensaje_error_listado)): ?>
+                <div class="alert alert-danger">
+                    <?php echo htmlspecialchars($mensaje_error_listado, ENT_QUOTES, 'UTF-8'); ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Tabla de preguntas -->
+            <?php if (!empty($preguntas)): ?>
+                <table class="table table-striped table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Examen</th>
+                            <th>Pregunta</th>
+                            <th>Tipo</th>
+                            <th>Fecha de Creación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($preguntas as $pregunta): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($pregunta['id'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($pregunta['examen_titulo'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($pregunta['texto_pregunta'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars(str_replace('_', ' ', $pregunta['tipo_pregunta']), ENT_QUOTES, 'UTF-8'); ?>
+                                </td>
+                                <td><?php echo htmlspecialchars($pregunta['fecha_creacion'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td>
+                                    <a href="editar_pregunta.php?id=<?php echo urlencode($pregunta['id']); ?>"
+                                        class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                        onclick="confirmarEliminar(
+                                <?php echo htmlspecialchars(json_encode($pregunta['id']), ENT_QUOTES, 'UTF-8'); ?>,
+                                '<?php echo htmlspecialchars(addslashes(mb_substr($pregunta['texto_pregunta'], 0, 50, 'UTF-8')), ENT_QUOTES, 'UTF-8'); ?>...')">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p class="lead">No hay preguntas registradas.</p>
+            <?php endif; ?>
+        </div>
+
+        <!-- Modal de confirmación -->
+        <div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <!-- Encabezado -->
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmarEliminarModalLabel">Confirmar Eliminación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <!-- Cuerpo -->
+                    <div class="modal-body">
+                        ¿Está seguro de que desea eliminar la pregunta con texto:
+                        "<span id="texto-pregunta-eliminar"></span>"?
+                    </div>
+                    <!-- Pie -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <a href="#" id="enlace-eliminar" class="btn btn-danger">Eliminar</a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
 
 
@@ -228,32 +240,37 @@ include '../componentes/head_admin.php';
 
 
 
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+        <link rel="stylesheet" type="text/css"
+            href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
+        <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
 
-    <!-- Scripts optimizados -->
-    <script src="../../public/js/bootstrap.bundle.min.js"></script>
-    <script src="../../public/js/chart.js"></script>
+        <!-- Scripts optimizados -->
+        <script src="../../public/js/bootstrap.bundle.min.js"></script>
+        <script src="../../public/js/chart.js"></script>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
-    <script>
-        function confirmarEliminar(id, texto) {
-            document.getElementById('texto-pregunta-eliminar').innerText = texto;
-            document.getElementById('enlace-eliminar').href = 'eliminar_pregunta.php?id=' + id;
-            const modal = new bootstrap.Modal(document.getElementById('confirmarEliminarModal'));
-            modal.show();
-        }
-    </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
+
+        <!-- Script para mostrar el modal -->
+        <script>
+            function confirmarEliminar(id, texto) {
+                document.getElementById('texto-pregunta-eliminar').textContent = texto;
+                document.getElementById('enlace-eliminar').href = 'eliminar_pregunta.php?id=' + encodeURIComponent(id);
+                var modal = new bootstrap.Modal(document.getElementById('confirmarEliminarModal'));
+                modal.show();
+            }
+        </script>
+
 
 
 

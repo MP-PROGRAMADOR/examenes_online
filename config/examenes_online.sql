@@ -157,21 +157,24 @@ CREATE TABLE IF NOT EXISTS preguntas (
     tipo_pregunta ENUM('multiple_choice', 'verdadero_falso', 'respuesta_unica') NOT NULL DEFAULT 'multiple_choice',
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     activo BOOLEAN DEFAULT TRUE,
+    imagen VARCHAR(255), -- ruta relativa de la imagen
     FOREIGN KEY (examen_id) REFERENCES examenes(id)
         ON DELETE CASCADE 
         ON UPDATE CASCADE
 );
+ 
+
 
 -- Tabla de Opciones de Pregunta
+ 
 CREATE TABLE IF NOT EXISTS opciones_pregunta (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pregunta_id INT NOT NULL,
     texto_opcion TEXT NOT NULL,
-    es_correcta BOOLEAN NOT NULL DEFAULT FALSE,
-    FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
-        ON DELETE CASCADE  
-        ON UPDATE CASCADE
+    es_correcta BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (pregunta_id) REFERENCES preguntas(id) ON DELETE CASCADE
 );
+
 
 -- Tabla de Intentos de Examen
 CREATE TABLE IF NOT EXISTS intentos_examen (
