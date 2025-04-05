@@ -163,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Si hay errores, redireccionar con mensaje
 if (!empty($errores)) {
     $mensaje_error = 'error_' . urlencode(implode(', ', $errores));
-    header("Location: ../vistas/registrar_preguntas.php?mensaje=$mensaje_error");
+    header("Location: ../admin/preguntas.php?mensaje=$mensaje_error");
     exit;
 }
 ?>
