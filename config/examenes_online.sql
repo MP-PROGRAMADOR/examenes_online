@@ -67,7 +67,7 @@ CREATE TABLE preguntas (
     examen_id INT NOT NULL,
     texto_pregunta TEXT NOT NULL,
     tipo_pregunta ENUM('multiple_choice', 'respuesta_unica', 'verdadero_falso', 'ilustrada') NOT NULL DEFAULT 'multiple_choice',
-    imagen VARCHAR(255),
+    imagen VARCHAR(255), -- imagen principal
     activo BOOLEAN DEFAULT TRUE,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (examen_id) REFERENCES examenes(id) ON DELETE CASCADE

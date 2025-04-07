@@ -120,6 +120,9 @@
             background: linear-gradient(90deg, #fd7e14, var(--secondary-color));
         }
     </style>
+    <!-- BOOSTRAP ICON CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
 </head>
 
 <body class="d-flex vh-100 overflow-hidden dark-mode">
