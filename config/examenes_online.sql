@@ -44,8 +44,8 @@ CREATE TABLE estudiantes (
     codigo_registro_examen VARCHAR(100) NOT NULL UNIQUE,
     examen_realizado BOOLEAN DEFAULT FALSE,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (escuela_id) REFERENCES escuelas_conduccion(id) ON UPDATE CASCADE,
-    FOREIGN KEY (categoria_carne_id) REFERENCES categorias_carne(id) ON UPDATE CASCADE
+    FOREIGN KEY (escuela_id) REFERENCES escuelas_conduccion(id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (categoria_carne_id) REFERENCES categorias_carne(id) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 -- Tabla: examenes
@@ -58,7 +58,7 @@ CREATE TABLE examenes (
     total_preguntas INT,
     preguntas_aleatorias BOOLEAN DEFAULT TRUE,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (categoria_carne_id) REFERENCES categorias_carne(id) ON UPDATE CASCADE
+    FOREIGN KEY (categoria_carne_id) REFERENCES categorias_carne(id) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 -- Tabla: preguntas
@@ -67,13 +67,13 @@ CREATE TABLE preguntas (
     examen_id INT NOT NULL,
     texto_pregunta TEXT NOT NULL,
     tipo_pregunta ENUM('multiple_choice', 'respuesta_unica', 'verdadero_falso', 'ilustrada') NOT NULL DEFAULT 'multiple_choice',
-    imagen VARCHAR(255), -- imagen principal
+    imagen VARCHAR(255),
     activo BOOLEAN DEFAULT TRUE,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (examen_id) REFERENCES examenes(id) ON DELETE CASCADE
 );
 
--- Tabla: imagenes_pregunta (para múltiples imágenes por pregunta)
+-- Tabla: imagenes_pregunta
 CREATE TABLE imagenes_pregunta (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pregunta_id INT NOT NULL,
@@ -101,7 +101,7 @@ CREATE TABLE intentos_examen (
     completado BOOLEAN DEFAULT FALSE,
     codigo_acceso_utilizado VARCHAR(100) NOT NULL,
     FOREIGN KEY (estudiante_id) REFERENCES estudiantes(id) ON DELETE CASCADE,
-    FOREIGN KEY (examen_id) REFERENCES examenes(id) ON DELETE NO ACTION
+    FOREIGN KEY (examen_id) REFERENCES examenes(id) ON DELETE RESTRICT
 );
 
 -- Tabla: respuestas_estudiante
@@ -113,6 +113,25 @@ CREATE TABLE respuestas_estudiante (
     respuesta_texto TEXT NULL,
     es_correcta BOOLEAN,
     FOREIGN KEY (intento_examen_id) REFERENCES intentos_examen(id) ON DELETE CASCADE,
-    FOREIGN KEY (pregunta_id) REFERENCES preguntas(id) ON DELETE NO ACTION,
+    FOREIGN KEY (pregunta_id) REFERENCES preguntas(id) ON DELETE RESTRICT,
     FOREIGN KEY (opcion_seleccionada_id) REFERENCES opciones_pregunta(id) ON DELETE SET NULL
+);
+
+-- Tabla: logs_sistema (auditoría)
+CREATE TABLE logs_sistema (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    accion VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    ip_origen VARCHAR(45),
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- Tabla: configuraciones_sistema
+CREATE TABLE configuraciones_sistema (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    clave VARCHAR(100) NOT NULL UNIQUE,
+    valor TEXT NOT NULL,
+    descripcion TEXT
 );
