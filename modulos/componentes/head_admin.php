@@ -121,4 +121,7 @@
 
        
     </style>
+    <!-- BOOSTRAP ICON CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
 </head>
