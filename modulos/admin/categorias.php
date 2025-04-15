@@ -12,7 +12,7 @@ try {
     $total = $consulta->fetchColumn();
 
     if ($total > 0) {
-      //  $_SESSION['mensaje'] = "✅ Las categorías ya están cargadas correctamente.";
+        //  $_SESSION['mensaje'] = "✅ Las categorías ya están cargadas correctamente.";
     } else {
         $categorias = [
             ['A', 'Motocicletas con o sin sidecar'],
@@ -97,7 +97,7 @@ include '../componentes/menu_admin.php';
 
 
                 <div class="table-responsive">
-                    <table id="categorias-table" class="table table-striped table-hover align-middle">
+                    <table id="container-table" class="table table-striped table-hover align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th><i class="bi bi-hash"></i> ID</th>
@@ -140,13 +140,13 @@ include '../componentes/menu_admin.php';
 <!-- DataTable personalizado -->
 <script>
     $(document).ready(function () {
-        const table = $('#categorias-table').DataTable({
+        const table = $('#container-table').DataTable({
             paging: true,
             searching: true,
             ordering: true,
             lengthChange: false,
             info: true,
-            lengthMenu: [5, 10, 25, 50],
+            lengthMenu: [5, 10, 15, 20, 25],
             language: {
                 search: "",
                 searchPlaceholder: "Buscar...",
@@ -169,73 +169,73 @@ include '../componentes/menu_admin.php';
         });
 
         // Select personalizado de longitud
-        $('#categorias-length').on('change', function () {
+        $('#container-length').on('change', function () {
             table.page.len($(this).val()).draw();
         });
 
         // Estilos adicionales
         $('<style>').prop('type', 'text/css').html(`
-    .card-header {
-        border-bottom: none;
-        border-radius: 0;
-        background-color: #0d6efd !important;
-    }
-    .card-header h5 {
-        margin-bottom: 0;
-    }
-    .card {
-        border-radius: 12px;
-        overflow: hidden;
-    }
-    table.dataTable thead th {
-        background-color: #0d6efd !important;
-        color: #fff !important;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.875rem;
-        letter-spacing: 0.5px;
-        border-top: none;
-        border-bottom: none;
-    }
-    table.dataTable tbody tr:hover {
-        background-color: #f1f3f5;
-    }
-    .search-box input {
-        padding-left: 2.5rem;
-        border-radius: 20px;
-        border: 1px solid #ced4da;
-        font-size: 0.9rem;
-    }
-    .search-box i {
-        left: 15px;
-        color: #6c757d;
-        font-size: 1rem;
-    }
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 0.5rem 0.9rem;
-        margin: 0 3px;
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        font-size: 0.875rem;
-        transition: all 0.2s ease-in-out;
-        color: #333;
-    }
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background-color: #0d6efd;
-        color: #fff !important;
-        border-color: #0d6efd;
-        font-weight: 600;
-    }
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-        background-color: #e2e6ea;
-        color: #000 !important;
-    }
-    table.dataTable {
-        border-collapse: separate;
-        border-spacing: 0;
-        border-radius: 0;
-    }
+                        .card-header {
+                            border-bottom: none;
+                            border-radius: 0;
+                            background-color: #0d6efd !important;
+                        }
+                        .card-header h5 {
+                            margin-bottom: 0;
+                        }
+                        .card {
+                            border-radius: 12px;
+                            overflow: hidden;
+                        }
+                        table.dataTable thead th {
+                            background-color: #0d6efd !important;
+                            color: #fff !important;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            font-size: 0.875rem;
+                            letter-spacing: 0.5px;
+                            border-top: none;
+                            border-bottom: none;
+                        }
+                        table.dataTable tbody tr:hover {
+                            background-color: #f1f3f5;
+                        }
+                        .search-box input {
+                            padding-left: 2.5rem;
+                            border-radius: 20px;
+                            border: 1px solid #ced4da;
+                            font-size: 0.9rem;
+                        }
+                        .search-box i {
+                            left: 15px;
+                            color: #6c757d;
+                            font-size: 1rem;
+                        }
+                        .dataTables_wrapper .dataTables_paginate .paginate_button {
+                            padding: 0.5rem 0.9rem;
+                            margin: 0 3px;
+                            background-color: #f8f9fa;
+                            border: 1px solid #dee2e6;
+                            border-radius: 8px;
+                            font-size: 0.875rem;
+                            transition: all 0.2s ease-in-out;
+                            color: #333;
+                        }
+                        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+                            background-color: #0d6efd;
+                            color: #fff !important;
+                            border-color: #0d6efd;
+                            font-weight: 600;
+                        }
+                        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+                            background-color: #e2e6ea;
+                            color: #000 !important;
+                        }
+                        table.dataTable {
+                            border-collapse: separate;
+                            border-spacing: 0;
+                            border-radius: 0;
+                        }
 `).appendTo('head');
 
     });
