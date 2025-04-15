@@ -1,35 +1,52 @@
-<div class="sidebar">
-    <div class="sidebar-logo">
-        Admin Panel
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <h5>Panel</h5>
+      <ul class="nav flex-column">
+
+        <li class="nav-item">
+          <a href="../admin/index.php" class="nav-link active">
+            <i class="bi bi-house-door"></i> Dashboard
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#gestionAcademica" role="button" aria-expanded="false">
+            <i class="bi bi-book"></i> Gestión Académica <i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <div class="collapse submenu" id="gestionAcademica">
+            <a href="../admin/categorias.php" class="nav-link">Categorías</a>
+            <a href="../admin/examenes.php" class="nav-link">Exámenes</a>
+            <a href="../admin/preguntas.php" class="nav-link">Preguntas</a>
+          </div>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#gestionUsuarios" role="button" aria-expanded="false">
+            <i class="bi bi-people"></i> Gestión de Usuarios <i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <div class="collapse submenu" id="gestionUsuarios">
+            <a href="../admin/usuarios.php" class="nav-link">Usuarios</a>
+            <a href="../admin/estudiantes.php" class="nav-link">Estudiantes</a>
+          </div>
+        </li>
+
+        <li class="nav-item">
+          <a href="../admin/escuelas.php" class="nav-link">
+            <i class="bi bi-building"></i> Escuelas
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a href="ajustes.html" class="nav-link">
+            <i class="bi bi-gear"></i> Ajustes
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a href="../login/logout.php" class="nav-link">
+            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+          </a>
+        </li>
+
+      </ul>
     </div>
-    <ul class="sidebar-menu">
-        <li class="sidebar-menu-item">
-            <a href="#"><i class="bi bi-house-door"></i> Dashboard</a>
-        </li>
-        <li class="sidebar-menu-item">
-            <a href="../admin/categorias.php"><i class="bi bi-folder-lock"></i> Gestión de categorias</a>
-        </li>
-        <li class="sidebar-menu-item">
-            <a href="../admin/escuelas.php"><i class="bi bi-building"></i> Gestión de escuelas</a>
-        </li>
-        <li class="sidebar-menu-item">
-            <a href="../admin/examenes.php"><i class="bi bi-journal-text"></i> Gestión de examenes</a>
-        </li>
-        <li class="sidebar-menu-item">
-            <a href="../admin/preguntas.php"><i class="bi bi-question-circle"></i> Gestión de preguntas</a>
-        </li>
-        <li class="sidebar-menu-item">
-            <a href="../admin/estudiantes.php"><i class="bi bi-person-lines-fill"></i> Gestión de estudiantes</a>
-        </li>
-        <li class="sidebar-menu-item">
-            <a href="../admin/usuarios.php"><i class="bi bi-person-fill"></i> Gestión de usuarios</a>
-        </li>
-        <!-- Añadir más ítems de menú según sea necesario -->
-        <li class="sidebar-menu-item">
-            <a href="ajustes.html"><i class="bi bi-gear-fill"></i> Ajustes</a>
-        </li>
-        <li class="sidebar-menu-item">
-            <a href="../login/logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
-        </li>
-    </ul>
-</div>

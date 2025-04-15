@@ -1,130 +1,150 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $titulo ?? 'Panel de Administración' ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #6c757d;
-            --bg-dark: #1e1e2f;
-            --bg-dark-alt: #2c2c3e;
-            --text-light: #f8f9fa;
-            --highlight: rgba(255, 255, 255, 0.1);
-            --section-label: #adb5bd;
-            --hover-link-bg: rgba(255, 255, 255, 0.1);
-            --hover-link-shadow: 0 0 10px rgba(13, 110, 253, 0.3);
-            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><?= $titulo ?? 'Panel de Administración' ?></title>
 
-        body {
-            font-family: var(--font-family);
-        }
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
 
-        body.dark-mode {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-        }
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-        body.dark-mode .card,
-        body.dark-mode .offcanvas,
-        body.dark-mode .navbar,
-        body.dark-mode .table,
-        body.dark-mode .form-control {
-            background-color: var(--bg-dark-alt);
-            color: var(--text-light);
-            border-color: #444;
-        }
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f6f8;
+    }
 
-        .nav-link {
-            transition: all 0.3s;
-            border-radius: 0.375rem;
-        }
+    .navbar {
+      background-color: #0d6efd;
+      color: #fff;
+      z-index: 1030;
+    }
 
-        .nav-link:hover {
-            background-color: var(--hover-link-bg);
-            box-shadow: var(--hover-link-shadow);
-            color: var(--primary-color);
-        }
+    .navbar .navbar-brand,
+    .navbar .btn,
+    .navbar span {
+      color: #fff !important;
+    }
 
-        .nav-link.active {
-            background-color: var(--highlight);
-            border-left: 4px solid var(--primary-color);
-        }
+    .wrapper {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-        .offcanvas-body h5 {
-            color: var(--primary-color);
-        }
+    .sidebar {
+      width: 250px;
+      background-color: #ffffff;
+      border-right: 1px solid #dee2e6;
+      overflow-y: auto;
+      transition: all 0.3s ease;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+    }
 
-        .btn-outline-light {
-            border-color: var(--primary-color);
-            color: var(--text-light);
-        }
+    .sidebar h5 {
+      padding: 1rem 1.5rem;
+      margin-bottom: 0;
+      color: #0d6efd;
+    }
 
-        .btn-outline-light:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
+    .sidebar .nav-link {
+      color: #495057;
+      padding: 0.75rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      border-radius: 0.375rem;
+      margin: 0.25rem 1rem;
+    }
 
-        .navbar {
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            color: white !important;
-        }
+    .sidebar .nav-link i {
+      margin-right: 0.5rem;
+    }
 
-        .navbar .navbar-brand,
-        .navbar .btn,
-        .navbar span {
-            color: white !important;
-        }
+    .sidebar .nav-link:hover {
+      background-color: #f1f3f5;
+      color: #0d6efd;
+    }
 
-        .navbar .btn-outline-danger {
-            border-color: #ffc107;
-            color: white;
-        }
+    .sidebar .nav-link.active {
+      background-color: #e7f1ff;
+      color: #0b5ed7;
+      font-weight: bold;
+    }
 
-        .navbar .btn-outline-danger:hover {
-            background-color: #ffc107;
-            color: black;
-        }
+    .sidebar .submenu .nav-link {
+      padding-left: 2.5rem;
+      font-size: 0.95rem;
+    }
 
-        .nav-item.mt-3.text-uppercase.text-muted.small.px-3 {
-            color: var(--section-label) !important;
-        }
+    .main-content {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
 
-        .collapse .nav-link {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        top: 56px;
+        left: -250px;
+        height: calc(100% - 56px);
+        z-index: 1020;
+      }
 
-        .collapse .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
+      .sidebar.show {
+        left: 0;
+      }
 
-        .collapse .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.15);
-            border-left: 4px solid var(--primary-color);
-        }
+      .main-content {
+        padding: 1rem;
+      }
+    }
 
-        body[data-rol="admin"] .navbar {
-            background: linear-gradient(90deg, #6610f2, var(--secondary-color));
-        }
+    .card h3 {
+      font-weight: 600;
+    }
 
-        body[data-rol="editor"] .navbar {
-            background: linear-gradient(90deg, #20c997, var(--secondary-color));
-        }
+    /* Scroll personalizado */
+    .main-content::-webkit-scrollbar {
+      width: 8px;
+    }
 
-        body[data-rol="viewer"] .navbar {
-            background: linear-gradient(90deg, #fd7e14, var(--secondary-color));
-        }
-    </style>
-    <!-- BOOSTRAP ICON CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    .main-content::-webkit-scrollbar-thumb {
+      background-color: #adb5bd;
+      border-radius: 4px;
+    }
 
+    .main-content::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+  </style>
 </head>
 
-<body class="d-flex vh-100 overflow-hidden dark-mode">
+<body>
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container-fluid">
+    <button class="btn d-lg-none" id="sidebarToggle">
+      <i class="bi bi-list fs-4"></i>
+    </button>
+    <span class="navbar-brand fw-semibold ms-2"><?= $titulo ?? 'Panel de Administración' ?></span>
+    <div class="ms-auto d-flex align-items-center gap-2">
+      <span class="text-white fw-semibold">Admin</span>
+      <a href="../login/logout.php" class="btn btn-outline-light btn-sm">
+        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+      </a>
+    </div>
+  </div>
+</nav>
 
-   
+<!-- Layout principal -->
+<div class="wrapper">
