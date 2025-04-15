@@ -1,69 +1,46 @@
 <?php
-// Incluir archivo de conexión
+// sembrar_categorias_carne.php
+
 require '../../config/conexion.php';
 
-// Obtener la conexión
-$conn = $pdo->getConexion();
+ 
 
-$nombre = '';
-$descripcion = '';
-$errores = [];
-$mensaje_exito = '';
-$mensaje_error = '';
+try {
+    $pdo = $pdo->getConexion();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Verificar que la conexión a la BD está establecida
-    if (!isset($conn)) {
-        die("Error de conexión a la base de datos.");
+    // Verificar si ya existen categorías para evitar duplicados
+    $consulta = $pdo->query("SELECT COUNT(*) FROM categorias_carne");
+    $total = $consulta->fetchColumn();
+
+    if ($total > 0) {
+        echo "⚠️ Ya existen categorías registradas. No se insertaron duplicados.";
+        exit;
     }
 
-    // Recoger y sanitizar datos de entrada
-    $nombre = trim($_POST['nombre'] ?? '');
-    $descripcion = trim($_POST['descripcion'] ?? '');
+    $categorias = [
+        ['A', 'Motocicletas con o sin sidecar'],
+        ['A1', 'Motocicletas ligeras hasta 125cc y 11kW'],
+        ['A2', 'Motocicletas de potencia media hasta 35 kW'],
+        ['B', 'Vehículos hasta 3.500 kg y 8 pasajeros'],
+        ['B+E', 'Vehículos B con remolque mayor a 750 kg'],
+        ['C', 'Vehículos pesados de más de 3.500 kg'],
+        ['C1', 'Camiones entre 3.500 y 7.500 kg'],
+        ['C+E', 'Camiones con remolque mayor a 750 kg'],
+        ['D', 'Autobuses de más de 8 pasajeros'],
+        ['D1', 'Autobuses pequeños hasta 16 pasajeros'],
+        ['D+E', 'Autobuses con remolque mayor a 750 kg'],
+        ['AM', 'Ciclomotores hasta 50cc y 45 km/h'],
+        ['T', 'Vehículos agrícolas como tractores'],
+    ];
 
-    $nombre = strtoupper(filter_var($nombre, FILTER_SANITIZE_STRING));
-    $descripcion = filter_var($descripcion, FILTER_SANITIZE_STRING);
+    $stmt = $pdo->prepare("INSERT INTO categorias_carne (nombre, descripcion) VALUES (?, ?)");
 
-    // Validar nombre
-    if (empty($nombre)) {
-        $errores['nombre'] = 'El nombre es obligatorio.';
-    } elseif (strlen($nombre) > 50) {
-        $errores['nombre'] = 'El nombre no puede tener más de 50 caracteres.';
+    foreach ($categorias as $cat) {
+        $stmt->execute([$cat[0], $cat[1]]);
     }
 
-    // Validar descripción (opcional)
-    if (!empty($descripcion) && strlen($descripcion) > 255) {
-        $errores['descripcion'] = 'La descripción no puede tener más de 255 caracteres.';
-    }
-
-    // Si no hay errores, intentar insertar en la base de datos
-    if (empty($errores)) {
-        try {
-            // Preparar consulta SQL
-            $sql = "INSERT INTO categorias_carne (nombre, descripcion) VALUES (:nombre, :descripcion)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':nombre', $nombre, PDO::PARAM_STR);
-            $stmt->bindParam(':descripcion', $descripcion, PDO::PARAM_STR);
-
-            if ($stmt->execute()) {
-                $mensaje_exito = 'Categoría creada exitosamente.';
-                header('Location: ../admin/categorias.php?mensaje=exito');
-                exit();
-            } else {
-                $mensaje_error = 'Error al guardar la categoría.';
-                error_log("Error al insertar categoría: " . print_r($stmt->errorInfo(), true));
-            }
-        } catch (PDOException $e) {
-            if ($e->getCode() === '23000' && strpos($e->getMessage(), 'nombre') !== false) {
-                $errores['nombre'] = 'El nombre ya existe.';
-            } else {
-                $mensaje_error = 'Error de base de datos.';
-                error_log("PDOException al insertar categoría: " . $e->getMessage());
-            }
-        } catch (Exception $e) {
-            $mensaje_error = 'Error inesperado: ' . $e->getMessage();
-            error_log("Excepción general: " . $e->getMessage());
-        }
-    }
+    echo "✅ Categorías insertadas correctamente.";
+} catch (PDOException $e) {
+    echo "❌ Error: " . $e->getMessage();
 }
 ?>
