@@ -1,147 +1,85 @@
-<!DOCTYPE html>
-<html lang="es">
-
-
 <?php
-
-
 include '../componentes/head_admin.php';
-
-
-
-?>
-
-<body>
-
-<?php
-
-
 include '../componentes/menu_admin.php';
-
-
-
 ?>
 
-    <div class="content ">
-        <div class="top-bar">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNavbar"
-                    aria-controls="topNavbar" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="topNavbar">
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-bell"></i> <span class="badge bg-danger">3</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="alertsDropdown">
-                                <li><a class="dropdown-item" href="#">Nueva inscripción de aspirante</a></li>
-                                <li><a class="dropdown-item" href="#">Examen teórico finalizado</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user-circle"></i> Admin User
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="perfil.html">Perfil</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="../login/logout.php">Cerrar Sesión</a></li>
-                            </ul>
-                        </li>
-
-                    </ul>
-                    <ul class="nav nav-tabs card-header-tabs float-end">
-                         
-                        <li class="nav-item">
-                        <a href="listar.php" class="btn btn-primary " type="button"><i class="fas fa-list me-2"></i> Visualizar</a> 
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Opción
-                                Deshabilitada</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </div>
-        <div class="container-fluid  mt-5 pt-2">
-
-            <div class="row d-flex justify-content-center align-items-center">
-                <div class="card p-5 mt-5 w-50">
-                    <div class="form-container">
-                        <h2>Registrar Escuela de Conducción</h2>
-                        <form action="../php/guardar_escuelas.php" method="POST">
-                            <!-- Campo Nombre de la Escuela -->
+<div class="main-content">
+    <div class="container-fluid mt-5 pt-2">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-6">
+                <div class="card shadow rounded-4 p-4">
+                    <div class="card-header bg-primary text-white rounded-3 mb-4">
+                        <h4 class="mb-0 d-flex align-items-center">
+                            <i class="bi bi-building me-2 fs-4"></i>
+                            Registrar Escuela de Conducción
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Formulario con validación Bootstrap -->
+                        <form action="../php/guardar_escuelas.php" method="POST" class="needs-validation" novalidate>
+                            <!-- Campo Nombre -->
                             <div class="mb-3">
-                                <label for="nombre" class="form-label">Nombre de la Escuela</label>
-                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                <label for="nombre" class="form-label fw-semibold">
+                                    <i class="bi bi-card-heading me-2 text-primary"></i>Nombre de la Escuela <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control shadow-sm" id="nombre" name="nombre" placeholder="Ej. Escuela San Cristóbal" required>
+                                <div class="invalid-feedback">
+                                    Por favor ingresa el nombre de la escuela.
+                                </div>
                             </div>
 
                             <!-- Campo Dirección -->
                             <div class="mb-3">
-                                <label for="direccion" class="form-label">Dirección</label>
-                                <input type="text" class="form-control" id="direccion" name="direccion">
+                                <label for="direccion" class="form-label fw-semibold">
+                                    <i class="bi bi-geo-alt-fill me-2 text-primary"></i>Dirección
+                                </label>
+                                <input type="text" class="form-control shadow-sm" id="direccion" name="direccion" placeholder="Ej. Av. Libertador 1234">
                             </div>
 
                             <!-- Campo Teléfono -->
-                            <div class="mb-3">
-                                <label for="telefono" class="form-label">Teléfono</label>
-                                <input type="tel" class="form-control" id="telefono" name="telefono">
+                            <div class="mb-4">
+                                <label for="telefono" class="form-label fw-semibold">
+                                    <i class="bi bi-telephone-fill me-2 text-primary"></i>Teléfono
+                                </label>
+                                <input type="tel" class="form-control shadow-sm" id="telefono" name="telefono" placeholder="Ej. 1234-567890" pattern="[0-9\-]+" maxlength="20">
+                                <div class="invalid-feedback">
+                                    Solo números y guiones son permitidos.
+                                </div>
                             </div>
 
-                        
-                            <!-- Botón de Enviar -->
-                            <div class="mb-3 text-center">
-                                <button type="submit" class="btn btn-primary">Registrar Escuela</button>
+                            <!-- Botones -->
+                            <div class="d-flex justify-content-between flex-column flex-sm-row gap-2">
+                                <a href="listar_escuelas.php" class="btn btn-outline-secondary w-100">
+                                    <i class="bi bi-arrow-left-circle me-2"></i>Volver
+                                </a>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-save2-fill me-2"></i>Registrar Escuela
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
-            </div> 
+            </div>
         </div>
     </div>
-   
+</div>
 
-    <!-- Scripts optimizados -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var examStatsData = {
-                labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
-                datasets: [{
-                    label: 'Exámenes Completados',
-                    data: [65, 59, 80, 81, 56, 55],
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            };
+<!-- Script de validación Bootstrap -->
+<script>
+// Validación visual Bootstrap 5
+(() => {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
+</script>
 
-            var examStatsConfig = {
-                type: 'bar',
-                data: examStatsData,
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            };
-
-            var examStatsChart = new Chart(
-                document.getElementById('examStatsChart'),
-                examStatsConfig
-            );
-        });
-    </script>
-
-</body>
-
-</html>
+<?php include_once('../componentes/footer.php'); ?>

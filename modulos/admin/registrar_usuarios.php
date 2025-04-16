@@ -1,116 +1,126 @@
-<!DOCTYPE html>
-<html lang="es">
-
-
 <?php
-
-
 include '../componentes/head_admin.php';
-
-
-
+include '../componentes/menu_admin.php';
 ?>
 
-<body>
-
-    <?php
-
-
-    include '../componentes/menu_admin.php';
-
-
-
-    ?>
-
-    <div class="content ">
-        <div class="top-bar">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNavbar"
-                    aria-controls="topNavbar" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="topNavbar">
-                    <ul class="navbar-nav ml-auto">
-                        <!--  <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-bell"></i> <span class="badge bg-danger">3</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="alertsDropdown">
-                                <li><a class="dropdown-item" href="#">Nueva inscripción de aspirante</a></li>
-                                <li><a class="dropdown-item" href="#">Examen teórico finalizado</a></li>
-                            </ul>
-                        </li> -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user-circle"></i> Admin User
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="perfil.html">Perfil</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="../login/logout.php">Cerrar Sesión</a></li>
-                            </ul>
-                        </li>
-
-                    </ul>
-                    <!--   <ul class="nav nav-tabs card-header-tabs float-end">
-
-                        <li class="nav-item">
-                            <a href="listar.php" class="btn btn-primary " type="button"><i class="fas fa-list me-2"></i> Visualizar</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Opción
-                                Deshabilitada</a>
-                        </li>
-                    </ul> -->
-                </div>
-            </nav>
-        </div>
-        <div class="container-fluid  mt-5 pt-2">
-
-            <div class="row d-flex justify-content-center align-items-center">
-                <div class="card p-5 mt-5 w-50">
-                    <div class="  ">
-                        <h2 class="text-center mb-4">Registro de usuarios</h2>
-                        <form action="../php/guardar_usuarios.php" method="POST">
+<div class="main-content">
+    <div class="container-fluid mt-5 pt-2">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-6">
+                <div class="card shadow rounded-4 p-4">
+                    <div class="card-header bg-primary text-white rounded-3 mb-4">
+                        <h4 class="mb-0 d-flex align-items-center">
+                            <i class="bi bi-person-plus-fill me-2 fs-4"></i>
+                            Registrar Usuario
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="../php/guardar_usuarios.php" method="POST" class="needs-validation" novalidate>
+                            
+                            <!-- Nombre de Usuario -->
                             <div class="mb-3">
-                                <label for="nombre_usuario" class="form-label">Nombre de Usuario:</label>
-                                <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario"
-                                    required>
+                                <label for="nombre_usuario" class="form-label fw-semibold">
+                                    <i class="bi bi-person-circle me-2 text-primary"></i>Nombre de Usuario <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control shadow-sm" id="nombre_usuario" name="nombre_usuario" placeholder="Ej. jlopez92" required>
+                                <div class="invalid-feedback">
+                                    Por favor ingresa un nombre de usuario.
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Contraseña:</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
+
+                            <!-- Contraseña -->
+                            <div class="mb-3 position-relative">
+                                <label for="password" class="form-label fw-semibold">
+                                    <i class="bi bi-lock-fill me-2 text-primary"></i>Contraseña <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control shadow-sm" id="password" name="password" required minlength="6">
+                                    <button type="button" class="btn btn-outline-secondary" id="toggle-password">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </button>
+                                </div>
+                                <div class="invalid-feedback">
+                                    La contraseña debe tener al menos 6 caracteres.
+                                </div>
                             </div>
+
+                            <!-- Correo Electrónico -->
                             <div class="mb-3">
-                                <label for="email" class="form-label">Correo Electrónico:</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
+                                <label for="email" class="form-label fw-semibold">
+                                    <i class="bi bi-envelope-fill me-2 text-primary"></i>Correo Electrónico <span class="text-danger">*</span>
+                                </label>
+                                <input type="email" class="form-control shadow-sm" id="email" name="email" placeholder="Ej. usuario@correo.com" required>
+                                <div class="invalid-feedback">
+                                    Ingresa un correo electrónico válido.
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="rol" class="form-label">Rol:</label>                              
-                                <select class="form-select" id="rol" name="rol" required>
+
+                            <!-- Rol -->
+                            <div class="mb-4">
+                                <label for="rol" class="form-label fw-semibold">
+                                    <i class="bi bi-person-gear me-2 text-primary"></i>Rol <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select shadow-sm" id="rol" name="rol" required>
                                     <option value="">Seleccionar Rol</option>
                                     <option value="admin">Administrador</option>
                                     <option value="docente">Docente</option>
                                 </select>
+                                <div class="invalid-feedback">
+                                    Selecciona un rol para el usuario.
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Registrar</button>
+
+                            <!-- Botones -->
+                            <div class="d-flex justify-content-between flex-column flex-sm-row gap-2">
+                                <a href="usuarios.php" class="btn btn-outline-secondary w-100">
+                                    <i class="bi bi-arrow-left-circle me-2"></i>Volver
+                                </a>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-person-plus-fill me-2"></i>Registrar
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
+<!-- Script para mostrar/ocultar la contraseña -->
+<script>
+    document.getElementById('toggle-password').addEventListener('click', function () {
+        const passwordField = document.getElementById('password');
+        const eyeIcon = this.querySelector('i');
+        
+        // Cambiar tipo de campo y icono
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            eyeIcon.classList.remove('bi-eye-fill');
+            eyeIcon.classList.add('bi-eye-slash-fill');
+        } else {
+            passwordField.type = 'password';
+            eyeIcon.classList.remove('bi-eye-slash-fill');
+            eyeIcon.classList.add('bi-eye-fill');
+        }
+    });
+</script>
 
-    <!-- Scripts optimizados -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
- 
+<!-- Script de validación Bootstrap -->
+<script>
+(() => {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
+</script>
 
-</body>
-
-</html>
+<?php include_once('../componentes/footer.php'); ?>

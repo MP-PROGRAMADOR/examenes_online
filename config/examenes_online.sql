@@ -61,35 +61,39 @@ CREATE TABLE examenes (
     FOREIGN KEY (categoria_carne_id) REFERENCES categorias_carne(id) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
--- Tabla: preguntas
 CREATE TABLE preguntas (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    examen_id INT NOT NULL,
-    texto_pregunta TEXT NOT NULL,
-    tipo_pregunta ENUM('multiple_choice', 'respuesta_unica', 'verdadero_falso', 'ilustrada') NOT NULL DEFAULT 'multiple_choice',
-    imagen VARCHAR(255), -- imagen principal
-    activo BOOLEAN DEFAULT TRUE,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    examen_id INT,
+    texto_pregunta TEXT,
+    tipo_contenido ENUM('texto', 'ilustracion') NOT NULL,
+    tipo_respuesta ENUM('multiple_choice', 'respuesta_unica', 'verdadero_falso') NOT NULL,
     FOREIGN KEY (examen_id) REFERENCES examenes(id) ON DELETE CASCADE
 );
 
--- Tabla: imagenes_pregunta
 CREATE TABLE imagenes_pregunta (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    pregunta_id INT NOT NULL,
+    pregunta_id INT,
     ruta_imagen VARCHAR(255) NOT NULL,
-    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (pregunta_id) REFERENCES preguntas(id) ON DELETE CASCADE
 );
 
--- Tabla: opciones_pregunta
 CREATE TABLE opciones_pregunta (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    pregunta_id INT NOT NULL,
-    texto_opcion TEXT NOT NULL,
-    es_correcta BOOLEAN DEFAULT FALSE,
+    pregunta_id INT,
+    texto_opcion VARCHAR(255) NOT NULL,
+    es_correcta BOOLEAN NOT NULL,
     FOREIGN KEY (pregunta_id) REFERENCES preguntas(id) ON DELETE CASCADE
 );
+
+CREATE TABLE respuestas_pregunta (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pregunta_id INT,
+    estudiante_id INT,  -- Puede ser una referencia al ID del estudiante
+    respuesta_usuario VARCHAR(255),
+    es_correcta BOOLEAN,
+    FOREIGN KEY (pregunta_id) REFERENCES preguntas(id) ON DELETE CASCADE
+);
+
 
 -- Tabla: intentos_examen
 CREATE TABLE intentos_examen (

@@ -1,135 +1,284 @@
-<?php include '../includes/header.php'; ?>
+<?php
+session_start();
 
-<div class="container mt-4">
-    <h2>Registrar Nueva Pregunta</h2>
-    <?php if (!empty($mensaje_error)): ?>
-        <div class="alert alert-danger"><?= $mensaje_error ?></div>
-    <?php endif; ?>
-    <form action="procesar_pregunta.php" method="POST" enctype="multipart/form-data" id="formPregunta">
-        <div class="mb-3">
-            <label for="examen_id" class="form-label">Examen:</label>
-            <select name="examen_id" id="examen_id" class="form-select" required>
-                <option value="">Seleccione un examen</option>
-                <!-- Suponiendo que traes la lista de exámenes de la base de datos -->
-                <?php
-                $stmt = $conn->query("SELECT id, nombre FROM examenes");
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    echo "<option value=\"{$row['id']}\">{$row['nombre']}</option>";
-                }
-                ?>
-            </select>
-        </div>
+// Recuperamos el mensaje de alerta de la sesión si existe
+$alerta = isset($_SESSION['alerta']) ? $_SESSION['alerta'] : null;
+unset($_SESSION['alerta']); // Limpiar la sesión después de usar el mensaje
+include '../componentes/head_admin.php';
+include '../componentes/menu_admin.php';
+include '../../config/conexion.php';
+$conn = $pdo->getConexion();
+try {
+    $stmt = $conn->prepare("SELECT id, titulo FROM examenes");
+    $stmt->execute();
+    $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $mensaje_error = "hubo un error en la consulta " . $e;
+}
+?>
 
-        <div class="mb-3">
-            <label for="texto_pregunta" class="form-label">Texto de la pregunta:</label>
-            <textarea name="texto_pregunta" id="texto_pregunta" class="form-control" required></textarea>
-        </div>
 
-        <div class="mb-3">
-            <label for="imagen" class="form-label">Imagen (opcional):</label>
-            <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*">
-        </div>
 
-        <div class="mb-3">
-            <label for="tipo_pregunta" class="form-label">Tipo de Pregunta:</label>
-            <select name="tipo_pregunta" id="tipo_pregunta" class="form-select" required>
-                <option value="">Seleccione un tipo</option>
-                <option value="multiple_choice">Opción múltiple</option>
-                <option value="verdadero_falso">Verdadero / Falso</option>
-                <option value="respuesta_unica">Respuesta única</option>
-            </select>
-        </div>
+<div class="main-content">
+    <div class="container-fluid mt-5 pt-2">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+                <div class="card shadow rounded-4 p-4">
+                    <div class="card-header bg-primary text-white rounded-3 mb-4">
+                        <h4 class="mb-0 d-flex align-items-center">
+                            <i class="bi bi-journal-text me-2 fs-4"></i>
+                            Registrar Pregunta de Examen
+                        </h4>
+                    </div>
 
-        <div id="opciones_container" class="mb-3" style="display: none;">
-            <label class="form-label">Opciones:</label>
-            <div id="opciones_dinamicas">
-                <!-- Las opciones se generan dinámicamente con JS -->
+                    <!-- Modal de Alerta -->
+                    <?php if ($alerta): ?>
+                        <div class="modal fade show" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel"
+                            aria-hidden="false" style="display: block;">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div
+                                        class="modal-header <?php echo $alerta['tipo'] == 'success' ? 'bg-success' : 'bg-danger'; ?>">
+                                        <h5 class="modal-title text-white" id="alertModalLabel">
+                                            <?php echo $alerta['tipo'] == 'success' ? '¡Éxito!' : 'Error'; ?>
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p class="text-center"><?php echo $alerta['mensaje']; ?></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cerrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="card-body">
+                        <form action="../php/guardar_preguntas.php" method="POST" enctype="multipart/form-data"
+                            class="needs-validation" novalidate>
+                            <!-- Select Examen -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Selecciona un examen <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-file-earmark-text"></i></span>
+                                    <select id="examenSelect" name="examen_id" class="form-select" required>
+                                        <option value="">Seleccione...</option>
+                                        <?php foreach ($examenes as $exam): ?>
+                                            <option value="<?= htmlspecialchars($exam['id']); ?> ">
+                                                <?= htmlspecialchars($exam['titulo']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="invalid-feedback">Selecciona un examen.</div>
+                            </div>
+
+                            <!-- Tipo de Contenido -->
+                            <div class="mb-3 d-none" id="tipoContenidoWrapper">
+                                <label class="form-label fw-semibold">Tipo de Pregunta</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-question-circle"></i></span>
+                                    <select id="tipoContenido" name="tipo_contenido" class="form-select" required>
+                                        <option value="">Seleccione...</option>
+                                        <option value="texto">Solo texto</option>
+                                        <option value="ilustracion">Con ilustración</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Texto de la Pregunta -->
+                            <div class="mb-3 d-none" id="textoPreguntaWrapper">
+                                <label class="form-label fw-semibold">Texto de la Pregunta</label>
+                                <textarea name="texto_pregunta" class="form-control" rows="3"
+                                    placeholder="Escribe la pregunta..." required></textarea>
+                            </div>
+
+                            <!-- Input Imagen (dinámico) -->
+                            <div class="mb-3 d-none" id="imagenesWrapper">
+                                <label class="form-label fw-semibold">Imágenes de apoyo</label>
+                                <div id="imagenesContainer">
+                                    <div class="input-group mb-2">
+                                        <input type="file" name="imagenes[]" class="form-control" accept="image/*">
+                                        <button type="button" class="btn btn-danger btn-remover-img">
+                                            <i class="bi bi-x-circle-fill"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline-success btn-sm" id="agregarImagenBtn">
+                                    <i class="bi bi-plus-circle"></i> Agregar imagen
+                                </button>
+                            </div>
+
+                            <!-- Tipo de Respuesta -->
+                            <div class="mb-3 d-none" id="tipoRespuestaWrapper">
+                                <label class="form-label fw-semibold">Tipo de respuesta</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-check-all"></i></span>
+                                    <select id="tipoRespuesta" name="tipo_respuesta" class="form-select" required>
+                                        <option value="">Seleccione...</option>
+                                        <option value="multiple">Opción múltiple</option>
+                                        <option value="unica">Única respuesta</option>
+                                        <option value="vf">Verdadero o Falso</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Opciones de Respuesta (dinámico) -->
+                            <div class="mb-3 d-none" id="opcionesWrapper">
+                                <label class="form-label fw-semibold">Opciones de respuesta</label>
+                                <div id="opcionesContainer"></div>
+                                <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="agregarOpcionBtn">
+                                    <i class="bi bi-plus-circle"></i> Agregar opción
+                                </button>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="d-flex justify-content-between flex-column flex-sm-row gap-2 mt-4">
+                                <a href="listar_preguntas.php" class="btn btn-outline-secondary w-100">
+                                    <i class="bi bi-arrow-left-circle me-2"></i>Volver
+                                </a>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-save2-fill me-2"></i>Guardar Pregunta
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm mt-2" id="agregarOpcion">+ Agregar opción</button>
         </div>
-
-        <div id="verdadero_falso_container" class="mb-3" style="display: none;">
-            <label class="form-label">Seleccione la respuesta correcta:</label>
-            <div>
-                <input type="radio" name="es_correcta_vf" value="verdadero" id="vf_verdadero">
-                <label for="vf_verdadero">Verdadero</label>
-            </div>
-            <div>
-                <input type="radio" name="es_correcta_vf" value="falso" id="vf_falso">
-                <label for="vf_falso">Falso</label>
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Guardar Pregunta</button>
-    </form>
+    </div>
 </div>
 
+<!-- Scripts -->
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const tipoPregunta = document.getElementById('tipo_pregunta');
-    const opcionesContainer = document.getElementById('opciones_container');
-    const opcionesDinamicas = document.getElementById('opciones_dinamicas');
-    const agregarOpcionBtn = document.getElementById('agregarOpcion');
-    const vfContainer = document.getElementById('verdadero_falso_container');
+   
 
-    function limpiarOpciones() {
-        opcionesDinamicas.innerHTML = '';
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const examenSelect = document.getElementById('examenSelect');
+        const tipoContenido = document.getElementById('tipoContenido');
+        const tipoRespuesta = document.getElementById('tipoRespuesta');
 
-    function crearOpcion(index) {
-        const div = document.createElement('div');
-        div.classList.add('input-group', 'mb-2');
+        const tipoContenidoWrapper = document.getElementById('tipoContenidoWrapper');
+        const textoPreguntaWrapper = document.getElementById('textoPreguntaWrapper');
+        const imagenesWrapper = document.getElementById('imagenesWrapper');
+        const tipoRespuestaWrapper = document.getElementById('tipoRespuestaWrapper');
+        const opcionesWrapper = document.getElementById('opcionesWrapper');
 
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'opcion[]';
-        input.placeholder = `Opción ${index + 1}`;
-        input.className = 'form-control';
-        input.required = true;
+        const opcionesContainer = document.getElementById('opcionesContainer');
+        const agregarOpcionBtn = document.getElementById('agregarOpcionBtn');
 
-        const radio = document.createElement('input');
-        radio.type = 'radio';
-        radio.name = 'es_correcta';
-        radio.value = index + 1;
-        radio.className = 'form-check-input ms-2 mt-2';
+        const imagenesContainer = document.getElementById('imagenesContainer');
+        const agregarImagenBtn = document.getElementById('agregarImagenBtn');
 
-        const radioLabel = document.createElement('span');
-        radioLabel.textContent = ' Correcta';
-        radioLabel.className = 'ms-1 mt-2';
+        // Estado inicial
+        resetFormulario();
 
-        div.appendChild(input);
-        div.appendChild(radio);
-        div.appendChild(radioLabel);
+        examenSelect.addEventListener('change', () => {
+            resetFormulario();
+            if (examenSelect.value !== '') {
+                tipoContenidoWrapper.classList.remove('d-none');
+            }
+        });
 
-        return div;
-    }
+        tipoContenido.addEventListener('change', () => {
+            textoPreguntaWrapper.classList.add('d-none');
+            imagenesWrapper.classList.add('d-none');
+            tipoRespuestaWrapper.classList.add('d-none');
+            opcionesWrapper.classList.add('d-none');
+            limpiarOpciones();
+            if (tipoContenido.value !== '') {
+                textoPreguntaWrapper.classList.remove('d-none');
+                tipoRespuestaWrapper.classList.remove('d-none');
+                if (tipoContenido.value === 'ilustracion') {
+                    imagenesWrapper.classList.remove('d-none');
+                }
+            }
+        });
 
-    function actualizarOpcionesIniciales() {
-        limpiarOpciones();
-        for (let i = 0; i < 2; i++) {
-            opcionesDinamicas.appendChild(crearOpcion(i));
+        tipoRespuesta.addEventListener('change', () => {
+            limpiarOpciones();
+            opcionesWrapper.classList.add('d-none');
+            if (tipoRespuesta.value === 'multiple' || tipoRespuesta.value === 'unica') {
+                opcionesWrapper.classList.remove('d-none');
+                agregarOpcion();
+            } else if (tipoRespuesta.value === 'vf') {
+                opcionesWrapper.classList.remove('d-none');
+                opcionesContainer.innerHTML = `
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="respuesta_correcta" value="verdadero" required>
+                    <label class="form-check-label">Verdadero</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="respuesta_correcta" value="falso" required>
+                    <label class="form-check-label">Falso</label>
+                </div>
+            `;
+                agregarOpcionBtn.classList.add('d-none');
+            } else {
+                agregarOpcionBtn.classList.add('d-none');
+            }
+        });
+
+        agregarOpcionBtn.addEventListener('click', agregarOpcion);
+
+        function agregarOpcion() {
+            const div = document.createElement('div');
+            div.classList.add('input-group', 'mb-2');
+            div.innerHTML = `
+            <input type="text" name="opciones[]" class="form-control" placeholder="Opción de respuesta" required>
+            <div class="input-group-text">
+                <input class="form-check-input mt-0" type="checkbox" name="correctas[]">
+            </div>
+            <button type="button" class="btn btn-danger btn-remover-opcion">
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        `;
+            opcionesContainer.appendChild(div);
         }
-    }
 
-    tipoPregunta.addEventListener('change', () => {
-        const tipo = tipoPregunta.value;
-        limpiarOpciones();
-        opcionesContainer.style.display = 'none';
-        vfContainer.style.display = 'none';
+        opcionesContainer.addEventListener('click', e => {
+            if (e.target.closest('.btn-remover-opcion')) {
+                e.target.closest('.input-group').remove();
+            }
+        });
 
-        if (tipo === 'multiple_choice' || tipo === 'respuesta_unica') {
-            opcionesContainer.style.display = 'block';
-            actualizarOpcionesIniciales();
-        } else if (tipo === 'verdadero_falso') {
-            vfContainer.style.display = 'block';
+        agregarImagenBtn.addEventListener('click', () => {
+            const div = document.createElement('div');
+            div.classList.add('input-group', 'mb-2');
+            div.innerHTML = `
+            <input type="file" name="imagenes[]" class="form-control" accept="image/*">
+            <button type="button" class="btn btn-danger btn-remover-img">
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        `;
+            imagenesContainer.appendChild(div);
+        });
+
+        imagenesContainer.addEventListener('click', e => {
+            if (e.target.closest('.btn-remover-img')) {
+                e.target.closest('.input-group').remove();
+            }
+        });
+
+        function limpiarOpciones() {
+            opcionesContainer.innerHTML = '';
+            agregarOpcionBtn.classList.remove('d-none');
+        }
+
+        function resetFormulario() {
+            tipoContenidoWrapper.classList.add('d-none');
+            textoPreguntaWrapper.classList.add('d-none');
+            imagenesWrapper.classList.add('d-none');
+            tipoRespuestaWrapper.classList.add('d-none');
+            opcionesWrapper.classList.add('d-none');
+            limpiarOpciones();
         }
     });
-
-    agregarOpcionBtn.addEventListener('click', () => {
-        const currentCount = opcionesDinamicas.children.length;
-        opcionesDinamicas.appendChild(crearOpcion(currentCount));
-    });
-});
 </script>
 
-<?php include '../includes/footer.php'; ?>
+<?php include_once('../componentes/footer.php'); ?>

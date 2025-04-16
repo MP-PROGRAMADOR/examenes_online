@@ -1,87 +1,31 @@
-<!DOCTYPE html>
-<html lang="es">
-
-
 <?php
-
-
 include '../componentes/head_admin.php';
-
-
-
+include '../componentes/menu_admin.php';
 ?>
 
-<body>
-
-    <?php
-
-
-    include '../componentes/menu_admin.php';
-
-
-
-    ?>
-
-    <div class="content ">
-        <div class="top-bar">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNavbar"
-                    aria-controls="topNavbar" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="topNavbar">
-                    <ul class="navbar-nav ml-auto">
-                        <!--  <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-bell"></i> <span class="badge bg-danger">3</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="alertsDropdown">
-                                <li><a class="dropdown-item" href="#">Nueva inscripción de aspirante</a></li>
-                                <li><a class="dropdown-item" href="#">Examen teórico finalizado</a></li>
-                            </ul>
-                        </li> -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user-circle"></i> Admin User
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="perfil.html">Perfil</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="../login/logout.php">Cerrar Sesión</a></li>
-                            </ul>
-                        </li>
-
-                    </ul>
-                    <!--   <ul class="nav nav-tabs card-header-tabs float-end">
-
-                        <li class="nav-item">
-                            <a href="listar.php" class="btn btn-primary " type="button"><i class="fas fa-list me-2"></i> Visualizar</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Opción
-                                Deshabilitada</a>
-                        </li>
-                    </ul> -->
-                </div>
-            </nav>
-        </div>
-        <div class="container-fluid  mt-5 pt-2">
-
-            <div class="row d-flex justify-content-center align-items-center">
-                <div class="card p-5 mt-5 w-50">
-                    <div class="form-container">
-                        <h2 class="mb-4">Registrar Nuevo Examen</h2>
+<div class="main-content">
+    <div class="container-fluid mt-5 pt-2">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-6">
+                <div class="card shadow rounded-4 p-4">
+                    <div class="card-header bg-primary text-white rounded-3 mb-4">
+                        <h4 class="mb-0 d-flex align-items-center">
+                            <i class="bi bi-journal-bookmark me-2 fs-4"></i>
+                            Registrar Examen
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Formulario con validación Bootstrap -->
                         <form action="../php/guardar_examen.php" method="POST" class="needs-validation" novalidate>
-                            <div class="mb-3 form-group required">
-                                <label for="categoria_carne_id" class="form-label">Categoría de Carné:</label>
-                                <select class="form-select" id="categoria_carne_id" name="categoria_carne_id" required>
+                            <!-- Campo Categoría de Carné -->
+                            <div class="mb-3">
+                                <label for="categoria_carne_id" class="form-label fw-semibold">
+                                    <i class="bi bi-archive me-2 text-primary"></i>Categoría de Carné <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select shadow-sm" id="categoria_carne_id" name="categoria_carne_id" required>
                                     <option value="">Seleccione una categoría</option>
                                     <?php
-                                    // Incluir archivo de conexión (asegúrate de que $conn esté definida aquí)
+                                    // Incluir archivo de conexión
                                     require_once '../../config/conexion.php';
                                     $conn = $pdo->getConexion();
 
@@ -105,43 +49,66 @@ include '../componentes/head_admin.php';
                                 </select>
                                 <div class="invalid-feedback">Por favor, seleccione una categoría de carné.</div>
                             </div>
-                            <div class="mb-3 form-group required">
-                                <label for="titulo" class="form-label">Título del Examen:</label>
-                                <input type="text" class="form-control" id="titulo" name="titulo"
-                                    placeholder="Ej: Examen Teórico General" required>
+
+                            <!-- Campo Título del Examen -->
+                            <div class="mb-3">
+                                <label for="titulo" class="form-label fw-semibold">
+                                    <i class="bi bi-file-earmark-text me-2 text-primary"></i>Título del Examen <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control shadow-sm" id="titulo" name="titulo" placeholder="Ej: Examen Teórico General" required>
                                 <div class="invalid-feedback">Por favor, ingrese el título del examen.</div>
                             </div>
+
+                            <!-- Campo Descripción (Opcional) -->
                             <div class="mb-3">
-                                <label for="descripcion" class="form-label">Descripción (Opcional):</label>
-                                <textarea class="form-control" id="descripcion" name="descripcion" rows="3"
-                                    placeholder="Descripción detallada del examen."></textarea>
+                                <label for="descripcion" class="form-label fw-semibold">
+                                    <i class="bi bi-file-earmark-person me-2 text-primary"></i>Descripción (Opcional)
+                                </label>
+                                <textarea class="form-control shadow-sm" id="descripcion" name="descripcion" rows="3" placeholder="Descripción detallada del examen."></textarea>
                             </div>
-                            <div class="mb-3 form-group required">
-                                <label for="duracion_minutos" class="form-label">Duración (en minutos):</label>
-                                <input type="number" class="form-control" id="duracion_minutos" name="duracion_minutos"
-                                    placeholder="Ej: 30" min="1" required>
-                                <div class="invalid-feedback">Por favor, ingrese la duración del examen en minutos.
-                                </div>
+
+                            <!-- Campo Duración -->
+                            <div class="mb-3">
+                                <label for="duracion_minutos" class="form-label fw-semibold">
+                                    <i class="bi bi-clock-fill me-2 text-primary"></i>Duración (en minutos) <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" class="form-control shadow-sm" id="duracion_minutos" name="duracion_minutos" placeholder="Ej: 30" min="1" required>
+                                <div class="invalid-feedback">Por favor, ingrese la duración del examen en minutos.</div>
                             </div>
-                            
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Guardar
-                                    Examen</button>
-                                <a href="listar_examenes.php" class="btn btn-secondary"><i
-                                        class="bi bi-arrow-left me-2"></i>Cancelar</a>
+
+                            <!-- Botones -->
+                            <div class="d-flex justify-content-between flex-column flex-sm-row gap-2">
+                                <a href="listar_examenes.php" class="btn btn-outline-secondary w-100">
+                                    <i class="bi bi-arrow-left-circle me-2"></i>Volver
+                                </a>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-save2-fill me-2"></i>Registrar Examen
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
+<!-- Script de validación Bootstrap -->
+<script>
+// Validación visual Bootstrap 5
+(() => {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
+</script>
 
-        <!-- Scripts optimizados -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
-</body>
-
-</html>
+<?php include_once('../componentes/footer.php'); ?>

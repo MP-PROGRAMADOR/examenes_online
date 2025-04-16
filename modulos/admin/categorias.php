@@ -54,6 +54,8 @@ try {
 include '../componentes/head_admin.php';
 include '../componentes/menu_admin.php';
 ?>
+
+
 <div class="main-content">
     <!-- Alertas -->
     <?php if (!empty($_SESSION['mensaje'])): ?>
@@ -73,8 +75,10 @@ include '../componentes/menu_admin.php';
         </div>
     <?php endif; ?>
 
+
     <div class="container-fluid mt-5">
         <div class="card shadow border-0 rounded-4">
+
             <div
                 class="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-top-4 px-4">
                 <h5 class="mb-0"><i class="bi bi-tags-fill me-2"></i>Listado de Categorías</h5>
@@ -83,15 +87,17 @@ include '../componentes/menu_admin.php';
                     <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
                 </div>
                 <div class="mb-0 d-flex justify-content-end align-items-center">
-                    <label for="categorias-length" class="me-2 mb-0 fw-medium text-muted text-white">Mostrar:</label>
-                    <select id="categorias-length" class="form-select w-auto shadow-sm">
+                    <label for="container-length" class="me-2 text-white fw-medium mb-0">Mostrar:</label>
+                    <select id="container-length" class="form-select w-auto shadow-sm">
                         <option value="5">5 registros</option>
                         <option value="10" selected>10 registros</option>
+                        <option value="15">15 registros</option>
+                        <option value="20">20 registros</option>
                         <option value="25">25 registros</option>
-                        <option value="50">50 registros</option>
                     </select>
                 </div>
             </div>
+
             <div class="card-body">
                 <!-- Select personalizado de longitud -->
 
@@ -109,17 +115,16 @@ include '../componentes/menu_admin.php';
                             <?php if (!empty($categorias)): ?>
                                 <?php foreach ($categorias as $categoria): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($categoria['id']) ?></td>
-                                        <td><?= htmlspecialchars($categoria['nombre']) ?></td>
-                                        <td><?= htmlspecialchars($categoria['descripcion']) ?></td>
+                                        <td><?= htmlspecialchars($categoria['id'], ENT_QUOTES, 'UTF-8') ?></td>
+                                        <td><?= htmlspecialchars($categoria['nombre'], ENT_QUOTES, 'UTF-8') ?></td>
+                                        <td><?= htmlspecialchars($categoria['descripcion'], ENT_QUOTES, 'UTF-8') ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted fst-italic">
-                                        <i class="bi bi-info-circle-fill me-1"></i>No hay categorías registradas.
-                                    </td>
-                                </tr>
+                                <div class="alert alert-warning text-center">
+                                    <i class="bi bi-exclamation-circle-fill me-2"></i>⚠️ No hay categorías registradas
+                                    actualmente.
+                                </div>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -127,7 +132,10 @@ include '../componentes/menu_admin.php';
             </div>
         </div>
     </div>
+
 </div>
+
+
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

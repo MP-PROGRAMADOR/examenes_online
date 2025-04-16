@@ -3,90 +3,71 @@
 
 <!-- Contenido principal -->
 <div class="main-content">
-  
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="mb-0">Resumen</h4>
-    <button id="collapseSidebar" class="btn btn-outline-secondary d-none d-lg-inline">
-      <i class="bi bi-layout-sidebar-inset"></i>
-    </button>
-  </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold"><i class="bi bi-speedometer2 me-2"></i>Panel Principal</h3>
+        <span class="text-muted fst-italic">Bienvenido/a, SIR 👋</span>
+    </div>
 
-  <div class="row g-3 mb-4">
-    <div class="col-md-4">
-      <div class="card shadow-sm border-start border-primary border-4">
-        <div class="card-body">
-          <h6 class="card-title">Total de Exámenes</h6>
-          <h3><i class="bi bi-journal-text me-2"></i>245</h3>
+    <div class="row g-4">
+        <!-- Total Exámenes -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 rounded-4 bg-primary text-white">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50">Exámenes</h6>
+                        <h3 class="fw-bold">20</h3>
+                    </div>
+                    <i class="bi bi-journal-check fs-2 text-white-50"></i>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card shadow-sm border-start border-success border-4">
-        <div class="card-body">
-          <h6 class="card-title">Estudiantes Activos</h6>
-          <h3><i class="bi bi-people me-2"></i>132</h3>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card shadow-sm border-start border-warning border-4">
-        <div class="card-body">
-          <h6 class="card-title">Escuelas Registradas</h6>
-          <h3><i class="bi bi-building me-2"></i>12</h3>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Contenido adicional -->
-  <div class="row g-3">
-    <div class="col-lg-6">
-      <div class="card shadow-sm">
-        <div class="card-header"><i class="bi bi-calendar-event"></i> Calendario</div>
-        <div class="card-body">
-          <input type="date" class="form-control">
+        <!-- Total Preguntas -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 rounded-4 bg-success text-white">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50">Preguntas</h6>
+                        <h3 class="fw-bold">10</h3>
+                    </div>
+                    <i class="bi bi-question-circle-fill fs-2 text-white-50"></i>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="col-lg-6">
-      <div class="card shadow-sm">
-        <div class="card-header"><i class="bi bi-table"></i> Últimos Exámenes</div>
-        <div class="card-body table-responsive">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Estudiante</th>
-                <th>Fecha</th>
-                <th>Resultado</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>Juan Pérez</td>
-                <td>2025-04-06</td>
-                <td>Aprobado</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>María López</td>
-                <td>2025-04-05</td>
-                <td>Reprobado</td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>Carlos Ruiz</td>
-                <td>2025-04-04</td>
-                <td>Aprobado</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
 
+        <!-- Total Estudiantes -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 rounded-4 bg-warning text-white">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50">Estudiantes</h6>
+                        <h3 class="fw-bold">50</h3>
+                    </div>
+                    <i class="bi bi-person-fill fs-2 text-white-50"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Resultados -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 rounded-4 bg-danger text-white">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50">Resultados</h6>
+                        <h3 class="fw-bold">700</h3>
+                    </div>
+                    <i class="bi bi-bar-chart-line-fill fs-2 text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Espacio para gráficas o accesos rápidos -->
+    <div class="row mt-5">
+        <div class="col-12 text-center text-muted">
+            <p class="fst-italic">Puedes navegar por el menú lateral para gestionar exámenes, preguntas y estudiantes.</p>
+        </div>
+    </div>
 </div>
 
 <?php include_once('../componentes/footer.php'); ?>

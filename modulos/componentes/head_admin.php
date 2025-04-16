@@ -13,13 +13,13 @@
 
 <!-- Bootstrap 5 -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+ -->
 <!-- jQuery + DataTables -->
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script> -->
 <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<link rel="stylesheet" href="../../public/css/dataTable.css">
+<!-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  -->
 
   <style>
     * {
@@ -141,9 +141,22 @@
     .main-content::-webkit-scrollbar-track {
       background-color: transparent;
     }
-      /* Estilos para la tabla */
+    
+      /* alerta modal de mensajes de errores Backend con sessiones*/
      
-
+      .modal-body {
+            font-size: 16px;
+        }
+        .modal-header {
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ddd;
+        }
+        .modal-content {
+            border-radius: 8px;
+        }
+        .modal-footer {
+            border-top: 1px solid #ddd;
+        }
 
   </style>
 </head>
