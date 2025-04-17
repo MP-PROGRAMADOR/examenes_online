@@ -1,95 +1,244 @@
- 
+
+
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Portal de Exámenes de Conducción | Guinea Ecuatorial</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background: #f1f5f9;
-      color: #1e293b;
-      font-family: 'Segoe UI', sans-serif;
-    }
-    .hero {
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: white;
-      padding: 100px 20px;
-      text-align: center;
-    }
-    .hero h1 {
-      font-size: 2.8rem;
-      margin-bottom: 10px;
-    }
-    .hero p {
-      font-size: 1.2rem;
-      color: #cbd5e1;
-    }
-    .section {
-      padding: 60px 20px;
-    }
-    .section h2 {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    .feature-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-      padding: 30px;
-      height: 100%;
-    }
-    .feature-card h5 {
-      margin-bottom: 10px;
-    }
-    footer {
-      padding: 30px 0;
-      text-align: center;
-      font-size: 0.9rem;
-      color: #64748b;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iniciar sesión - Exámenes Teóricos DGT Guinea Ecuatorial</title>
+    <style>
+        :root {
+            --azul-oscuro: #0f172a;
+            --azul-intermedio: #1e293b;
+            --azul-claro: #00bfff;
+            --blanco: #ffffff;
+            --gris-texto: #ccc;
+            --gris-input: #f2f2f2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--blanco);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background-color: #f8fafc;
+        }
+
+        header {
+            flex: 0 0 27vh;
+            background-color: var(--azul-oscuro);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            animation: fadeDown 1s ease-out;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1rem;
+            color: var(--gris-texto);
+        }
+
+        main {
+            flex: 1;
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+            position: relative;
+        }
+
+        .login-card {
+            background-color: var(--azul-oscuro);
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 60px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            animation: floatUp 1.2s ease forwards;
+            opacity: 0;
+        }
+
+        .login-card img.logo {
+            width: 80px;
+            margin-bottom: 20px;
+        }
+
+        .login-card h2 {
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .login-card p.sub {
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+            color: var(--gris-texto);
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            display: block;
+            color: var(--gris-texto);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            background-color: var(--gris-input);
+            color: #333;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 0 0 4px var(--azul-claro);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.05em;
+            font-weight: bold;
+            background-color: var(--azul-claro);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #009fd1;
+        }
+
+        .form-links {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: var(--gris-texto);
+        }
+
+        .form-links a {
+            color: var(--azul-claro);
+            text-decoration: none;
+        }
+
+        .form-links a:hover {
+            text-decoration: underline;
+        }
+
+        .volver-btn {
+            margin-top: 30px;
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: transparent;
+            color: var(--azul-claro);
+            border: 1px solid var(--azul-claro);
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .volver-btn:hover {
+            background-color: var(--azul-claro);
+            color: white;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-  <div class="hero">
-    <h1>Examen Teórico Oficial para el Carné de Conducir</h1>
-    <p>Sistema autorizado para la preparación y evaluación teórica en Guinea Ecuatorial</p>
-  </div>
+    <header>
+        <h1>Plataforma de Exámenes DGT</h1>
+        <p>Bienvenido a la plataforma oficial de Guinea Ecuatorial</p>
+    </header>
 
-  <div class="container section">
-    <h2>¿Qué ofrece nuestro sistema?</h2>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="feature-card text-center">
-          <h5>📚 Formación Teórica Oficial</h5>
-          <p>Accede a un banco de preguntas oficiales adaptadas a la normativa vigente del país. Aprende sobre señales, normas y seguridad vial.</p>
+    <main>
+        <div class="login-card">
+            <img src="logo_dgt.png" alt="Logo DGT" class="logo" />
+            <h2>Acceso al Examen Teórico</h2>
+            <p class="sub">Plataforma oficial de Guinea Ecuatorial</p>
+            <form action="login.php" method="post">
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required />
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required />
+                </div>
+                <button type="submit">Iniciar sesión</button>
+            </form>
+            <div class="form-links">
+                <a href="#">¿Olvidaste tu contraseña?</a>
+            </div>
+            <a href="../index.php" class="volver-btn">← Volver a la página principal</a>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="feature-card text-center">
-          <h5>🎓 Preparación Profesional</h5>
-          <p>Diseñado para centros de formación vial y usuarios particulares que desean entrenar en un entorno similar al examen real.</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="feature-card text-center">
-          <h5>🛂 Certificación Reconocida</h5>
-          <p>Los resultados obtenidos pueden ser revisados por instructores y autoridades autorizadas. Paso esencial para obtener el carné de conducir oficial.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="text-center mt-5">
-      <a href="info.php" class="btn btn-outline-secondary me-2">Más información</a>
-      <a href="./modulos/index.php" class="btn btn-primary">Iniciar sesión</a>
-    </div>
-  </div>
-
-  <footer>
-    &copy; <?php echo date("Y"); ?> República de Guinea Ecuatorial — Ministerio de Transporte | Todos los derechos reservados.
-  </footer>
+    </main>
 
 </body>
+
 </html>
+
+
+
+

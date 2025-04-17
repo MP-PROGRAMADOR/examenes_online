@@ -1,0 +1,15 @@
+ /* Estilos para el botón flotante de volver */
+ .btn-volver-fixed {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    z-index: 1050;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+}
+
+@media (max-width: 768px) {
+    .btn-volver-fixed {
+        top: auto;
+        bottom: 20px;
+    }
+}

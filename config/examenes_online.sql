@@ -27,9 +27,10 @@ CREATE TABLE escuelas_conduccion (
 CREATE TABLE categorias_carne (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE,
-    descripcion TEXT
+    descripcion TEXT,
+    edad_minima INT NOT NULL                      -- Edad mínima requerida para obtener la categoría
 );
-
+ 
 -- Tabla: estudiantes
 CREATE TABLE estudiantes (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -63,27 +64,31 @@ CREATE TABLE examenes (
 
 CREATE TABLE preguntas (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    examen_id INT,
+    examen_id INT NOT NULL,
     texto_pregunta TEXT,
     tipo_contenido ENUM('texto', 'ilustracion') NOT NULL,
-    tipo_respuesta ENUM('multiple_choice', 'respuesta_unica', 'verdadero_falso') NOT NULL,
+    tipo_pregunta ENUM('unica', 'multiple', 'vf') NOT NULL,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (examen_id) REFERENCES examenes(id) ON DELETE CASCADE
 );
 
+
 CREATE TABLE imagenes_pregunta (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    pregunta_id INT,
+    pregunta_id INT NOT NULL,
     ruta_imagen VARCHAR(255) NOT NULL,
     FOREIGN KEY (pregunta_id) REFERENCES preguntas(id) ON DELETE CASCADE
 );
 
+
 CREATE TABLE opciones_pregunta (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    pregunta_id INT,
-    texto_opcion VARCHAR(255) NOT NULL,
-    es_correcta BOOLEAN NOT NULL,
+    pregunta_id INT NOT NULL,
+    texto_opcion TEXT NOT NULL,
+    es_correcta BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (pregunta_id) REFERENCES preguntas(id) ON DELETE CASCADE
 );
+
 
 CREATE TABLE respuestas_pregunta (
     id INT AUTO_INCREMENT PRIMARY KEY,

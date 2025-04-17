@@ -1,6 +1,3 @@
-
-
-
 <?php
 session_start();
 include '../config/conexion.php';
@@ -89,7 +86,7 @@ try {
     }
 
     // Insertar las opciones de respuesta
-    if ($tipo_pregunta === 'multiple_choice' || $tipo_pregunta === 'respuesta_unica') {
+    if ($tipo_pregunta === 'multiple' || $tipo_pregunta === 'unica') {
         foreach ($opciones as $key => $opcion) {
             $correcta = isset($correctas[$key]) ? 1 : 0;
             $stmt = $conn->prepare("INSERT INTO opciones_pregunta (pregunta_id, texto_opcion, es_correcta) VALUES (?, ?, ?)");
@@ -114,3 +111,23 @@ try {
     header('Location: ../admin/registrar_preguntas.php');
 }
 ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
