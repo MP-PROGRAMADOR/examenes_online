@@ -1,3 +1,13 @@
+<?php
+session_start();
+
+// Verifica que el estudiante esté logueado
+if (!isset($_SESSION['estudiante_id'])) {
+    header("Location: index.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -16,17 +26,6 @@
         .navbar-brand, .nav-link, .navbar-text {
             color: white !important;
         }
-        .stat-card {
-            border-left: 5px solid #0d6efd;
-            transition: transform 0.2s;
-        }
-        .stat-card:hover {
-            transform: translateY(-3px);
-        }
-        .card-icon {
-            font-size: 2.5rem;
-            opacity: 0.6;
-        }
     </style>
 </head>
 <body>
@@ -36,11 +35,30 @@
     <div class="container-fluid">
         <a class="navbar-brand" href="#">🎓 Autoescuela | Estudiante</a>
         <div class="ms-auto d-flex align-items-center">
-            <span class="navbar-text me-3">Bienvenido, <strong>Juan Pérez</strong></span>
-            <a href="logout.php" class="btn btn-sm btn-outline-light">Cerrar sesión</a>
+            <span class="navbar-text me-3">
+                Bienvenido, <strong><?php echo htmlspecialchars($_SESSION['nombre'] . ' ' . $_SESSION['apellido']); ?></strong>
+            </span>
+            <a href="cerrar_sesion.php" class="btn btn-sm btn-outline-light">Cerrar sesión</a>
         </div>
     </div>
 </nav>
 
 <!-- Espaciado por navbar fija -->
 <div style="height: 70px;"></div>
+
+<!-- Contenido principal -->
+<div class="container mt-5 pt-3">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3>Panel del Estudiante</h3>
+                    <p>Bienvenido al panel de estudiante. Desde aquí podrás gestionar tu información.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
