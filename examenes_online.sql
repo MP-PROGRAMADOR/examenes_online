@@ -294,6 +294,17 @@ CREATE TABLE `usuarios` (
 --
 -- Índices para tablas volcadas
 --
+CREATE TABLE `asignaciones_examen` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `estudiante_id` INT NOT NULL,
+  `examen_id` INT NOT NULL,
+  `codigo_acceso` VARCHAR(100) NOT NULL UNIQUE,
+  `fecha_asignacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `estado` ENUM('pendiente', 'en_progreso', 'completado') DEFAULT 'pendiente',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`examen_id`) REFERENCES `examenes`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Indices de la tabla `categorias_carne`
