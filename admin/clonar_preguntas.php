@@ -1,10 +1,10 @@
 <?php
-session_start(); 
+session_start();
 require '../config/conexion.php';
 
-$pdo=$pdo->getConexion();
+$pdo = $pdo->getConexion();
 
- 
+
 
 // Obtener todos los exámenes
 $stmt = $pdo->query("SELECT id, titulo FROM examenes");
@@ -21,7 +21,7 @@ include '../componentes/head_admin.php';
 include '../componentes/menu_admin.php';
 ?>
 
- 
+
 
 <div class="main-content">
     <div class="container-fluid mt-5">
@@ -32,23 +32,25 @@ include '../componentes/menu_admin.php';
             <div class="card-body">
                 <form method="GET" class="row mb-4">
                     <div class="col-md-6">
-                        <label for="examen_origen" class="form-label">Seleccionar examen de origen:</label>
-                        <select name="examen_origen" id="examen_origen" class="form-select" required>
-                            <option value="">-- Selecciona uno --</option>
-                            <?php foreach ($examenes as $examen): ?>
-                                <option value="<?= $examen['id'] ?>" <?= ($_GET['examen_origen'] ?? '') == $examen['id'] ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($examen['titulo']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i> Buscar</button>
+                        <label for="examen_origen_mostrar" class="form-label">Examen de origen:</label>
+                        <input type="text" id="examen_origen_mostrar" class="form-control" value="<?php
+                                                                                                    $examen_id = $_GET['examen_origen'] ?? '';
+                                                                                                    $titulo = '';
+                                                                                                    foreach ($examenes as $examen) {
+                                                                                                        if ($examen['id'] == $examen_id) {
+                                                                                                            $titulo = $examen['titulo'];
+                                                                                                            break;
+                                                                                                        }
+                                                                                                    }
+                                                                                                    echo htmlspecialchars($titulo);
+                                                                                                    ?>" readonly>
+                        <input type="hidden" name="examen_origen" value="<?= htmlspecialchars($examen_id) ?>">
                     </div>
                 </form>
 
+
                 <?php if (!empty($preguntas)): ?>
-                    <form action="procesar_clonado.php" method="POST">
+                    <form action="../php/procesar_clonado.php" method="POST">
                         <input type="hidden" name="examen_origen" value="<?= htmlspecialchars($_GET['examen_origen']) ?>">
 
                         <div class="mb-3">
@@ -104,7 +106,7 @@ include '../componentes/menu_admin.php';
 </div>
 
 <script>
-    document.getElementById('checkAll')?.addEventListener('change', function () {
+    document.getElementById('checkAll')?.addEventListener('change', function() {
         document.querySelectorAll('input[name="preguntas_clonar[]"]').forEach(cb => {
             cb.checked = this.checked;
         });
