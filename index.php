@@ -231,6 +231,9 @@
             <div class="form-links">
                 <a href="#">¿Olvidaste tu contraseña?</a>
             </div>
+            <div class="form-links">
+                <a href="aspirantes/politicas.php">entra sin contraseña</a>
+            </div>
             <a href="../index.php" class="volver-btn">← Volver a la página principal</a>
         </div>
     </main>
