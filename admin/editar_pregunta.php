@@ -1,118 +1,162 @@
 <?php
-// =====================================
-// ARCHIVO: editar_pregunta.php
-// Descripción: Formulario para editar una pregunta y sus imágenes asociadas.
-// =====================================
+session_start();
 
-// Conexión a la base de datos
-require_once '../config/conexion.php';
-
-// =====================
-// VALIDACIÓN DEL ID
-// =====================
-if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    die('ID de pregunta no válido.');
+// Verificar si se proporcionó un ID de pregunta
+$id_pregunta = isset($_GET['id']) ? intval($_GET['id']) : null;
+if (!$id_pregunta) {
+    $_SESSION['alerta'] = ['tipo' => 'danger', 'mensaje' => 'ID de pregunta no proporcionado.'];
+    header("Location: preguntas.php");
+    exit;
 }
 
-$id = (int) $_GET['id'];
+include '../componentes/head_admin.php';
+include '../componentes/menu_admin.php';
+include '../config/conexion.php';
+$conn = $pdo->getConexion();
 
-// =====================
-// CONSULTA DE LA PREGUNTA
-// =====================
 try {
-    $pdo = $pdo->getConexion(); 
-    // Obtener datos de la pregunta
-    $stmt = $pdo->prepare("SELECT * FROM preguntas WHERE id = ?");
-    $stmt->execute([$id]);
+    // Obtener examenes
+    $stmt = $conn->prepare("SELECT id, titulo FROM examenes");
+    $stmt->execute();
+    $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Obtener la pregunta
+    $stmt = $conn->prepare("SELECT * FROM preguntas WHERE id = ?");
+    $stmt->execute([$id_pregunta]);
     $pregunta = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$pregunta) {
-        die('La pregunta no existe.');
+        $_SESSION['alerta'] = ['tipo' => 'danger', 'mensaje' => 'La pregunta no existe.'];
+        header("Location: preguntas.php");
+        exit;
     }
 
-    // Obtener imágenes asociadas
-    $stmtImg = $pdo->prepare("SELECT * FROM imagenes_pregunta WHERE pregunta_id = ?");
-    $stmtImg->execute([$id]);
-    $imagenes = $stmtImg->fetchAll(PDO::FETCH_ASSOC);
+    // Obtener imágenes
+    $stmt = $conn->prepare("SELECT ruta_imagen FROM imagenes_pregunta WHERE pregunta_id = ?");
+    $stmt->execute([$id_pregunta]);
+    $imagenes = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    // Obtener opciones
+    $stmt = $conn->prepare("SELECT texto_opcion, es_correcta FROM opciones_pregunta WHERE pregunta_id = ?");
+    $stmt->execute([$id_pregunta]);
+    $opciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
+    $_SESSION['alerta'] = ['tipo' => 'danger', 'mensaje' => 'Error al cargar datos: ' . $e->getMessage()];
+    header("Location: preguntas.php");
+    exit;
 }
 ?>
 
-<!-- ============================== -->
-<!-- HTML: FORMULARIO DE EDICIÓN -->
-<!-- ============================== -->
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Editar Pregunta</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+<div class="main-content">
+    <div class="container-fluid mt-5 pt-2">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+                <div class="card shadow rounded-4 p-4">
+                    <div class="card-header bg-warning text-dark rounded-3 mb-4">
+                        <h4 class="mb-0 d-flex align-items-center">
+                            <i class="bi bi-pencil-square me-2 fs-4"></i>
+                            Editar Pregunta de Examen
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="../php/actualizar_pregunta.php" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                            <input type="hidden" name="pregunta_id" value="<?= $pregunta['id']; ?>">
 
-<div class="container mt-5 mb-5">
-    <h4 class="mb-4">Editar Pregunta</h4>
-
-    <form action="actualizar_pregunta.php" method="POST" enctype="multipart/form-data">
-        <!-- ID oculto -->
-        <input type="hidden" name="id" value="<?= htmlspecialchars($pregunta['id']) ?>">
-
-        <!-- Texto de la pregunta -->
-        <div class="mb-3">
-            <label for="texto_pregunta" class="form-label">Texto de la pregunta</label>
-            <textarea name="texto_pregunta" id="texto_pregunta" rows="4" class="form-control" required><?= htmlspecialchars($pregunta['texto_pregunta']) ?></textarea>
-        </div>
-
-        <!-- Tipo de pregunta -->
-        <div class="mb-3">
-            <label for="tipo_pregunta" class="form-label">Tipo de pregunta</label>
-            <select name="tipo_pregunta" id="tipo_pregunta" class="form-select" required>
-                <option value="multiple_choice" <?= $pregunta['tipo_pregunta'] === 'multiple_choice' ? 'selected' : '' ?>>Opción múltiple</option>
-                <option value="respuesta_unica" <?= $pregunta['tipo_pregunta'] === 'respuesta_unica' ? 'selected' : '' ?>>Respuesta única</option>
-                <option value="verdadero_falso" <?= $pregunta['tipo_pregunta'] === 'verdadero_falso' ? 'selected' : '' ?>>Verdadero / Falso</option>
-            </select>
-        </div>
-
-        <!-- Tipo de contenido -->
-        <div class="mb-3">
-            <label for="tipo_contenido" class="form-label">Tipo de contenido</label>
-            <select name="tipo_contenido" id="tipo_contenido" class="form-select" required>
-                <option value="texto" <?= $pregunta['tipo_contenido'] === 'texto' ? 'selected' : '' ?>>Solo texto</option>
-                <option value="imagen" <?= $pregunta['tipo_contenido'] === 'imagen' ? 'selected' : '' ?>>Con ilustración</option>
-            </select>
-        </div>
-
-        <!-- Imágenes existentes -->
-        <?php if (!empty($imagenes)): ?>
-            <div class="mb-3">
-                <label class="form-label">Imágenes actuales</label>
-                <div class="d-flex flex-wrap gap-3">
-                    <?php foreach ($imagenes as $img): ?>
-                        <div class="border p-2 text-center">
-                            <img src="<?= htmlspecialchars($img['ruta_imagen']) ?>" alt="Imagen" class="img-thumbnail mb-2" style="max-width: 100px;">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="eliminar_imagenes[]" value="<?= $img['id'] ?>" id="img<?= $img['id'] ?>">
-                                <label class="form-check-label text-danger small" for="img<?= $img['id'] ?>">Eliminar</label>
+                            <!-- Examen -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Examen <span class="text-danger">*</span></label>
+                                <select name="examen_id" class="form-select" required>
+                                    <option value="">Seleccione...</option>
+                                    <?php foreach ($examenes as $exam): ?>
+                                        <option value="<?= $exam['id']; ?>" <?= $exam['id'] == $pregunta['examen_id'] ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($exam['titulo']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
-                        </div>
-                    <?php endforeach; ?>
+
+                            <!-- Tipo de contenido -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Tipo de contenido</label>
+                                <select name="tipo_contenido" class="form-select">
+                                    <option value="">Seleccione...</option>
+                                    <option value="texto" <?= $pregunta['tipo_contenido'] === 'texto' ? 'selected' : '' ?>>Solo texto</option>
+                                    <option value="ilustracion" <?= $pregunta['tipo_contenido'] === 'ilustracion' ? 'selected' : '' ?>>Con ilustración</option>
+                                </select>
+                            </div>
+
+                            <!-- Texto de la Pregunta -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Texto de la Pregunta</label>
+                                <textarea name="texto_pregunta" class="form-control" rows="3" required><?= htmlspecialchars($pregunta['texto_pregunta']); ?></textarea>
+                            </div>
+
+                            <!-- Imágenes existentes -->
+                            <?php if (!empty($imagenes)): ?>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Imágenes actuales</label>
+                                    <?php foreach ($imagenes as $img): ?>
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control" value="<?= htmlspecialchars($img); ?>" readonly>
+                                            <button type="button" class="btn btn-danger btn-remover-img">
+                                                <i class="bi bi-x-circle-fill"></i>
+                                            </button>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Nuevas imágenes -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Agregar nuevas imágenes</label>
+                                <input type="file" name="imagenes[]" class="form-control" accept="image/*" multiple>
+                            </div>
+
+                            <!-- Tipo de Respuesta -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Tipo de respuesta</label>
+                                <select name="tipo_pregunta" class="form-select" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="multiple" <?= $pregunta['tipo_pregunta'] === 'multiple' ? 'selected' : '' ?>>Opción múltiple</option>
+                                    <option value="unica" <?= $pregunta['tipo_pregunta'] === 'unica' ? 'selected' : '' ?>>Única respuesta</option>
+                                    <option value="vf" <?= $pregunta['tipo_pregunta'] === 'vf' ? 'selected' : '' ?>>Verdadero o Falso</option>
+                                </select>
+                            </div>
+
+                            <!-- Opciones -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Opciones</label>
+                                <?php foreach ($opciones as $op): ?>
+                                    <div class="input-group mb-2">
+                                        <input type="text" name="opciones[]" class="form-control" value="<?= htmlspecialchars($op['texto_opcion']); ?>" required>
+                                        <div class="input-group-text">
+                                            <input class="form-check-input mt-0" type="<?= $pregunta['tipo_pregunta'] === 'multiple' ? 'checkbox' : 'radio' ?>"
+                                                   name="correctas[]" <?= $op['es_correcta'] ? 'checked' : '' ?>>
+                                        </div>
+                                        <button type="button" class="btn btn-danger btn-remover-opcion">
+                                            <i class="bi bi-x-circle-fill"></i>
+                                        </button>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="d-flex justify-content-between">
+                                <a href="preguntas.php" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left-circle"></i> Volver
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save2-fill"></i> Guardar Cambios
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
                 </div>
             </div>
-        <?php endif; ?>
-
-        <!-- Nuevas imágenes -->
-        <div class="mb-4">
-            <label for="nuevas_imagenes" class="form-label">Agregar nuevas imágenes (opcional)</label>
-            <input type="file" name="nuevas_imagenes[]" id="nuevas_imagenes" class="form-control" multiple accept="image/*">
         </div>
-
-        <!-- Botones -->
-        <button type="submit" class="btn btn-primary">Actualizar</button>
-        <a href="listar_preguntas.php" class="btn btn-secondary">Cancelar</a>
-    </form>
+    </div>
 </div>
 
-</body>
-</html>
+<?php include_once('../componentes/footer.php'); ?>
