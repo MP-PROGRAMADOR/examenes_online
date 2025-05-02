@@ -121,8 +121,8 @@
                         <strong>Importante:</strong> Al hacer clic en "Comenzar Examen", confirmas que has leído y aceptas todas las políticas y condiciones mencionadas anteriormente. ¡Mucho éxito!
                     </div>
 
-                    <a href="./folio_test.php" class="btn btn-start-exam btn-block mt-4">Comenzar Examen</a>
-                    <a href="seleccionar_examen.php" class="back-link">Volver a Selección de Examen</a>
+                    <a href="./examen.php" class="btn btn-start-exam btn-block mt-4">Comenzar Examen</a>
+                    <a href="aspirante.php" class="back-link">Volver</a>
                 </div>
             </div>
         </div>

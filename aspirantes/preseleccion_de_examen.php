@@ -207,7 +207,7 @@ if ($versesion == 'admin') {
                                             <li><i class="fas fa-percentage mr-2"></i> Cálculo de tu porcentaje de aciertos.</li>
                                             <li><i class="fas fa-chart-line mr-2"></i> Seguimiento de tu progreso a lo largo del tiempo.</li>
                                         </ul>
-                                        <a href="./politicas_del_simulacro.php" class="btn-light btn-lg border bg-success"><i class="fas fa-flag-checkered mr-2"></i> Iniciar Simulacro</a>
+                                        <a href="./politicas.php" class="btn-light btn-lg border bg-success"><i class="fas fa-flag-checkered mr-2"></i> Iniciar Simulacro</a>
                                     </div>
                                 </div>
                             </div>
@@ -223,7 +223,7 @@ if ($versesion == 'admin') {
                                             <li><i class="fas fa-lightbulb mr-2"></i> Sugerencias de estudio personalizado.</li>
                                             <li><i class="fas fa-redo mr-2"></i> Opción para enfocar la práctica en áreas específicas.</li>
                                         </ul>
-                                        <a href="./politicas_del_simulacro.php" class="btn-light btn-lg border bg-success"><i class="fas fa-flag-checkered mr-2"></i> Iniciar Simulacro</a>
+                                        <a href="./politicas.php" class="btn-light btn-lg border bg-success"><i class="fas fa-flag-checkered mr-2"></i> Iniciar Simulacro</a>
                                     </div>
                                 </div>
                             </div>
@@ -239,7 +239,7 @@ if ($versesion == 'admin') {
                                             <li><i class="fas fa-clock mr-2"></i> Tiempo promedio por pregunta.</li>
                                             <li><i class="fas fa-star mr-2"></i> Resumen de tu desempeño por tema.</li>
                                         </ul>
-                                        <a href="./politicas_del_simulacro.php" class="btn-light btn-lg border bg-success"><i class="fas fa-flag-checkered mr-2"></i> Iniciar Simulacro</a>
+                                        <a href="./politicas.php" class="btn-light btn-lg border bg-success"><i class="fas fa-flag-checkered mr-2"></i> Iniciar Simulacro</a>
                                     </div>
                                 </div>
                             </div>
@@ -254,7 +254,7 @@ if ($versesion == 'admin') {
                                             <li><i class="fas fa-list-alt mr-2"></i> Cómo identificar rápidamente la información clave en las preguntas.</li>
                                             <li><i class="fas fa-check-double mr-2"></i> Estrategias para revisar tus respuestas de manera eficiente.</li>
                                         </ul>
-                                        <a href="./politicas_del_simulacro.php" class="btn-light btn-lg border bg-success"><i class="fas fa-flag-checkered mr-2"></i> Iniciar Simulacro</a>
+                                        <a href="./politicas.php" class="btn-light btn-lg border bg-success"><i class="fas fa-flag-checkered mr-2"></i> Iniciar Simulacro</a>
                                     </div>
                                 </div>
                             </div>

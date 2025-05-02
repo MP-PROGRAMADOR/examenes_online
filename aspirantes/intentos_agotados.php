@@ -92,7 +92,7 @@
         <div class="temporary-lock-info">
             <strong>Importante:</strong> Tu acceso al examen ha sido suspendido temporalmente. Una vez que obtengas y utilices un código válido, podrás acceder nuevamente.
         </div>
-        <a href="../index.php" class="back-link text-end">Volver a inicio</a>
+        <a href="../estudiante.php" class="back-link text-end">Volver a inicio</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
