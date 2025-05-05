@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['nombre'] = $estudiante['nombre'];
             $_SESSION['apellido'] = $estudiante['apellido'];
             $_SESSION['codigo'] = $codigo;
+            $_SESSION['codigo_registro_examen'] = $estudiante['codigo_registro_examen'];
             header("Location: ../aspirantes/aspirante.php"); // Página tras login exitoso
             exit();
         } else {
