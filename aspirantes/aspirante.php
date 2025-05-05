@@ -1,31 +1,68 @@
 <?php
+
 include_once("includes/header.php");
-
-
 require '../config/conexion.php';
+
 $pdo = $pdo->getConexion();
+$id_estudiante =$_SESSION['estudiante_id'];
+$estadoExamen = "NO ENCONTRADO";
+$intentosCompletados = 0;
+$promedio = 0;
+$examenesRealizados = [];
 
-$codigo = $_SESSION['codigo_registro_examen'];
-$estadoExamen = ""; // Variable que usaremos para mostrar
-$id_estudiante = $_SESSION['estudiante_id'];
 try {
-    $stmt = $pdo->prepare("SELECT estado FROM examenes_estudiantes WHERE estudiante_id = :id_estudiante");
-    $stmt->execute(['id_estudiante' => $id_estudiante]);
-    $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    // Estado actual del examen
+    $stmtEstado = $pdo->prepare("SELECT estado FROM examenes_estudiantes WHERE estudiante_id = :id_estudiante ORDER BY id DESC LIMIT 1");
+    $stmtEstado->execute(['id_estudiante' => $id_estudiante]);
+    $resultado = $stmtEstado->fetch(PDO::FETCH_ASSOC);
     if ($resultado) {
-        $estadoExamen = ($resultado['estado'] == "pendiante") ? "pendiente" : "0";
-    } else {
-        $estadoExamen = "NO ENCONTRADO";
+        $estadoExamen = ucfirst($resultado['estado']);
     }
+
+    // Intentos completados
+    $stmtIntentos = $pdo->prepare("SELECT COUNT(*) as total FROM intentos_examen WHERE estudiante_id = :id_estudiante AND completado = 1");
+    $stmtIntentos->execute(['id_estudiante' => $id_estudiante]);
+    $fila = $stmtIntentos->fetch(PDO::FETCH_ASSOC);
+    $intentosCompletados = $fila ? $fila['total'] : 0;
+
+    // Promedio de notas
+    $stmtPromedio = $pdo->prepare("
+        SELECT AVG(
+            (SELECT COUNT(*) FROM respuestas_estudiante 
+             WHERE intento_examen_id = i.id AND es_correcta = 1) /
+            (SELECT COUNT(*) FROM respuestas_estudiante 
+             WHERE intento_examen_id = i.id) * 100
+        ) AS promedio
+        FROM intentos_examen i
+        WHERE estudiante_id = :id_estudiante AND completado = 1
+    ");
+    $stmtPromedio->execute(['id_estudiante' => $id_estudiante]);
+    $fila = $stmtPromedio->fetch(PDO::FETCH_ASSOC);
+    $promedio = $fila && $fila['promedio'] !== null ? round($fila['promedio']) : 0;
+
+    // Últimos exámenes
+    $stmtUltimos = $pdo->prepare("
+        SELECT e.titulo, i.fecha_fin,
+            ROUND((
+                (SELECT COUNT(*) FROM respuestas_estudiante 
+                 WHERE intento_examen_id = i.id AND es_correcta = 1) /
+                (SELECT COUNT(*) FROM respuestas_estudiante 
+                 WHERE intento_examen_id = i.id) * 100
+            )) AS nota,
+            (SELECT estado FROM examenes_estudiantes 
+             WHERE id = i.examen_estudiante_id) AS estado_examen
+        FROM intentos_examen i
+        INNER JOIN examenes e ON i.examen_id = e.id
+        WHERE i.estudiante_id = :id_estudiante AND i.completado = 1
+        ORDER BY i.fecha_fin DESC
+        LIMIT 5
+    ");
+    $stmtUltimos->execute(['id_estudiante' => $id_estudiante]);
+    $examenesRealizados = $stmtUltimos->fetchAll(PDO::FETCH_ASSOC);
+
 } catch (PDOException $e) {
     $estadoExamen = "ERROR: " . $e->getMessage();
 }
-
-
-
- 
-
 ?>
 
 <!-- Contenido principal -->
@@ -37,7 +74,7 @@ try {
             <div class="card stat-card shadow-sm">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div>
-                        <h6 class="text-muted">Exámenes disponibles</h6>
+                        <h6 class="text-muted">Estado actual</h6>
                         <h3 class="fw-bold text-primary"><?= htmlspecialchars($estadoExamen) ?></h3>
                     </div>
                     <div class="card-icon text-primary">📝</div>
@@ -62,7 +99,7 @@ try {
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div>
                         <h6 class="text-muted">Promedio</h6>
-                        <h3 class="fw-bold text-warning">83%</h3>
+                        <h3 class="fw-bold text-warning"><?= $promedio ?>%</h3>
                     </div>
                     <div class="card-icon text-warning">📊</div>
                 </div>
@@ -86,24 +123,30 @@ try {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Reglamento básico</td>
-                        <td>01/05/2025</td>
-                        <td>85%</td>
-                        <td><span class="badge bg-success">Aprobado</span></td>
-                    </tr>
-                    <tr>
-                        <td>Señales de tránsito</td>
-                        <td>25/04/2025</td>
-                        <td>70%</td>
-                        <td><span class="badge bg-warning text-dark">Aprobado</span></td>
-                    </tr>
-                    <tr>
-                        <td>Teoría vial</td>
-                        <td>18/04/2025</td>
-                        <td>55%</td>
-                        <td><span class="badge bg-danger">Reprobado</span></td>
-                    </tr>
+                    <?php if (count($examenesRealizados) > 0): ?>
+                        <?php foreach ($examenesRealizados as $examen): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($examen['titulo']) ?></td>
+                                <td><?= date('d/m/Y', strtotime($examen['fecha_fin'])) ?></td>
+                                <td><?= $examen['nota'] ?>%</td>
+                                <td>
+                                    <?php
+                                        $estado = strtolower($examen['estado_examen']);
+                                        $badge = match($estado) {
+                                            'aprobado' => 'bg-success',
+                                            'reprobado' => 'bg-danger',
+                                            default => 'bg-warning text-dark',
+                                        };
+                                    ?>
+                                    <span class="badge <?= $badge ?>"><?= ucfirst($estado) ?></span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="4" class="text-center">No hay exámenes completados.</td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
