@@ -7,14 +7,14 @@ $pdo = $pdo->getConexion();
 
 $codigo = $_SESSION['codigo_registro_examen'];
 $estadoExamen = ""; // Variable que usaremos para mostrar
-
+$id_estudiante = $_SESSION['estudiante_id'];
 try {
-    $stmt = $pdo->prepare("SELECT examen_realizado FROM estudiantes WHERE codigo_registro_examen = :codigo");
-    $stmt->execute(['codigo' => $codigo]);
+    $stmt = $pdo->prepare("SELECT estado FROM examenes_estudiantes WHERE estudiante_id = :id_estudiante");
+    $stmt->execute(['id_estudiante' => $id_estudiante]);
     $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($resultado) {
-        $estadoExamen = ($resultado['examen_realizado'] == 1) ? "SI" : "0";
+        $estadoExamen = ($resultado['estado'] == "pendiante") ? "pendiente" : "0";
     } else {
         $estadoExamen = "NO ENCONTRADO";
     }
@@ -24,28 +24,7 @@ try {
 
 
 
-$intentosCompletados = 0;
-
-try {
-    // Obtener ID del estudiante desde su código
-    $stmt = $pdo->prepare("SELECT id FROM estudiantes WHERE codigo_registro_examen = :codigo");
-    $stmt->execute(['codigo' => $codigo]);
-    $estudiante = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($estudiante) {
-        $estudiante_id = $estudiante['id'];
-
-        // Contar intentos completados
-        $stmt2 = $pdo->prepare("SELECT COUNT(*) as total FROM intentos_examen WHERE estudiante_id = :id AND completado = 1");
-        $stmt2->execute(['id' => $estudiante_id]);
-        $result = $stmt2->fetch(PDO::FETCH_ASSOC);
-
-        $intentosCompletados = $result ? $result['total'] : 0;
-    }
-} catch (PDOException $e) {
-    $intentosCompletados = "ERROR: " . $e->getMessage();
-}
-
+ 
 
 ?>
 
