@@ -1,5 +1,5 @@
 <?php
- 
+
 session_start();
 require '../config/conexion.php';
 
@@ -40,8 +40,8 @@ include '../componentes/menu_admin.php';
 ?>
 
 <div class="main-content">
-     <!-- Modal de Alerta -->
-     <?php if ($alerta): ?>
+    <!-- Modal de Alerta -->
+    <?php if ($alerta): ?>
         <div class="modal fade show" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="false"
             style="display: block;">
             <div class="modal-dialog">
@@ -73,7 +73,7 @@ include '../componentes/menu_admin.php';
                         </h4>
                     </div>
                     <div class="card-body">
-         
+
 
                         <form action="../php/guardar_estudiante.php" method="POST" class="needs-validation" novalidate>
                             <div class="row">
@@ -82,7 +82,8 @@ include '../componentes/menu_admin.php';
                                     <!-- Escuela -->
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold">
-                                            <i class="bi bi-building me-2 text-primary"></i>Escuela de Conducción <span class="text-danger">*</span>
+                                            <i class="bi bi-building me-2 text-primary"></i>Escuela de Conducción <span
+                                                class="text-danger">*</span>
                                         </label>
                                         <select name="escuela_id" class="form-select" required>
                                             <option value="">Seleccione una escuela</option>
@@ -96,7 +97,8 @@ include '../componentes/menu_admin.php';
                                     <!-- Identificación -->
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold">
-                                            <i class="bi bi-card-heading me-2 text-primary"></i>Identificación <span class="text-danger">*</span>
+                                            <i class="bi bi-card-heading me-2 text-primary"></i>Identificación <span
+                                                class="text-danger">*</span>
                                         </label>
                                         <input type="text" name="numero_identificacion" class="form-control" required>
                                         <div class="invalid-feedback">Ingrese el número de identificación.</div>
@@ -105,7 +107,8 @@ include '../componentes/menu_admin.php';
                                     <!-- Nombre -->
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold">
-                                            <i class="bi bi-person me-2 text-primary"></i>Nombre <span class="text-danger">*</span>
+                                            <i class="bi bi-person me-2 text-primary"></i>Nombre <span
+                                                class="text-danger">*</span>
                                         </label>
                                         <input type="text" name="nombre" class="form-control" required>
                                         <div class="invalid-feedback">Ingrese el nombre del estudiante.</div>
@@ -114,7 +117,8 @@ include '../componentes/menu_admin.php';
                                     <!-- Apellido -->
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold">
-                                            <i class="bi bi-person-fill me-2 text-primary"></i>Apellido <span class="text-danger">*</span>
+                                            <i class="bi bi-person-fill me-2 text-primary"></i>Apellido <span
+                                                class="text-danger">*</span>
                                         </label>
                                         <input type="text" name="apellido" class="form-control" required>
                                         <div class="invalid-feedback">Ingrese el apellido del estudiante.</div>
@@ -126,9 +130,11 @@ include '../componentes/menu_admin.php';
                                     <!-- Fecha de nacimiento -->
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold">
-                                            <i class="bi bi-calendar-date me-2 text-primary"></i>Fecha de Nacimiento <span class="text-danger">*</span>
+                                            <i class="bi bi-calendar-date me-2 text-primary"></i>Fecha de Nacimiento
+                                            <span class="text-danger">*</span>
                                         </label>
-                                        <input type="date" name="fecha_nacimiento" class="form-control" id="fecha_nacimiento" required>
+                                        <input type="date" name="fecha_nacimiento" class="form-control"
+                                            id="fecha_nacimiento" required>
                                         <div class="invalid-feedback">Ingrese una fecha válida.</div>
                                     </div>
 
@@ -150,20 +156,34 @@ include '../componentes/menu_admin.php';
                                     </div>
 
                                     <!-- Categoría de Carné -->
-<div class="mb-3">
-    <label for="categoria_carne" class="form-label fw-semibold">
-        <i class="bi bi-card-list me-2 text-primary"></i>Categoría de Carné <span class="text-danger">*</span>
-    </label>
-    <select name="categoria_carne" id="categoria_carne" class="form-select" disabled required>
-        <option value="">Seleccione una categoría</option>
-    </select>
-    <div class="invalid-feedback">
-        Por favor selecciona una categoría de carné.
-    </div>
-    <div id="mensaje_categoria_vacia" class="text-danger mt-2 fw-semibold" style="display: none;">
-        No hay ninguna categoría habilitada para la edad ingresada.
-    </div>
-</div>
+                                    <div class="mb-3">
+                                        <label for="categoria_carne" class="form-label fw-semibold">
+                                            <i class="bi bi-card-list me-2 text-primary"></i>Categoría de Carné <span
+                                                class="text-danger">*</span>
+                                        </label>
+                                        <select name="categoria_carne" id="categoria_carne" class="form-select" disabled
+                                            required>
+                                            <option value="">Seleccione una categoría</option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Por favor selecciona una categoría de carné.
+                                        </div>
+                                        <div id="mensaje_categoria_vacia" class="text-danger mt-2 fw-semibold"
+                                            style="display: none;">
+                                            No hay ninguna categoría habilitada para la edad ingresada.
+                                        </div>
+                                        <div id="examen-alerta" class="mt-2" style="display: none;">
+                                            <div
+                                                class="alert alert-warning d-flex justify-content-between align-items-center">
+                                                No existe un examen para esta categoría.
+                                                <a href="registrar_examenes.php" id="btn-registrar-examen"
+                                                    class="btn btn-sm btn-outline-primary">
+                                                    Registrar Examen
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                    </div>
 
                                 </div>
                             </div>
@@ -184,16 +204,17 @@ include '../componentes/menu_admin.php';
         </div>
     </div>
 </div>
+
 <body data-alerta="<?= $alerta ? 'true' : 'false' ?>">
 
-  <script>
-    document.getElementById('sidebarToggle').addEventListener('click', function () {
-      document.getElementById('sidebar').classList.toggle('show');
-    });
+    <script>
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('show');
+        });
 
 
-     // Función para cerrar el modal automáticamente después de 5 segundos
-     window.onload = function () {
+        // Función para cerrar el modal automáticamente después de 5 segundos
+        window.onload = function () {
             const alertModal = new bootstrap.Modal(document.getElementById('alertModal'), {
                 keyboard: false,
                 backdrop: 'static'
@@ -207,71 +228,97 @@ include '../componentes/menu_admin.php';
                 }, 5000); // Cierra el modal después de 5 segundos
             <?php endif; ?>
         }
-  </script>
-  
-<script>
-    // Calcular edad a partir de la fecha de nacimiento
-    document.addEventListener("DOMContentLoaded", function() {
-    // Función para calcular la edad a partir de la fecha de nacimiento
-    function calcularEdad(fechaNacimiento) {
-        const hoy = new Date();
-        const nacimiento = new Date(fechaNacimiento);
-        let edad = hoy.getFullYear() - nacimiento.getFullYear();
-        const m = hoy.getMonth() - nacimiento.getMonth();
-        if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
-            edad--;
-        }
-        return edad;
-    }
+    </script>
 
-    // Función para filtrar las categorías según la edad
-    function filtrarCategoriasPorEdad(edad) {
-        const categorias = <?php echo json_encode($categoria_carne); ?>;
-        const select = document.getElementById("categoria_carne");
-        const mensaje = document.getElementById("mensaje_categoria_vacia");
+    <script>
+        // Calcular edad a partir de la fecha de nacimiento
+        document.addEventListener("DOMContentLoaded", function () {
+            // Función para calcular la edad a partir de la fecha de nacimiento
+            function calcularEdad(fechaNacimiento) {
+                const hoy = new Date();
+                const nacimiento = new Date(fechaNacimiento);
+                let edad = hoy.getFullYear() - nacimiento.getFullYear();
+                const m = hoy.getMonth() - nacimiento.getMonth();
+                if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+                    edad--;
+                }
+                return edad;
+            }
 
-        select.innerHTML = "<option value=''>Seleccione una categoría</option>";
-        let tieneOpciones = false;
+            // Función para filtrar las categorías según la edad
+            function filtrarCategoriasPorEdad(edad) {
+                const categorias = <?php echo json_encode($categoria_carne); ?>;
+                const select = document.getElementById("categoria_carne");
+                const mensaje = document.getElementById("mensaje_categoria_vacia");
 
-        categorias.forEach(categoria => {
-            if (edad >= categoria.edad_minima) {
-                const option = document.createElement("option");
-                option.value = categoria.id;
-                option.textContent = categoria.nombre;
-                select.appendChild(option);
-                tieneOpciones = true;
+                select.innerHTML = "<option value=''>Seleccione una categoría</option>";
+                let tieneOpciones = false;
+
+                categorias.forEach(categoria => {
+                    if (edad >= categoria.edad_minima) {
+                        const option = document.createElement("option");
+                        option.value = categoria.id;
+                        option.textContent = categoria.nombre;
+                        select.appendChild(option);
+                        tieneOpciones = true;
+                    }
+                });
+
+                if (tieneOpciones) {
+                    select.disabled = false;
+                    mensaje.style.display = "none";
+                } else {
+                    select.disabled = true;
+                    mensaje.style.display = "block";
+                }
+            }
+
+            // Escuchar cambios en el campo de fecha de nacimiento
+            document.getElementById("fecha_nacimiento").addEventListener("change", function () {
+                const edad = calcularEdad(this.value);
+                filtrarCategoriasPorEdad(edad);
+            });
+
+            // Verificar si el modal de alerta debe mostrarse y cerrarlo después de 5 segundos
+            const alertModal = new bootstrap.Modal(document.getElementById('alertModal'), {
+                keyboard: false,
+                backdrop: 'static'
+            });
+
+            if (document.body.dataset.alerta === "true") {
+                alertModal.show();
+                setTimeout(function () {
+                    alertModal.hide();
+                }, 5000);
             }
         });
 
-        if (tieneOpciones) {
-            select.disabled = false;
-            mensaje.style.display = "none";
-        } else {
-            select.disabled = true;
-            mensaje.style.display = "block";
-        }
+    </script>
+
+
+<script>
+document.getElementById("categoria_carne").addEventListener("change", function () {
+    const categoriaId = this.value;
+
+    if (categoriaId === "") {
+        document.getElementById("examen-alerta").style.display = "none";
+        return;
     }
 
-    // Escuchar cambios en el campo de fecha de nacimiento
-    document.getElementById("fecha_nacimiento").addEventListener("change", function () {
-        const edad = calcularEdad(this.value);
-        filtrarCategoriasPorEdad(edad);
-    });
-
-    // Verificar si el modal de alerta debe mostrarse y cerrarlo después de 5 segundos
-    const alertModal = new bootstrap.Modal(document.getElementById('alertModal'), {
-        keyboard: false,
-        backdrop: 'static'
-    });
-
-    if (document.body.dataset.alerta === "true") {
-        alertModal.show();
-        setTimeout(function() {
-            alertModal.hide();
-        }, 5000);
-    }
+    fetch(`../php/verificar_examen_categoria.php?categoria_id=${categoriaId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.existe) {
+                document.getElementById("examen-alerta").style.display = "none";
+            } else {
+                document.getElementById("examen-alerta").style.display = "block";
+            }
+        })
+        .catch(err => {
+            console.error("Error al verificar examen:", err);
+            document.getElementById("examen-alerta").style.display = "none";
+        });
 });
-
 </script>
 
-<?php include_once('../componentes/footer.php'); ?>
+    <?php include_once('../componentes/footer.php'); ?>

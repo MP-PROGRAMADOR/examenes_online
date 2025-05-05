@@ -291,9 +291,39 @@ CREATE TABLE `usuarios` (
   `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
+CREATE TABLE examenes_estudiantes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    estudiante_id INT NOT NULL,
+    categoria_carne_id INT NOT NULL, 
+    fecha_asignacion DATE NOT NULL DEFAULT CURRENT_DATE,
+    fecha_realizacion DATETIME DEFAULT NULL,
+    fecha_proximo_intento DATE DEFAULT NULL,
+    estado ENUM('pendiente', 'aprobado', 'reprobado') DEFAULT 'pendiente',
+    acceso_habilitado TINYINT(1) DEFAULT 0, -- 0 = oculto, 1 = visible al estudiante 
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (estudiante_id) REFERENCES estudiantes(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (categoria_carne_id) REFERENCES categorias_carne(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+
+ 
+
 --
 -- Índices para tablas volcadas
 --
+
+DROP TABLE IF EXISTS respuestas_pregunta;
+ALTER TABLE estudiantes ADD permitido_ver_examen TINYINT(1) DEFAULT 0;
+
+ALTER TABLE intentos_examen
+    ADD COLUMN examen_estudiante_id INT AFTER id,
+    ADD FOREIGN KEY (examen_estudiante_id) REFERENCES examenes_estudiantes(id);
+
+-- Puedes luego quitar `examen_id` de aquí, si toda la lógica la haces a través de `examenes_estudiantes`.
 
 --
 -- Indices de la tabla `categorias_carne`
