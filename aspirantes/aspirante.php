@@ -9,7 +9,7 @@ $estadoExamen = "NO ENCONTRADO";
 $intentosCompletados = 0;
 $promedio = 0;
 $examenesRealizados = [];
-
+$codigo =  $_SESSION['codigo_registro_examen'];
 try {
     // Estado actual del examen
     $stmtEstado = $pdo->prepare("SELECT estado FROM examenes_estudiantes WHERE estudiante_id = :id_estudiante ORDER BY id DESC LIMIT 1");
@@ -74,7 +74,7 @@ try {
             <div class="card stat-card shadow-sm">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div>
-                        <h6 class="text-muted">Estado actual</h6>
+                        <h6 class="text-muted">Estado actual <?php $codigo?></h6>
                         <h3 class="fw-bold text-primary"><?= htmlspecialchars($estadoExamen) ?></h3>
                     </div>
                     <div class="card-icon text-primary">📝</div>

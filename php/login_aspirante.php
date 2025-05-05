@@ -5,6 +5,7 @@ include '../config/conexion.php'; // Asegúrate de que este archivo retorna $pdo
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $codigo = trim($_POST['codigo']);
 
+    // Validación básica
     if (empty($codigo)) {
         $_SESSION['error'] = "El código de acceso es obligatorio.";
         header("Location: ../aspirantes/index.php");
@@ -12,20 +13,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        $conn = $pdo->getConexion(); // O directamente $pdo si no usas clase
+        // Obtener conexión
+        $conn = $pdo->getConexion(); // O usar $pdo directamente si es una instancia de PDO
+
+        // Buscar estudiante por código
         $stmt = $conn->prepare("SELECT * FROM estudiantes WHERE codigo_registro_examen = :codigo");
-        $stmt->bindParam(':codigo', $codigo);
+        $stmt->bindParam(':codigo', $codigo, PDO::PARAM_STR);
         $stmt->execute();
 
         $estudiante = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($estudiante) {
-            $_SESSION['estudiante_id'] = $estudiante['id'];
-            $_SESSION['nombre'] = $estudiante['nombre'];
-            $_SESSION['apellido'] = $estudiante['apellido'];
-            $_SESSION['codigo'] = $codigo;
-            $_SESSION['codigo_registro_examen'] = $estudiante['codigo_registro_examen'];
-            header("Location: ../aspirantes/aspirante.php"); // Página tras login exitoso
+            // Guardar información del estudiante en la sesión
+            $_SESSION['estudiante'] = [
+                'id' => $estudiante['id'],
+                'nombre' => $estudiante['nombre'],
+                'apellido' => $estudiante['apellido'],
+                'codigo' => $estudiante['codigo_registro_examen'],
+                'email' => $estudiante['email'] ?? null // opcional si existe campo email
+            ];
+
+            // Redirigir al panel del aspirante
+            header("Location: ../aspirantes/aspirante.php");
             exit();
         } else {
             $_SESSION['error'] = "Código incorrecto. Intenta nuevamente.";
@@ -38,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 } else {
+    // Acceso no válido
     header("Location: ../aspirantes/index.php");
     exit();
 }
