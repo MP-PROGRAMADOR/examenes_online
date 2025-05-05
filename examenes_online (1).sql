@@ -5,7 +5,13 @@
 -- Servidor: 127.0.0.1
 -- Tiempo de generación: 05-05-2025 a las 16:19:22
 -- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Versión de PHP: 8.0
+
+drop database if exists examenes_online;
+
+create database examenes_online;
+
+use examenes_online;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -80,12 +86,7 @@ CREATE TABLE `escuelas_conduccion` (
   `email` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `escuelas_conduccion`
---
 
-INSERT INTO `escuelas_conduccion` (`id`, `nombre`, `direccion`, `telefono`, `email`) VALUES
-(1, 'Nana mangue', 'Malabo', '222545658', NULL);
 
 -- --------------------------------------------------------
 
@@ -107,15 +108,7 @@ CREATE TABLE `estudiantes` (
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `estudiantes`
---
 
-INSERT INTO `estudiantes` (`id`, `escuela_id`, `numero_identificacion`, `nombre`, `apellido`, `fecha_nacimiento`, `telefono`, `direccion`, `categoria_carne_id`, `codigo_registro_examen`, `examen_realizado`, `fecha_registro`, `permitido_ver_examen`) VALUES
-(1, 1, '000144778', 'sir', 'topola', '2005-04-10', '555232124', 'Malabo', 4, 'ENA254D7', 0, '2025-04-17 13:26:37', 0),
-(2, 1, '000144775', 'monica', 'topola', '1992-10-28', '555411478', 'Malabo', 12, 'ENA251288', 0, '2025-05-05 12:13:15', 0);
-
--- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `examenes`
@@ -132,20 +125,7 @@ CREATE TABLE `examenes` (
   `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `examenes`
---
 
-INSERT INTO `examenes` (`id`, `categoria_carne_id`, `titulo`, `descripcion`, `duracion_minutos`, `total_preguntas`, `preguntas_aleatorias`, `fecha_creacion`) VALUES
-(1, 4, 'TEORÍA DEDICADA NIVEL B', 'examen dedicado', 40, NULL, 1, '2025-04-17 13:41:20'),
-(2, 6, 'TEORÍA DEDICADA C', 'modular', 25, NULL, 1, '2025-04-17 14:44:33'),
-(3, 12, 'TEORÍA DEDICADA AM', 'MAS', 25, NULL, 1, '2025-05-05 10:57:06');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `examenes_estudiantes`
---
 
 CREATE TABLE `examenes_estudiantes` (
   `id` int(11) NOT NULL,
@@ -159,18 +139,6 @@ CREATE TABLE `examenes_estudiantes` (
   `creado_en` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `examenes_estudiantes`
---
-
-INSERT INTO `examenes_estudiantes` (`id`, `estudiante_id`, `categoria_carne_id`, `fecha_asignacion`, `fecha_realizacion`, `fecha_proximo_intento`, `estado`, `acceso_habilitado`, `creado_en`) VALUES
-(1, 2, 12, '2025-05-05', NULL, NULL, 'pendiente', 1, '2025-05-05 12:13:15');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `imagenes_pregunta`
---
 
 CREATE TABLE `imagenes_pregunta` (
   `id` int(11) NOT NULL,
@@ -178,18 +146,7 @@ CREATE TABLE `imagenes_pregunta` (
   `ruta_imagen` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `imagenes_pregunta`
---
 
-INSERT INTO `imagenes_pregunta` (`id`, `pregunta_id`, `ruta_imagen`) VALUES
-(1, 5, '../uploads/preguntas/ade.png');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `intentos_examen`
---
 
 CREATE TABLE `intentos_examen` (
   `id` int(11) NOT NULL,
@@ -230,19 +187,7 @@ CREATE TABLE `opciones_pregunta` (
   `es_correcta` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `opciones_pregunta`
---
 
-INSERT INTO `opciones_pregunta` (`id`, `pregunta_id`, `texto_opcion`, `es_correcta`) VALUES
-(1, 2, 'es un lenguaje', 1),
-(2, 2, 'es un pais', 0),
-(3, 4, 'es una libelula', 1),
-(4, 4, 'es un personaje', 1),
-(5, 4, 'es un programador', 0),
-(6, 4, 'es un joven', 0);
-
--- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `preguntas`
@@ -257,22 +202,7 @@ CREATE TABLE `preguntas` (
   `fecha_creacion` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `preguntas`
---
 
-INSERT INTO `preguntas` (`id`, `examen_id`, `texto_pregunta`, `tipo_contenido`, `tipo_pregunta`, `fecha_creacion`) VALUES
-(1, 1, 'php es un lenguaje literrario', 'texto', 'vf', '2025-04-17 14:42:55'),
-(2, 1, 'que es js', 'texto', 'unica', '2025-04-17 15:09:56'),
-(3, 1, 'PHP es un lenguaje de alto nivel', 'texto', 'vf', '2025-04-17 15:11:19'),
-(4, 2, 'mh', 'texto', 'multiple', '2025-04-17 15:45:32'),
-(5, 2, '\"¿Está permitido adelantar en esta situación?\"', 'ilustracion', 'vf', '2025-04-17 16:33:01');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `respuestas_estudiante`
---
 
 CREATE TABLE `respuestas_estudiante` (
   `id` int(11) NOT NULL,
