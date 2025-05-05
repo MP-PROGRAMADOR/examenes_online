@@ -17,7 +17,7 @@
             <a href="../admin/categorias.php" class="nav-link">Categorías</a>
             <a href="../admin/examenes.php" class="nav-link">Exámenes</a>
             <a href="../admin/preguntas.php" class="nav-link">Preguntas</a>
-            <!-- <a href="../admin/asignar_examen_aspirante.php" class="nav-link">Evaluación</a> -->
+            <a href="../admin/examenes_estudiantes.php" class="nav-link">Evaluación</a>
           </div>
         </li>
 
