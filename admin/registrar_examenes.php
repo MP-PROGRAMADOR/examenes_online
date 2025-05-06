@@ -68,13 +68,13 @@ include '../componentes/menu_admin.php';
                             </div>
 
                             <!-- Campo Duración -->
-                            <div class="mb-3">
+                            <!-- <div class="mb-3">
                                 <label for="duracion_minutos" class="form-label fw-semibold">
                                     <i class="bi bi-clock-fill me-2 text-primary"></i>Duración (en minutos) <span class="text-danger">*</span>
                                 </label>
                                 <input type="number" class="form-control shadow-sm" id="duracion_minutos" name="duracion_minutos" placeholder="Ej: 30" min="1" required>
                                 <div class="invalid-feedback">Por favor, ingrese la duración del examen en minutos.</div>
-                            </div>
+                            </div> -->
 
                             <!-- Botones -->
                             <div class="d-flex justify-content-between flex-column flex-sm-row gap-2">

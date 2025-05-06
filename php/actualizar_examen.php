@@ -25,7 +25,10 @@ try {
         header('Location: ../admin/examenes.php?mensaje=error');
         exit();
     }
-
+    $id = filter_input(INPUT_POST, 'examen_id', FILTER_VALIDATE_INT);
+    if (!$id) {
+        throw new Exception("ID de examen inválido.");
+    }
     if ($id) {
         // Actualizar examen
         $sql = "UPDATE examenes SET 
@@ -56,7 +59,18 @@ try {
             ':duracion_minutos' => $duracion_minutos
         ]);
     }
-
+    // Recalcular y actualizar total_preguntas del examen
+    $stmtActualizar = $conn->prepare("
+    UPDATE examenes 
+    SET total_preguntas = (
+        SELECT COUNT(*) FROM preguntas WHERE examen_id = :examen_id
+    ) 
+    WHERE id = :examen_id
+    ");
+    $stmtActualizar->bindParam(':examen_id', $id, PDO::PARAM_INT);
+    $stmtActualizar->bindParam(':examen_id', $id, PDO::PARAM_INT);
+    $stmtActualizar->execute();
+    
     // Redirigir siempre aquí tras guardar correctamente
     header('Location: ../admin/examenes.php?mensaje=exito');
     exit();

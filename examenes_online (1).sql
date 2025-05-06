@@ -118,10 +118,8 @@ CREATE TABLE `examenes` (
   `id` int(11) NOT NULL,
   `categoria_carne_id` int(11) NOT NULL,
   `titulo` varchar(255) NOT NULL,
-  `descripcion` text DEFAULT NULL,
-  `duracion_minutos` int(11) DEFAULT NULL,
-  `total_preguntas` int(11) DEFAULT NULL,
-  `preguntas_aleatorias` tinyint(1) DEFAULT 1,
+  `descripcion` text DEFAULT NULL, 
+  `total_preguntas` int(11) DEFAULT NULL, 
   `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -134,6 +132,7 @@ CREATE TABLE `examenes_estudiantes` (
   `fecha_asignacion` date NOT NULL DEFAULT curdate(),
   `fecha_realizacion` datetime DEFAULT NULL,
   `fecha_proximo_intento` date DEFAULT NULL,
+  `total_preguntas` int(11) DEFAULT NULL,
   `estado` enum('pendiente','aprobado','reprobado') DEFAULT 'pendiente',
   `acceso_habilitado` tinyint(1) DEFAULT 0,
   `creado_en` timestamp NOT NULL DEFAULT current_timestamp()

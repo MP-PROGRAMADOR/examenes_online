@@ -1,95 +1,25 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Información del Examen - Autoescuela Online</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/styles_realizar.css">
-    <style>
-        /* Estilos personalizados para reflejar disciplina, perseverancia y actitud */
-        body {
-            background-color: #f8f9fa;
-            color: #343a40;
-            font-family: 'Montserrat', sans-serif;
-        }
+<?php include_once('includes/header.php') ;
 
-        .header-shadow {
-            box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
-        }
+$id = $estudiante['id']; 
 
-        .main-section {
-            padding: 40px 0;
-        }
+require '../config/conexion.php'; 
+$pdo = $pdo->getConexion();
 
-        .info-card {
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            border-radius: 10px;
-            padding: 30px;
-            margin-bottom: 30px;
-            background-color: white;
-        }
+// Obtener el id de la categoría del carne del estudiante
+$stmtCategoria = $pdo->prepare("SELECT categoria_carne_id FROM estudiantes WHERE id = :id ORDER BY id DESC LIMIT 1");
+$stmtCategoria->execute(['id' => $id]);
+$categoria_carne = $stmtCategoria->fetch(PDO::FETCH_ASSOC); // Usamos fetch para obtener una sola fila
 
-        .info-card h2 {
-            color: #007bff;
-            font-weight: bold;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 10px;
-        }
+if ($categoria_carne) {
+    $id_carne = $categoria_carne['categoria_carne_id'];
 
-        .info-card h3 {
-            color: #28a745;
-            font-weight: bold;
-            margin-top: 20px;
-            margin-bottom: 10px;
-        }
+    // Obtener el examen asociado a la categoría del carne
+    $stmtExamen = $pdo->prepare("SELECT * FROM examenes WHERE categoria_carne_id = :id ORDER BY id DESC LIMIT 1");
+    $stmtExamen->execute(['id' => $id_carne]);
+    $examen = $stmtExamen->fetch(PDO::FETCH_ASSOC); // Usamos fetch para obtener una sola fila
+} 
 
-        .info-card p {
-            line-height: 1.7;
-            color: #6c757d;
-        }
-
-        .important-note {
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            color: #85640c;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-
-        .btn-start-exam {
-            background-color: #28a745;
-            border-color: #28a745;
-            color: white;
-            padding: 12px 25px;
-            font-size: 1.1em;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-start-exam:hover {
-            background-color: #1e7e34;
-            border-color: #1e7e34;
-        }
-
-        .back-link {
-            display: block;
-            margin-top: 20px;
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
-</head>
-<body class="d-flex flex-column min-vh-100">
-    
-
+?>
     <main class="container my-5 flex-grow-1 main-section">
         <div class="row justify-content-center">
             <div class="col-md-8">
@@ -109,8 +39,7 @@
 
                     <h3>Condiciones del Examen</h3>
                     <ul>
-                        <li><strong>Requisitos:</strong> Para realizar este examen, debes haber completado el módulo correspondiente y estar registrado en la plataforma.</li>
-                        <li><strong>Puntuación:</strong> La puntuación se basará en el número de respuestas correctas. Cada pregunta tiene el mismo valor.</li>
+                         <li><strong>Puntuación:</strong> La puntuación se basará en el número de respuestas correctas. Cada pregunta tiene el mismo valor.</li>
                         <li><strong>Resultados:</strong> Los resultados del examen estarán disponibles inmediatamente después de la finalización.</li>
                         <li><strong>Revisión:</strong> En caso de dudas sobre alguna pregunta o resultado, puedes contactar a tu instructor a través de la plataforma.</li>
                         <li><strong>Intentos:</strong> Tendrás un máximo de <span id="exam-attempts">un intento</span> para realizar este examen.</li>
@@ -121,8 +50,8 @@
                         <strong>Importante:</strong> Al hacer clic en "Comenzar Examen", confirmas que has leído y aceptas todas las políticas y condiciones mencionadas anteriormente. ¡Mucho éxito!
                     </div>
 
-                    <a href="./examen.php" class="btn btn-start-exam btn-block mt-4">Comenzar Examen</a>
-                    <a href="aspirante.php" class="back-link">Volver</a>
+                    <a href="examen.php?id=<?= $examen['id'] ?>" class="btn btn-start-exam btn-block mt-4">Comenzar Examen</a>
+                  
                 </div>
             </div>
         </div>
@@ -135,6 +64,8 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Puedes personalizar la duración, número de preguntas e intentos desde JavaScript si es dinámico
         document.getElementById('exam-duration').textContent = '45 minutos';

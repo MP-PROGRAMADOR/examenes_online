@@ -16,8 +16,7 @@ if ($examen_id) {
 
 $categoriaSeleccionada = $examen['categoria_carne_id'] ?? '';
 $titulo = $examen['titulo'] ?? '';
-$descripcion = $examen['descripcion'] ?? '';
-$duracion = $examen['duracion_minutos'] ?? '';
+$descripcion = $examen['descripcion'] ?? ''; 
 ?>
 
 <div class="main-content">
@@ -86,13 +85,7 @@ $duracion = $examen['duracion_minutos'] ?? '';
                             </div>
 
                             <!-- Duración -->
-                            <div class="mb-3">
-                                <label for="duracion_minutos" class="form-label fw-semibold">
-                                    <i class="bi bi-clock-fill me-2 text-primary"></i>Duración (en minutos) <span class="text-danger">*</span>
-                                </label>
-                                <input type="number" class="form-control shadow-sm" id="duracion_minutos" name="duracion_minutos" value="<?= htmlspecialchars($duracion) ?>" min="1" required>
-                                <div class="invalid-feedback">Por favor, ingrese la duración del examen en minutos.</div>
-                            </div>
+                          <!--   -->
 
                             <!-- Botones -->
                             <div class="d-flex justify-content-between flex-column flex-sm-row gap-2">

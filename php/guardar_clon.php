@@ -50,6 +50,17 @@ try {
             $stmt->execute([$nueva_pregunta_id, $op['texto_opcion'], $op['es_correcta']]);
         }
     }
+    // Recalcular y actualizar total_preguntas del examen
+$stmtActualizar = $pdo->prepare("
+UPDATE examenes 
+SET total_preguntas = (
+    SELECT COUNT(*) FROM preguntas WHERE examen_id = :examen_id
+) 
+WHERE id = :examen_id
+");
+$stmtActualizar->bindParam(':examen_id', $examen_id, PDO::PARAM_INT);
+$stmtActualizar->execute();
+
 
     $pdo->commit();
     $_SESSION['mensaje'] = "Preguntas clonadas exitosamente.";

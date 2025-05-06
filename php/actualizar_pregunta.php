@@ -4,8 +4,8 @@
 // Descripción: Procesa la edición de preguntas y sus imágenes asociadas.
 // ==========================================
 
-require_once 'conexion.php';
-
+require_once '../config/conexion.php';
+$pdo = $pdo->getConexion();
 // =======================
 // VALIDACIÓN DEL POST
 // =======================
@@ -30,9 +30,7 @@ if ($id <= 0 || empty($texto) || empty($tipo) || empty($contenido)) {
 // ACTUALIZACIÓN DE DATOS
 // =======================
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $usuario, $contrasena);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+    
     $pdo->beginTransaction();
 
     // 1. Actualizar datos de la pregunta
@@ -85,6 +83,18 @@ try {
             }
         }
     }
+    // ✅ Actualizar el total de preguntas del examen
+    $stmtActualizar = $pdo->prepare("
+        UPDATE examenes 
+        SET total_preguntas = (
+            SELECT COUNT(*) FROM preguntas WHERE examen_id = :id
+        ) 
+        WHERE id = :id
+    ");
+    $stmtActualizar->execute([$id, $id]);
+
+
+    // Confirmar transacción 
 
     $pdo->commit();
 

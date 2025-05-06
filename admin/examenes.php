@@ -22,8 +22,7 @@ try {
     $sql = "SELECT
                 e.id,
                 e.titulo,
-                e.descripcion,
-                e.duracion_minutos, 
+                e.descripcion, 
                 e.fecha_creacion,
                 cc.nombre AS categoria_nombre
             FROM examenes e
@@ -97,8 +96,7 @@ include '../componentes/menu_admin.php';
                                 <tr>
                                     <th><i class="bi bi-hash me-1"></i>ID</th>
                                     <th><i class="bi bi-card-text me-1"></i>Título</th>
-                                    <th><i class="bi bi-tags me-1"></i>Categoría</th>
-                                    <th><i class="bi bi-clock me-1"></i>Duración</th>
+                                    <th><i class="bi bi-tags me-1"></i>Categoría</th> 
                                     <th><i class="bi bi-text-paragraph me-1"></i>Descripción</th>
                                     <th><i class="bi bi-calendar3 me-1"></i>Creado</th>
                                     <th><i class="bi bi-gear-fill me-1"></i>Acciones</th>
@@ -110,7 +108,7 @@ include '../componentes/menu_admin.php';
                                         <td><?= htmlspecialchars($examen['id']) ?></td>
                                         <td><?= htmlspecialchars($examen['titulo']) ?></td>
                                         <td><?= htmlspecialchars($examen['categoria_nombre']) ?></td>
-                                        <td><?= htmlspecialchars($examen['duracion_minutos']) ?> min</td>
+                                        
                                         <td><?= htmlspecialchars($examen['descripcion']) ?></td>
                                         <td><?= date('d/m/Y', strtotime($examen['fecha_creacion'])) ?></td>
                                         <td>
