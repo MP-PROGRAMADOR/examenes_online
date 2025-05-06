@@ -26,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($estudiante) {
             // Guardar información del estudiante en la sesión
             $_SESSION['estudiante'] = [
+                'categoria_carne' => $estudiante['categoria_carne_id'],
                 'id' => $estudiante['id'],
                 'nombre' => $estudiante['nombre'],
                 'apellido' => $estudiante['apellido'],

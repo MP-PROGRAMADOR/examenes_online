@@ -4,24 +4,26 @@ include_once("includes/header.php");
 require '../config/conexion.php';
 
 $pdo = $pdo->getConexion();
-$id_estudiante =$_SESSION['estudiante_id'];
+$id = $estudiante['id'];
 $estadoExamen = "NO ENCONTRADO";
 $intentosCompletados = 0;
 $promedio = 0;
-$examenesRealizados = [];
-$codigo =  $_SESSION['codigo_registro_examen'];
+$examenesRealizados = []; 
+
 try {
     // Estado actual del examen
-    $stmtEstado = $pdo->prepare("SELECT estado FROM examenes_estudiantes WHERE estudiante_id = :id_estudiante ORDER BY id DESC LIMIT 1");
-    $stmtEstado->execute(['id_estudiante' => $id_estudiante]);
+    $stmtEstado = $pdo->prepare("SELECT estado, acceso_habilitado FROM examenes_estudiantes WHERE estudiante_id = :id ORDER BY id DESC LIMIT 1");
+    $stmtEstado->execute(['id' => $id]);
     $resultado = $stmtEstado->fetch(PDO::FETCH_ASSOC);
     if ($resultado) {
         $estadoExamen = ucfirst($resultado['estado']);
+        $accesoExamen = $resultado['acceso_habilitado'];
     }
+   
 
     // Intentos completados
-    $stmtIntentos = $pdo->prepare("SELECT COUNT(*) as total FROM intentos_examen WHERE estudiante_id = :id_estudiante AND completado = 1");
-    $stmtIntentos->execute(['id_estudiante' => $id_estudiante]);
+    $stmtIntentos = $pdo->prepare("SELECT COUNT(*) as total FROM intentos_examen WHERE estudiante_id = :id AND completado = 1");
+    $stmtIntentos->execute(['id' => $id]);
     $fila = $stmtIntentos->fetch(PDO::FETCH_ASSOC);
     $intentosCompletados = $fila ? $fila['total'] : 0;
 
@@ -34,9 +36,9 @@ try {
              WHERE intento_examen_id = i.id) * 100
         ) AS promedio
         FROM intentos_examen i
-        WHERE estudiante_id = :id_estudiante AND completado = 1
+        WHERE estudiante_id = :id AND completado = 1
     ");
-    $stmtPromedio->execute(['id_estudiante' => $id_estudiante]);
+    $stmtPromedio->execute(['id' => $id]);
     $fila = $stmtPromedio->fetch(PDO::FETCH_ASSOC);
     $promedio = $fila && $fila['promedio'] !== null ? round($fila['promedio']) : 0;
 
@@ -53,11 +55,11 @@ try {
              WHERE id = i.examen_estudiante_id) AS estado_examen
         FROM intentos_examen i
         INNER JOIN examenes e ON i.examen_id = e.id
-        WHERE i.estudiante_id = :id_estudiante AND i.completado = 1
+        WHERE i.estudiante_id = :id AND i.completado = 1
         ORDER BY i.fecha_fin DESC
         LIMIT 5
     ");
-    $stmtUltimos->execute(['id_estudiante' => $id_estudiante]);
+    $stmtUltimos->execute(['id' => $id]);
     $examenesRealizados = $stmtUltimos->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
@@ -74,8 +76,8 @@ try {
             <div class="card stat-card shadow-sm">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div>
-                        <h6 class="text-muted">Estado actual <?php $codigo?></h6>
-                        <h3 class="fw-bold text-primary"><?= htmlspecialchars($estadoExamen) ?></h3>
+                        <h6 class="text-muted">Examen</h6>
+                        <h3 class="fw-bold text-primary"><?= (htmlspecialchars($accesoExamen) == '1') ?  htmlspecialchars($estadoExamen) : "No disponible" ?></h3>
                     </div>
                     <div class="card-icon text-primary">📝</div>
                 </div>
@@ -99,7 +101,7 @@ try {
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div>
                         <h6 class="text-muted">Promedio</h6>
-                        <h3 class="fw-bold text-warning"><?= $promedio ?>%</h3>
+                        <h3 class="fw-bold text-warning"><?= htmlspecialchars($promedio) ?>%</h3>
                     </div>
                     <div class="card-icon text-warning">📊</div>
                 </div>
@@ -152,12 +154,14 @@ try {
         </div>
     </div>
 
+    <?php    if($accesoExamen == '1') {    ?>
     <!-- Acceso directo a simulación -->
     <div class="text-end mt-4">
         <a href="politicas.php" class="btn btn-primary btn-lg">
             🚀 Comenzar simulación de examen
         </a>
     </div>
+    <?php  }   ?>
 
 </div>
 

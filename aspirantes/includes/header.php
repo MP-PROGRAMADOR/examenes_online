@@ -1,11 +1,18 @@
 <?php
 session_start();
 
-// Verifica que el estudiante esté logueado
-if (!isset($_SESSION['estudiante_id'])) {
+// Verificar si hay sesión activa
+if (!isset($_SESSION['estudiante'])) {
     header("Location: index.php");
-    exit;
+    exit();
 }
+
+// Acceder a los datos del estudiante
+$estudiante = $_SESSION['estudiante'];
+$nombre = $estudiante['nombre'];
+$apellido = $estudiante['apellido'];
+$codigo = $estudiante['codigo'];
+$id_categoria_carne = $estudiante['categoria_carne']; 
 ?>
 
 <!DOCTYPE html>
@@ -33,10 +40,10 @@ if (!isset($_SESSION['estudiante_id'])) {
 <!-- Navbar superior -->
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">🎓 Autoescuela | Estudiante</a>
+        <a class="navbar-brand" href="#">🎓 Autoescuela | Estudiante M  </a>
         <div class="ms-auto d-flex align-items-center">
             <span class="navbar-text me-3">
-                Bienvenido, <strong><?php echo htmlspecialchars($_SESSION['nombre'] . ' ' . $_SESSION['apellido']); ?></strong>
+                Bienvenido, <strong><?php echo htmlspecialchars($nombre . ' ' . $apellido); ?> <?php echo htmlspecialchars($id_categoria_carne); ?></strong>
             </span>
             <a href="cerrar_sesion.php" class="btn btn-sm btn-outline-light">Cerrar sesión</a>
         </div>
@@ -47,18 +54,7 @@ if (!isset($_SESSION['estudiante_id'])) {
 <div style="height: 70px;"></div>
 
 <!-- Contenido principal -->
-<div class="container mt-5 pt-3">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card shadow">
-                <div class="card-body">
-                    <h3>Panel del Estudiante</h3>
-                    <p>Bienvenido al panel de estudiante. Desde aquí podrás gestionar tu información.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+ 
 
 </body>
 </html>
