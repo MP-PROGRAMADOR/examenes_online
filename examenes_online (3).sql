@@ -188,18 +188,7 @@ CREATE TABLE `imagenes_pregunta` (
 --
 -- Estructura de tabla para la tabla `intentos_examen`
 --
-
-CREATE TABLE `intentos_examen` (
-  `id` int(11) NOT NULL,
-  `examen_estudiante_id` int(11) DEFAULT NULL,
-  `estudiante_id` int(11) NOT NULL,
-  `examen_id` int(11) NOT NULL,
-  `fecha_inicio` timestamp NOT NULL DEFAULT current_timestamp(),
-  `fecha_fin` timestamp NULL DEFAULT NULL,
-  `completado` tinyint(1) DEFAULT 0,
-  `codigo_acceso_utilizado` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
+ 
 -- --------------------------------------------------------
 
 --
@@ -293,7 +282,6 @@ CREATE TABLE `respuestas_estudiante` (
   `es_correcta` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `usuarios`
@@ -319,6 +307,14 @@ INSERT INTO `usuarios` (`id`, `nombre_usuario`, `email`, `password`, `rol`, `act
 --
 -- Índices para tablas volcadas
 --
+-- --------------------------------------------------------
+ALTER TABLE respuestas_estudiante
+CHANGE intento_examen_id examenes_estudiantes_id INT(11) NOT NULL;
+
+ALTER TABLE respuestas_estudiante
+ADD CONSTRAINT fk_respuesta_examen_estudiante
+FOREIGN KEY (examenes_estudiantes_id) REFERENCES examenes_estudiantes(id)
+ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Indices de la tabla `categorias_carne`
@@ -373,15 +369,7 @@ ALTER TABLE `imagenes_pregunta`
   ADD KEY `pregunta_id` (`pregunta_id`);
 
 --
--- Indices de la tabla `intentos_examen`
---
-ALTER TABLE `intentos_examen`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `estudiante_id` (`estudiante_id`),
-  ADD KEY `examen_id` (`examen_id`),
-  ADD KEY `examen_estudiante_id` (`examen_estudiante_id`);
-
---
+ 
 -- Indices de la tabla `logs_sistema`
 --
 ALTER TABLE `logs_sistema`
@@ -463,14 +451,7 @@ ALTER TABLE `examenes_estudiantes`
 --
 ALTER TABLE `imagenes_pregunta`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT de la tabla `intentos_examen`
---
-ALTER TABLE `intentos_examen`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
-
---
+ 
 -- AUTO_INCREMENT de la tabla `logs_sistema`
 --
 ALTER TABLE `logs_sistema`
