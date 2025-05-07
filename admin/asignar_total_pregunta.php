@@ -3,10 +3,13 @@ include '../componentes/head_admin.php';
 include '../componentes/menu_admin.php';
 
 require_once '../config/conexion.php';
-$conn = $pdo->getConexion();
+// Verifica si la clase $pdo existe y se puede obtener conexión
+$conn = method_exists($pdo, 'getConexion') ? $pdo->getConexion() : null;
+ 
 
 // Obtener los parámetros
 $examenes_estudiantes_id = $_GET['id'] ?? null;
+ 
 
 $categoria_carne = null;
 $examen_estudiante = null;
@@ -17,29 +20,21 @@ $total_preguntas = 0;
 if ($examenes_estudiantes_id) {
     try {
         // Obtener datos del examen_estudiante
-        $stmt = $conn->prepare("SELECT * FROM examenes_estudiantes WHERE id = ?");
+        $stmt = $conn->prepare("SELECT 
+                                        ee.*,
+                                        e.titulo AS nombre_examen,
+                                        e.total_preguntas AS total_pregunta_examen,
+                                        est.nombre AS nombre_estudiante,
+                                        est.id AS id_estudiante,
+                                        est.apellido AS apellido_estudiante
+                                         FROM examenes_estudiantes ee
+                                         LEFT JOIN examenes e ON ee.categoria_carne_id = e.categoria_carne_id
+                                         LEFT JOIN estudiantes est ON ee.estudiante_id = est.id
+                                          WHERE ee.id = ?");
         $stmt->execute([$examenes_estudiantes_id]);
         $examen_estudiante = $stmt->fetch(PDO::FETCH_ASSOC);
-      //  print_r($examen_estudiante);
-        if ($examen_estudiante) {
-            // Obtener datos del examen
-            $stmt_examen = $conn->prepare("SELECT * FROM examenes WHERE id = ?");
-            $stmt_examen->execute([$examen_estudiante['categoria_carne_id']]); // Corregido de 'categoria_carne_id' a 'examen_id'
-            $examen = $stmt_examen->fetch(PDO::FETCH_ASSOC);
-
-            // Obtener datos del estudiante
-            $stmt_estudiante = $conn->prepare("SELECT * FROM estudiantes WHERE id = ?");
-            $stmt_estudiante->execute([$examen_estudiante['estudiante_id']]);
-            $estudiante = $stmt_estudiante->fetch(PDO::FETCH_ASSOC);
-
-            // Verificar si el examen y estudiante existen
-            if ($examen) {
-                $total_preguntas = $examen['total_preguntas'] ?? 0;
-            }
-        } else {
-            echo "Examen Estudiante no encontrado.";
-            exit;
-        }
+        //print_r($examen_estudiante);
+        
     } catch (Exception $e) {
         echo "Error: " . $e->getMessage();
         exit;
@@ -67,17 +62,17 @@ $descripcion = $examen['descripcion'] ?? '';
                     <div class="card-body">
                         <!-- Formulario con validación Bootstrap -->
                         <form action="../php/guardar_total_pregunta.php" method="POST" class="needs-validation" novalidate>
-                            <?php if ($examenes_estudiantes_id && $estudiante['id']): ?>
-                                <input type="hidden" name="examenes_estudiantes_id" value="<?= htmlspecialchars($examenes_estudiantes_id) ?>">
-                                <input type="hidden" name="estudiante_id" value="<?= htmlspecialchars($estudiante['id']) ?>">
-                            <?php endif; ?>
+                           
+                                <input type="hidden" name="examenes_estudiantes_id" value="<?= htmlspecialchars($examen_estudiante['id']) ?>">
+                                <input type="hidden" name="estudiante_id" value="<?= htmlspecialchars($examen_estudiante['id_estudiante']) ?>">
+                          
 
                             <!-- Nombre del Estudiante (lectura) -->
                             <div class="mb-3">
                                 <label for="estudiante" class="form-label fw-semibold">
                                     <i class="bi bi-person-circle me-2 text-primary"></i>Estudiante:
                                 </label>
-                                <input type="text" class="form-control shadow-sm" id="estudiante" value="<?= htmlspecialchars($estudiante['nombre'] . ' ' . $estudiante['apellido']) ?>" readonly>
+                                <input type="text" class="form-control shadow-sm" id="estudiante" value="<?= htmlspecialchars($examen_estudiante['nombre_estudiante'] . ' ' . $examen_estudiante['apellido_estudiante']) ?>" readonly>
                             </div>
 
                             <!-- Examen -->
@@ -85,7 +80,7 @@ $descripcion = $examen['descripcion'] ?? '';
                                 <label for="examen" class="form-label fw-semibold">
                                     <i class="bi bi-journal-text me-2 text-primary"></i>Examen:
                                 </label>
-                                <input type="text" class="form-control shadow-sm" id="examen" value="<?= htmlspecialchars($titulo) ?>" readonly>
+                                <input type="text" class="form-control shadow-sm" id="examen" value="<?= htmlspecialchars($examen_estudiante['nombre_examen']) ?>" readonly>
                             </div>
 
                             <!-- Total de preguntas -->
@@ -93,8 +88,8 @@ $descripcion = $examen['descripcion'] ?? '';
                                 <label for="total_preguntas" class="form-label fw-semibold">
                                     <i class="bi bi-list-check me-2 text-primary"></i>Total de Preguntas a Asignar:
                                 </label>
-                                <input type="number" class="form-control shadow-sm" id="total_preguntas" name="total_preguntas" value="" required min="1" max="<?= htmlspecialchars($total_preguntas) ?>" step="1">
-                                <div class="invalid-feedback">Por favor, ingrese un número válido de preguntas (no mayor a <?= htmlspecialchars($total_preguntas) ?>).</div>
+                                <input type="number" class="form-control shadow-sm" id="total_preguntas" name="total_preguntas" value="" required min="1" max="<?= htmlspecialchars($examen_estudiante['total_pregunta_examen']) ?>" step="1">
+                                <div class="invalid-feedback">Por favor, ingrese un número válido de preguntas (no mayor a <?= htmlspecialchars($examen_estudiante['total_pregunta_examen']) ?>).</div>
                             </div>
 
                             <!-- Botones -->

@@ -21,20 +21,25 @@ if ($examenes_estudiantes_id && $estudiante_id && $total_preguntas) {
         if ($stmt->rowCount() > 0) {
             // Si todo salió bien, confirmamos la transacción
             $conn->commit();
-            echo "Total de preguntas asignadas correctamente.";
+            //echo "Total de preguntas asignadas correctamente.";
+            header('Location: ../admin/examenes_estudiantes.php');
         } else {
             // Si no hubo cambios, revertimos la transacción
             $conn->rollBack();
-            echo "Error al asignar el total de preguntas.";
+            //  echo "Error al asignar el total de preguntas.";
+            header('Location: ../admin/asignar_total_pregunta.php');
+            header('Location: ../admin/asignar_total_pregunta.php');
         }
-
+        
     } catch (Exception $e) {
         // En caso de error, revertir la transacción
         $conn->rollBack();
-        echo "Error: " . $e->getMessage();
+        header('Location: ../admin/asignar_total_pregunta.php');
+        //echo "Error: " . $e->getMessage();
     }
 } else {
-    echo "Error: Faltan datos.";
+    header('Location: ../admin/examenes_estudiantes.php');
+   // echo "Error: Faltan datos.";
 }
 
 ?>

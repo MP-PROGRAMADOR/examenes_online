@@ -13,10 +13,10 @@ try {
 
     if ($total > 0) {
         // Si las categorías ya están cargadas, no es necesario insertarlas de nuevo
-        $alerta = [
+       /*  $alerta = [
             'tipo' => 'success',
             'mensaje' => "✅ Las categorías ya están cargadas correctamente."
-        ];
+        ]; */
     } else {
         // Si no hay categorías, insertamos las predeterminadas
         $categorias = [

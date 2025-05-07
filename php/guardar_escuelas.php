@@ -20,13 +20,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bindParam(':direccion', $direccion, PDO::PARAM_STR);
         
         if ($stmt->execute()) {
-            echo "<script>alert('Usuario registrado correctamente'); window.location.href='../admin/escuelas.php';</script>";
+            $alerta = [
+                'tipo' => 'success',
+                'mensaje' => "✅ La escuela fue registrada correctamente."
+            ];
+            header('location: ../admin/escuelas.php');
         } else {
             echo "Error al registrar el usuario.";
         }
     } catch (PDOException $e) {
         error_log("Error en la inserción: " . $e->getMessage());
-        echo "Ocurrió un error. Por favor, inténtelo de nuevo más tarde.";
+        $alerta = [
+            'tipo' => 'error',
+            'mensaje' => " Ocurrió un error. Por favor, inténtelo de nuevo más tarde."
+        ];
+        header('location: ../admin/escuelas.php');
+        
     }
 }
 ?>

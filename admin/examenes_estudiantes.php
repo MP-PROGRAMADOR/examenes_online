@@ -29,6 +29,10 @@ if ($conn) {
     JOIN categorias_carne cc ON est.categoria_carne_id = cc.id
     JOIN examenes e ON e.categoria_carne_id = ee.categoria_carne_id
     WHERE e.categoria_carne_id = est.categoria_carne_id";
+
+
+
+
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $permisos = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -98,11 +102,12 @@ include '../componentes/menu_admin.php';
                             <th><i class="bi bi-file-earmark-text-fill me-1 text-secondary"></i>Examen</th>
                             <th><i class="bi bi-calendar-check-fill me-1 text-secondary"></i>Fecha de Asignación</th>
                             <th><i class="bi bi-calendar-check-fill me-1 text-secondary"></i>Fecha de Realización</th>
-                            <th><i class="bi bi-calendar-check-fill me-1 text-secondary"></i>Fecha de Próximo Intento</th>
+                            <th><i class="bi bi-calendar-check-fill me-1 text-secondary"></i>Fecha de Próximo Intento
+                            </th>
                             <th><i class="bi bi-file-earmark-text-fill me-1 text-secondary"></i>Estado</th>
                             <th><i class="bi bi-check-circle me-1 text-secondary"></i>Acceso Habilitado</th>
                             <th><i class="bi bi-calendar-plus me-1 text-secondary"></i>Creado En</th>
-                            <th><i class="bi bi-gear-fill me-1 text-secondary"></i>Acciones</th>
+                              <th><i class="bi bi-gear-fill me-1 text-secondary"></i>Acciones</th>
                         </tr>
                     </thead>
 
@@ -111,7 +116,8 @@ include '../componentes/menu_admin.php';
                             <?php foreach ($permisos as $permiso): ?>
                                 <tr>
                                     <td><?= htmlspecialchars($permiso['id']) ?></td>
-                                    <td><?= htmlspecialchars($permiso['nombre_estudiante']) . ' ' . htmlspecialchars($permiso['apellido_estudiante']) ?></td>
+                                    <td><?= htmlspecialchars($permiso['nombre_estudiante']) . ' ' . htmlspecialchars($permiso['apellido_estudiante']) ?>
+                                    </td>
                                     <td><?= htmlspecialchars($permiso['categoria_carne']) ?></td>
                                     <td><?= htmlspecialchars($permiso['nombre_examen']) ?></td>
                                     <td><?= htmlspecialchars($permiso['fecha_asignacion']) ?></td>
@@ -120,21 +126,21 @@ include '../componentes/menu_admin.php';
                                     <td><?= htmlspecialchars($permiso['estado']) ?></td>
                                     <td> 
                                         <button class="btn toggle-acceso shadow-sm fw-semibold px-3 py-1 rounded-pill
-                                         <?= $permiso['acceso_habilitado'] ? 'btn-success' : 'btn-outline-secondary' ?>" data-id="<?= $permiso['id'] ?>"
+                                         <?= $permiso['acceso_habilitado'] ? 'btn-primary' : 'btn-outline-danger' ?>" data-id="<?= $permiso['id'] ?>"
                                             data-status="<?= $permiso['acceso_habilitado'] ?>">
                                             <?= $permiso['acceso_habilitado'] ? '<i class="bi bi-unlock-fill me-1"></i>Activo' : '<i class="bi bi-lock-fill me-1"></i>Inactivo' ?>
                                         </button> 
                                     </td>
                                     <td><?= htmlspecialchars($permiso['creado_en']) ?></td>
-                                    <td>
-    <a href="asignar_total_pregunta.php?id=<?= $permiso['id'] ?>" class="btn btn-sm btn-outline-primary">Asignar Total Preguntas</a>
-</td>
-
+                                    <td>  
+                                        <a class="btn btn-sm btn-outline-primary"    href="asignar_total_pregunta.php?id=<?= $permiso['id'] ?>">Asignar Total Preguntas</a>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="10" class="text-center text-warning fw-semibold">⚠️ No hay permisos asignados actualmente.</td>
+                                <td colspan="10" class="text-center text-warning fw-semibold">⚠️ No hay permisos asignados
+                                    actualmente.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -145,5 +151,59 @@ include '../componentes/menu_admin.php';
     </div>
 </div>
  
- 
-<?php include '../componentes/footer.php'; ?>
+
+
+
+<script>
+    document.addEventListener('click', async function (event) {
+        const btn = event.target.closest('.toggle-acceso');
+        if (!btn) return;
+
+        const id = btn.dataset.id;
+        const currentStatus = btn.dataset.status;
+        const newStatus = currentStatus === '1' ? '0' : '1';
+
+        // Cambia a estado de carga
+        const originalHTML = btn.innerHTML;
+        btn.classList.add('loading');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></span>';
+
+        try {
+            const res = await fetch('../php/activar_acceso_examen.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, acceso_habilitado: newStatus })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                // Actualiza el estado y estilos del botón
+                btn.dataset.status = newStatus;
+
+                if (newStatus === '1') {
+                    btn.classList.remove('btn-outline-danger');
+                    btn.classList.add('btn-primary');
+                    btn.innerHTML = '<i class="bi bi-unlock-fill me-1"></i>Activo';
+                } else {
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-outline-danger');
+                    btn.innerHTML = '<i class="bi bi-lock-fill me-1"></i>Inactivo';
+                }
+
+            } else {
+                alert('❌ Error: No se pudo actualizar el estado.');
+                btn.innerHTML = originalHTML;
+            }
+        } catch (error) {
+            console.error('Error en la solicitud:', error);
+            alert('❌ Error al conectar con el servidor.');
+            btn.innerHTML = originalHTML;
+        }
+
+        btn.classList.remove('loading');
+    });
+</script>
+
+
+<?php include_once('../componentes/footer.php'); ?>

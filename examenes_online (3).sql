@@ -3,15 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 05-05-2025 a las 16:19:22
+-- Tiempo de generación: 07-05-2025 a las 15:22:37
 -- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0
-
-drop database if exists examenes_online;
-
-create database examenes_online;
-
-use examenes_online;
+-- Versión de PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -86,7 +80,15 @@ CREATE TABLE `escuelas_conduccion` (
   `email` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `escuelas_conduccion`
+--
 
+INSERT INTO `escuelas_conduccion` (`id`, `nombre`, `direccion`, `telefono`, `email`) VALUES
+(1, 'Nana mangue', 'Malabo', '222545658', NULL),
+(2, 'Guinea Circula', 'Malabo', '222121415', NULL),
+(3, 'Don pastor', 'Bata', '222141223', NULL),
+(4, 'Mpa Sipaco', 'Bata', '555233669', NULL);
 
 -- --------------------------------------------------------
 
@@ -104,11 +106,19 @@ CREATE TABLE `estudiantes` (
   `telefono` varchar(20) DEFAULT NULL,
   `direccion` varchar(255) DEFAULT NULL,
   `categoria_carne_id` int(11) NOT NULL,
-  `codigo_registro_examen` varchar(100) NOT NULL, 
-  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() 
+  `codigo_registro_examen` varchar(100) NOT NULL,
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `estudiantes`
+--
 
+INSERT INTO `estudiantes` (`id`, `escuela_id`, `numero_identificacion`, `nombre`, `apellido`, `fecha_nacimiento`, `telefono`, `direccion`, `categoria_carne_id`, `codigo_registro_examen`, `fecha_registro`) VALUES
+(4, 2, '000174142', 'sir', 'topola', '2000-05-17', '555232558', 'Malabo', 1, 'EGU25136', '2025-05-07 08:10:58'),
+(5, 4, '000144778', 'Mh', 'Bijeri', '2003-01-08', '222312556', 'Malabo', 4, 'EMP2542D', '2025-05-07 08:12:27');
+
+-- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `examenes`
@@ -118,12 +128,26 @@ CREATE TABLE `examenes` (
   `id` int(11) NOT NULL,
   `categoria_carne_id` int(11) NOT NULL,
   `titulo` varchar(255) NOT NULL,
-  `descripcion` text DEFAULT NULL, 
-  `total_preguntas` int(11) DEFAULT NULL, 
+  `descripcion` text DEFAULT NULL,
+  `total_preguntas` int(11) DEFAULT NULL,
+  `preguntas_aleatorias` tinyint(1) DEFAULT 1,
   `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `examenes`
+--
 
+INSERT INTO `examenes` (`id`, `categoria_carne_id`, `titulo`, `descripcion`, `total_preguntas`, `preguntas_aleatorias`, `fecha_creacion`) VALUES
+(5, 1, 'TEORÍA DEDICADA NIVEL A', 'reforzamiento', 4, 1, '2025-05-07 07:56:25'),
+(6, 4, 'TEORÍA DEDICADA NIVEL B', 'normativas de circulación', 3, 1, '2025-05-07 07:57:12'),
+(7, 6, 'TEORÍA DEDICADA C', 'habilidades de manejo en circulación', 0, 1, '2025-05-07 07:57:58');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `examenes_estudiantes`
+--
 
 CREATE TABLE `examenes_estudiantes` (
   `id` int(11) NOT NULL,
@@ -132,12 +156,26 @@ CREATE TABLE `examenes_estudiantes` (
   `fecha_asignacion` date NOT NULL DEFAULT curdate(),
   `fecha_realizacion` datetime DEFAULT NULL,
   `fecha_proximo_intento` date DEFAULT NULL,
-  `total_preguntas` int(11) DEFAULT NULL,
   `estado` enum('pendiente','aprobado','reprobado') DEFAULT 'pendiente',
   `acceso_habilitado` tinyint(1) DEFAULT 0,
-  `creado_en` timestamp NOT NULL DEFAULT current_timestamp()
+  `creado_en` timestamp NOT NULL DEFAULT current_timestamp(),
+  `total_preguntas` int(11) DEFAULT NULL,
+  `intentos_examen` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `examenes_estudiantes`
+--
+
+INSERT INTO `examenes_estudiantes` (`id`, `estudiante_id`, `categoria_carne_id`, `fecha_asignacion`, `fecha_realizacion`, `fecha_proximo_intento`, `estado`, `acceso_habilitado`, `creado_en`, `total_preguntas`, `intentos_examen`) VALUES
+(3, 4, 1, '2025-05-07', '2025-05-07 13:02:53', NULL, 'pendiente', 1, '2025-05-07 08:10:58', 4, 1),
+(4, 5, 4, '2025-05-07', NULL, NULL, 'pendiente', 1, '2025-05-07 08:12:27', NULL, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `imagenes_pregunta`
+--
 
 CREATE TABLE `imagenes_pregunta` (
   `id` int(11) NOT NULL,
@@ -145,7 +183,11 @@ CREATE TABLE `imagenes_pregunta` (
   `ruta_imagen` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
 
+--
+-- Estructura de tabla para la tabla `intentos_examen`
+--
 
 CREATE TABLE `intentos_examen` (
   `id` int(11) NOT NULL,
@@ -186,7 +228,29 @@ CREATE TABLE `opciones_pregunta` (
   `es_correcta` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `opciones_pregunta`
+--
 
+INSERT INTO `opciones_pregunta` (`id`, `pregunta_id`, `texto_opcion`, `es_correcta`) VALUES
+(10, 15, 'Detenerse ', 1),
+(11, 15, 'Ceder paso', 1),
+(12, 15, 'Aumentar la velocidad', 0),
+(13, 17, 'detenerse para observar y luego levantar con primera', 1),
+(14, 17, 'ir a toda pastilla', 0),
+(15, 17, 'mirar por el retrovisor mientras das la curva', 0),
+(16, 18, 'es una tecnica para reducir la velocidad a la que va un vehículo', 1),
+(17, 18, 'son pastillas de freno ', 1),
+(18, 18, 'es eficiente para la reducción de la velocidad', 0),
+(19, 19, 'es un elemento de la tabla periódica', 1),
+(20, 19, 'es un perro', 1),
+(21, 19, 'es un lenguaje de programación', 0),
+(22, 19, 'es un lenguaje de alto nivel', 0),
+(23, 21, 'es un nombre', 1),
+(24, 21, 'es un adjetivo', 0),
+(25, 21, 'es un mono', 0);
+
+-- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `preguntas`
@@ -201,7 +265,24 @@ CREATE TABLE `preguntas` (
   `fecha_creacion` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `preguntas`
+--
 
+INSERT INTO `preguntas` (`id`, `examen_id`, `texto_pregunta`, `tipo_contenido`, `tipo_pregunta`, `fecha_creacion`) VALUES
+(15, 5, 'el símbolo de stop en una villa indica:', 'texto', 'multiple', '2025-05-07 09:00:08'),
+(16, 5, 'la luz de intermitente es fundamental en la circulación', 'texto', 'vf', '2025-05-07 09:01:01'),
+(17, 5, 'entes de tomar una curva, es recomendable:', 'texto', 'unica', '2025-05-07 09:05:47'),
+(18, 5, 'el freno motor', 'texto', 'multiple', '2025-05-07 09:07:53'),
+(19, 6, 'Qué es js?', 'texto', 'multiple', '2025-05-07 09:14:17'),
+(20, 6, 'php es un lenguaje de escritorio', 'texto', 'vf', '2025-05-07 09:15:04'),
+(21, 6, 'la peste', 'texto', 'unica', '2025-05-07 09:15:55');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `respuestas_estudiante`
+--
 
 CREATE TABLE `respuestas_estudiante` (
   `id` int(11) NOT NULL,
@@ -227,6 +308,13 @@ CREATE TABLE `usuarios` (
   `activo` tinyint(1) DEFAULT 1,
   `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `usuarios`
+--
+
+INSERT INTO `usuarios` (`id`, `nombre_usuario`, `email`, `password`, `rol`, `activo`, `fecha_creacion`) VALUES
+(1, 'sir', 'admin@gmail.com', '$2y$10$Dxhgt4jilwDqUmGWAcZqJ.dkWCl0EAqwLHGgqPIF7RLP43rrRtFb2', 'admin', 1, '2025-05-07 08:20:12');
 
 --
 -- Índices para tablas volcadas
@@ -350,25 +438,25 @@ ALTER TABLE `configuraciones_sistema`
 -- AUTO_INCREMENT de la tabla `escuelas_conduccion`
 --
 ALTER TABLE `escuelas_conduccion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `estudiantes`
 --
 ALTER TABLE `estudiantes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `examenes`
 --
 ALTER TABLE `examenes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `examenes_estudiantes`
 --
 ALTER TABLE `examenes_estudiantes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `imagenes_pregunta`
@@ -380,7 +468,7 @@ ALTER TABLE `imagenes_pregunta`
 -- AUTO_INCREMENT de la tabla `intentos_examen`
 --
 ALTER TABLE `intentos_examen`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `logs_sistema`
@@ -392,13 +480,13 @@ ALTER TABLE `logs_sistema`
 -- AUTO_INCREMENT de la tabla `opciones_pregunta`
 --
 ALTER TABLE `opciones_pregunta`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT de la tabla `preguntas`
 --
 ALTER TABLE `preguntas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT de la tabla `respuestas_estudiante`
@@ -410,7 +498,7 @@ ALTER TABLE `respuestas_estudiante`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Restricciones para tablas volcadas
@@ -443,14 +531,6 @@ ALTER TABLE `imagenes_pregunta`
   ADD CONSTRAINT `imagenes_pregunta_ibfk_1` FOREIGN KEY (`pregunta_id`) REFERENCES `preguntas` (`id`) ON DELETE CASCADE;
 
 --
--- Filtros para la tabla `intentos_examen`
---
-ALTER TABLE `intentos_examen`
-  ADD CONSTRAINT `intentos_examen_ibfk_1` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `intentos_examen_ibfk_2` FOREIGN KEY (`examen_id`) REFERENCES `examenes` (`id`),
-  ADD CONSTRAINT `intentos_examen_ibfk_3` FOREIGN KEY (`examen_estudiante_id`) REFERENCES `examenes_estudiantes` (`id`);
-
---
 -- Filtros para la tabla `logs_sistema`
 --
 ALTER TABLE `logs_sistema`
@@ -472,7 +552,6 @@ ALTER TABLE `preguntas`
 -- Filtros para la tabla `respuestas_estudiante`
 --
 ALTER TABLE `respuestas_estudiante`
-  ADD CONSTRAINT `respuestas_estudiante_ibfk_1` FOREIGN KEY (`intento_examen_id`) REFERENCES `intentos_examen` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `respuestas_estudiante_ibfk_2` FOREIGN KEY (`pregunta_id`) REFERENCES `preguntas` (`id`),
   ADD CONSTRAINT `respuestas_estudiante_ibfk_3` FOREIGN KEY (`opcion_seleccionada_id`) REFERENCES `opciones_pregunta` (`id`) ON DELETE SET NULL;
 COMMIT;
