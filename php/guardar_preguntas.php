@@ -11,7 +11,7 @@ $tipo_contenido = $_POST['tipo_contenido'] ?? null;
 $imagenes = $_FILES['imagenes'] ?? null;
 $opciones = $_POST['opciones'] ?? [];
 $correctas = $_POST['correctas'] ?? [];
-$respuesta_correctas = $_POST['respuesta_correctas'] ?? null;
+$respuesta_correctas = $_POST['respuesta_correcta'] ?? null;
 
 try {
     // Validación básica de los campos obligatorios
@@ -92,6 +92,9 @@ try {
     }
     if($tipo_pregunta === 'vf'){
         
+        $correcta = isset($respuesta_correctas) ? 1 : 0;
+        $stmt = $conn->prepare("INSERT INTO opciones_pregunta (pregunta_id, texto_opcion, es_correcta) VALUES (?, ?, ?)");
+        $stmt->execute([$pregunta_id, $texto_pregunta, $correcta]);
     }
 
 

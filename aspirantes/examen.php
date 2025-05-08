@@ -189,9 +189,10 @@ $examen_id = $_GET['id'] ?? 0;
         .then(res => res.json())
         .then(res => {
             if (res.ok) {
+                cargarPregunta(); // Cargar la siguiente pregunta
+            } else {
                     console.log(`${pregunta_id} y ${seleccion} y ${tipo}`)
-                    cargarPregunta(); // Cargar la siguiente pregunta
-                } else {
+                    console.log(res)
                     alert("Error al guardar la respuesta");
                 }
             });

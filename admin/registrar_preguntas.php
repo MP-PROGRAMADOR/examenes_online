@@ -174,6 +174,7 @@ try {
 
         const imagenesContainer = document.getElementById('imagenesContainer');
         const agregarImagenBtn = document.getElementById('agregarImagenBtn');
+        let contadorOpciones = 0;
 
         // Estado inicial
         resetFormulario();
@@ -225,21 +226,37 @@ try {
         });
 
         agregarOpcionBtn.addEventListener('click', agregarOpcion);
-
+       
         function agregarOpcion() {
+            const index = contadorOpciones++;
             const div = document.createElement('div');
             div.classList.add('input-group', 'mb-2');
             div.innerHTML = `
-            <input type="text" name="opciones[]" class="form-control" placeholder="Opción de respuesta" required>
-            <div class="input-group-text">
-                <input class="form-check-input mt-0" type="checkbox" name="correctas[]">
-            </div>
-            <button type="button" class="btn btn-danger btn-remover-opcion">
-                <i class="bi bi-x-circle-fill"></i>
-            </button>
-        `;
+                <input type="text" name="opciones[${index}]" class="form-control" placeholder="Opción de respuesta" required>
+                <div class="input-group-text">
+                    <input class="form-check-input mt-0" type="checkbox" name="correctas[${index}]" value="1">
+                </div>
+                <button type="button" class="btn btn-danger btn-remover-opcion">
+                    <i class="bi bi-x-circle-fill"></i>
+                </button>
+            `;
             opcionesContainer.appendChild(div);
         }
+
+        /*  function agregarOpcion() {
+             const div = document.createElement('div');
+             div.classList.add('input-group', 'mb-2');
+             div.innerHTML = `
+             <input type="text" name="opciones[]" class="form-control" placeholder="Opción de respuesta" required>
+             <div class="input-group-text">
+                 <input class="form-check-input mt-0" type="checkbox" name="correctas[]">
+             </div>
+             <button type="button" class="btn btn-danger btn-remover-opcion">
+                 <i class="bi bi-x-circle-fill"></i>
+             </button>
+         `;
+             opcionesContainer.appendChild(div);
+         } */
 
         opcionesContainer.addEventListener('click', e => {
             if (e.target.closest('.btn-remover-opcion')) {
@@ -249,9 +266,10 @@ try {
 
         agregarImagenBtn.addEventListener('click', () => {
             const div = document.createElement('div');
+            const index = contadorOpciones++;
             div.classList.add('input-group', 'mb-2');
             div.innerHTML = `
-            <input type="file" name="imagenes[]" class="form-control" accept="image/*">
+            <input type="file" name="imagenes[${index}]" class="form-control" accept="image/*">
                        <button type="button" class="btn btn-danger btn-remover-img">
                 <i class="bi bi-x-circle-fill"></i>
             </button>

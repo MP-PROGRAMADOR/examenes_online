@@ -40,15 +40,23 @@ try {
 
     // Verificar la(s) respuesta(s) correcta(s)
     if ($tipo === 'vf') {
-        $respuesta = $opciones[0]; // 'v' o 'f'
-        $stmt = $pdo->prepare("SELECT respuesta_correcta FROM preguntas WHERE id = ?");
+        $respuesta = strtolower( $opciones[0]); // 'v' o 'f'
+        $stmt = $pdo->prepare("SELECT es_correcta FROM opciones_pregunta WHERE pregunta_id = ?");
         $stmt->execute([$pregunta_id]);
         $correcta = $stmt->fetchColumn();
-        $es_correcta = strtolower($respuesta) === strtolower($correcta) ? 1 : 0;
+        
+        // comparamos la respuesta enviada con la opcion correcta de la base de datos
+        (strtolower('v') == $respuesta) ? $respuesta = 1 : $respuesta = 0 ;
+        $es_correcta = $respuesta === $correcta ? 1 : 0 ;
+        // recoger el ID del texto de la pregunta
+        $stmt = $pdo->prepare("SELECT id FROM opciones_pregunta WHERE pregunta_id = ?");
+        $stmt->execute([$pregunta_id]);
+        $opcion_vf_id = $stmt->fetchColumn();
 
-        $stmt = $pdo->prepare("INSERT INTO respuestas_estudiante (examenes_estudiantes_id, pregunta_id, respuesta_texto, es_correcta)
-                               VALUES (?, ?, ?, ?)");
-        $stmt->execute([$examen_id, $pregunta_id, $respuesta, $es_correcta]);
+
+        $stmt = $pdo->prepare("INSERT INTO respuestas_estudiante (examenes_estudiantes_id, pregunta_id, opcion_seleccionada_id, es_correcta)
+                               VALUES (?, ?, ?,?)");
+        $stmt->execute([$examen_id, $pregunta_id, $opcion_vf_id, $es_correcta]);
 
     } else {
         // Obtener opciones correctas
