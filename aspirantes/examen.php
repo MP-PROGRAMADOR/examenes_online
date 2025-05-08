@@ -186,9 +186,10 @@ $examen_id = $_GET['id'] ?? 0;
                 tipo: tipo // opcional, por si necesitas manejar en el backend
             })
         })
-            .then(res => res.json())
-            .then(res => {
-                if (res.ok) {
+        .then(res => res.json())
+        .then(res => {
+            if (res.ok) {
+                    console.log(`${pregunta_id} y ${seleccion} y ${tipo}`)
                     cargarPregunta(); // Cargar la siguiente pregunta
                 } else {
                     alert("Error al guardar la respuesta");
@@ -199,106 +200,7 @@ $examen_id = $_GET['id'] ?? 0;
     cargarPregunta(); // Inicializar
 </script>
 
-
-
-
-   <!--  <script>
-        //let examenId = new URLSearchParams(window.location.search).get('examen_id');
-        let examenId = <?php echo $examen_id; ?>;
-        let contenedor = document.getElementById('contenedor-pregunta');
-        let progreso = document.getElementById('progreso');
-
-        function cargarPregunta() {
-            fetch(`../php/obtener_pregunta.php?examen_id=${examenId}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.finalizado) {
-                        contenedor.innerHTML = "<h3>¡Has completado el examen!</h3>";
-                        return;
-                    }
-
-                    mostrarPregunta(data);
-                })
-                .catch(err => {
-                    console.error("Error al cargar la pregunta:", err);
-                    contenedor.innerHTML = "<p>Error al cargar pregunta</p>";
-                });
-        }
-
-        function mostrarPregunta(p) {
-            let opcionesHtml = '';
-
-            p.opciones.forEach(op => {
-                let tipo = p.tipo_pregunta === 'multiple' ? 'checkbox' : 'radio';
-                opcionesHtml += `
-            <div>
-                <label>
-                    <input type="${tipo}" name="opcion" value="${op.id}">
-                    ${op.texto_opcion}
-                </label>
-            </div>
-        `;
-            });
-
-            let imagenHtml = p.tipo_contenido === 'ilustracion' && p.ruta_imagen
-                ? `<img src="../imagenes/${p.ruta_imagen}" style="max-width: 300px;">`
-                : '';
-
-            contenedor.innerHTML = `
-        <div>
-            <h4>Pregunta ${p.pregunta_actual} de ${p.total_preguntas}</h4>
-            ${imagenHtml}
-            <p>${p.texto_pregunta}</p>
-            <form id="form-respuesta">
-                ${opcionesHtml}
-                <button type="submit">Siguiente</button>
-            </form>
-        </div>
-    `;
-
-            document.getElementById('form-respuesta').onsubmit = (e) => {
-                e.preventDefault();
-                enviarRespuesta(p.pregunta_id);
-            };
-        }
-
-        function enviarRespuesta(pregunta_id) {
-            const form = document.getElementById('form-respuesta');
-            const datos = new FormData(form);
-
-            // Soporte para múltiples opciones seleccionadas
-            const seleccion = Array.from(form.elements['opcion'])
-                .filter(el => el.checked)
-                .map(el => el.value);
-
-            if (seleccion.length === 0) {
-                alert("Debes seleccionar una opción");
-                return;
-            }
-
-            fetch('../php/guardar_respuestas.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    pregunta_id: pregunta_id,
-                    opciones: seleccion
-                })
-            })
-                .then(res => res.json())
-                .then(res => {
-                    if (res.ok) {
-                        cargarPregunta(); // Siguiente
-                    } else {
-                        alert("Error al guardar respuesta");
-                    }
-                });
-        }
-
-        // Inicializa
-        cargarPregunta();
-    </script>
- -->
-
+ 
 </body>
 
 </html>

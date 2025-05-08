@@ -160,6 +160,7 @@ CREATE TABLE `examenes_estudiantes` (
   `acceso_habilitado` tinyint(1) DEFAULT 0,
   `creado_en` timestamp NOT NULL DEFAULT current_timestamp(),
   `total_preguntas` int(11) DEFAULT NULL,
+  `calificacion` int(11) DEFAULT NULL,
   `intentos_examen` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -275,7 +276,7 @@ INSERT INTO `preguntas` (`id`, `examen_id`, `texto_pregunta`, `tipo_contenido`, 
 
 CREATE TABLE `respuestas_estudiante` (
   `id` int(11) NOT NULL,
-  `intento_examen_id` int(11) NOT NULL,
+  `examenes_estudiantes_id` int(11) NOT NULL,
   `pregunta_id` int(11) NOT NULL,
   `opcion_seleccionada_id` int(11) DEFAULT NULL,
   `respuesta_texto` text DEFAULT NULL,

@@ -11,6 +11,7 @@ $tipo_contenido = $_POST['tipo_contenido'] ?? null;
 $imagenes = $_FILES['imagenes'] ?? null;
 $opciones = $_POST['opciones'] ?? [];
 $correctas = $_POST['correctas'] ?? [];
+$respuesta_correctas = $_POST['respuesta_correctas'] ?? null;
 
 try {
     // Validación básica de los campos obligatorios
@@ -23,7 +24,7 @@ try {
     if (!$examen_id) {
         throw new Exception("ID de examen inválido.");
     }
-    
+
     // Iniciar transacción
     $conn->beginTransaction();
 
@@ -89,6 +90,10 @@ try {
             $stmt->execute([$pregunta_id, $opcion, $correcta]);
         }
     }
+    if($tipo_pregunta === 'vf'){
+        
+    }
+
 
     // ✅ Actualizar el total de preguntas del examen
     $stmtActualizar = $conn->prepare("
@@ -98,7 +103,7 @@ try {
     ) 
     WHERE id = ?
 ");
-$stmtActualizar->execute([$examen_id, $examen_id]);
+    $stmtActualizar->execute([$examen_id, $examen_id]);
 
     // Confirmar transacción
     $conn->commit();
