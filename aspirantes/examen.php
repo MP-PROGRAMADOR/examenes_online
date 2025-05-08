@@ -177,7 +177,7 @@ $examen_id = $_GET['id'] ?? 0;
             seleccion = seleccionados.map(el => el.value);
         }
 
-        fetch('../php/guardar_respuesta.php', {
+        fetch('../php/guardar_respuestas.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
