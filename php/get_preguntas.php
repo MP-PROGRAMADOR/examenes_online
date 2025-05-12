@@ -36,51 +36,24 @@ if ($examenEstudianteId <= 0) {
     exit;
 }
 
-// Obtener examen asignado
-$sqlExamen = "SELECT ee.*, 
-                e.id AS examen_id, 
-                e.preguntas_aleatorias
-              FROM examenes ee
-              INNER JOIN examenes e ON ee.categoria_carne_id = e.categoria_carne_id
-              WHERE ee.id = :id LIMIT 1";
 
 
-$stmt = $pdo->prepare($sqlExamen);
-$stmt->execute([':id' => $examenEstudianteId]);
-$examenEstudiante = $stmt->fetch(PDO::FETCH_ASSOC);
+// obtener el total de preguntas asignadas al estudiante
 
+$sql = "SELECT * FROM examenes_estudiantes WHERE estudiante_id = ? ";
+$stmt = $pdo->prepare($sql);
+ $stmt->execute([$estudiante_id]);
+ $examen_estudiante =$stmt->fetch(PDO::FETCH_ASSOC);
 
-
-
-
- // id de examen...            
-$sqlExamen = "SELECT ee.*, 
-                e.id AS examen_id, 
-                e.preguntas_aleatorias
-              FROM examenes_estudiantes ee
-              INNER JOIN examenes e ON ee.categoria_carne_id = e.categoria_carne_id
-              WHERE ee.id = :id LIMIT 1";
-
-
-
-
-
-
-
-
-if (!$examenEstudiante) {
-    echo json_encode(['error' => 'Examen no encontrado']);
-    exit;
-}
-
+ 
 // Obtener preguntas del examen
 $sqlPreguntas = "SELECT p.*
                  FROM preguntas p
                  WHERE p.examen_id = :examen_id
-                 ORDER BY " . ($examenEstudiante['preguntas_aleatorias'] ? 'RAND()' : 'p.id') . "
+                 ORDER BY " . ($examenEstudianteId  ? 'RAND()' : 'p.id') . "
                  LIMIT 1";
 $stmt = $pdo->prepare($sqlPreguntas);
-$stmt->execute([':examen_id' => $examenEstudiante['examen_id']]);
+$stmt->execute([':examen_id' => $examenEstudianteId]);
 $pregunta = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$pregunta) {
@@ -107,7 +80,7 @@ if ($pregunta['tipo_contenido'] === 'ilustracion') {
 // Total preguntas para mostrar número
 $sqlTotal = "SELECT COUNT(*) FROM preguntas WHERE examen_id = :id";
 $stmt = $pdo->prepare($sqlTotal);
-$stmt->execute([':id' => $examenEstudiante['examen_id']]);
+$stmt->execute([':id' => $examenEstudianteId]);
 $totalPreguntas = $stmt->fetchColumn();
 
 echo json_encode([
@@ -118,6 +91,6 @@ echo json_encode([
     'ruta_imagen' => $rutaImagen,
     'opciones' => $opciones,
     'pregunta_actual' => 1, // Puedes llevar un contador real en sesión si deseas
-    'total_preguntas' => (int)$totalPreguntas,
-    'examen_id' => (int)$examenEstudiante['examen_id']
+    'total_preguntas' => (int)$examen_estudiante['total_preguntas'],
+    'examen_id' => (int)$examenEstudianteId
 ]);
