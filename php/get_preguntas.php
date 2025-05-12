@@ -40,19 +40,33 @@ if ($examenEstudianteId <= 0) {
 $sqlExamen = "SELECT ee.*, 
                 e.id AS examen_id, 
                 e.preguntas_aleatorias
-              FROM examenes_estudiantes ee
+              FROM examenes ee
               INNER JOIN examenes e ON ee.categoria_carne_id = e.categoria_carne_id
               WHERE ee.id = :id LIMIT 1";
-              
+
+
+$stmt = $pdo->prepare($sqlExamen);
+$stmt->execute([':id' => $examenEstudianteId]);
+$examenEstudiante = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
+
+
+
+ // id de examen...            
 $sqlExamen = "SELECT ee.*, 
                 e.id AS examen_id, 
                 e.preguntas_aleatorias
               FROM examenes_estudiantes ee
               INNER JOIN examenes e ON ee.categoria_carne_id = e.categoria_carne_id
               WHERE ee.id = :id LIMIT 1";
-$stmt = $pdo->prepare($sqlExamen);
-$stmt->execute([':id' => $examenEstudianteId]);
-$examenEstudiante = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
+
+
+
+
+
 
 if (!$examenEstudiante) {
     echo json_encode(['error' => 'Examen no encontrado']);

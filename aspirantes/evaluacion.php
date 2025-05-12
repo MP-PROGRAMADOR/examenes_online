@@ -85,7 +85,7 @@ $examen_id = $_GET['id'] ?? 0;
         }
 
         // Ejemplo de uso
-        cargarPregunta(1); // pasa el ID real del examen_estudiante
+        cargarPregunta(examenEstudianteId); // pasa el ID real del examen_estudiante
 
 
         function mostrarPregunta(p) {
