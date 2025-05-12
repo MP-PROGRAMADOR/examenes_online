@@ -1,117 +1,144 @@
 <?php
+session_start();
 header('Content-Type: application/json');
 require_once '../config/conexion.php'; // Ajusta la ruta según tu estructura
 
 $pdo = $pdo->getConexion();
 
-session_start();
 $estudiante = $_SESSION['estudiante'];
-    $estudiante_id = $estudiante['id'];
+$estudiante_id = $estudiante['id'];
 
-$input = json_decode(file_get_contents("php://input"), true);
 
-if (
-    !$estudiante_id ||
-    !isset($input['pregunta_id'], $input['opciones'], $input['tipo']) ||
-    !is_array($input['opciones'])
-) {
-    echo json_encode(['ok' => false, 'error' => 'Datos inválidos']);
+// Validar método HTTP
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['ok' => false, 'mensaje' => 'Método no permitido']);
     exit;
 }
 
-$pregunta_id = (int)$input['pregunta_id'];
-$opciones = $input['opciones'];
-$tipo = $input['tipo'];
+// Obtener y decodificar JSON
+$data = json_decode(file_get_contents("php://input"), true);
 
-// Obtener el examen activo del estudiante
-$stmt = $pdo->prepare("SELECT * FROM examenes_estudiantes WHERE estudiante_id = ? AND estado = 'pendiente' AND acceso_habilitado = 1");
-$stmt->execute([$estudiante_id]);
-$examen = $stmt->fetch(PDO::FETCH_ASSOC);
+// Validar campos requeridos
+if (!isset($data['pregunta_id'], $data['opciones'], $data['tipo'], $data['examen_id'])) {
+    echo json_encode(['ok' => false, 'mensaje' => 'Faltan datos requeridos']);
+    exit;
+}
+ 
+$pregunta_id = intval($data['pregunta_id']);
+$examen_id = intval($data['examen_id']);
+$tipo = $data['tipo'];
+$opciones = $data['opciones']; // ['v'] o ['f'] o IDs de opción
 
-if (!$examen) {
-    echo json_encode(['ok' => false, 'error' => 'No tienes un examen activo']);
+// Verificar tipo de pregunta válido
+$tipos_validos = ['unica', 'multiple', 'vf'];
+if (!in_array($tipo, $tipos_validos)) {
+    echo json_encode(['ok' => false, 'mensaje' => 'Tipo de pregunta inválido']);
     exit;
 }
 
-$examen_id = $examen['id'];
+// Buscar ID de relación en `examenes_estudiantes`
+$stmt = $pdo->prepare("SELECT id FROM examenes_estudiantes WHERE estudiante_id = ? AND examen_id = ?");
+$stmt->execute([$estudiante_id, $examen_id]);
+$relacion = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$relacion) {
+    echo json_encode(['ok' => false, 'mensaje' => 'Relación examen-estudiante no encontrada']);
+    exit;
+}
+
+$examenes_estudiantes_id = $relacion['id'];
 
 try {
+    // Eliminar respuestas previas para esta pregunta
+    $stmt = $pdo->prepare("DELETE FROM respuestas_estudiante WHERE examenes_estudiantes_id = ? AND pregunta_id = ?");
+    $stmt->execute([$examenes_estudiantes_id, $pregunta_id]);
+
     $pdo->beginTransaction();
 
-    // Verificar la(s) respuesta(s) correcta(s)
     if ($tipo === 'vf') {
-        $respuesta = strtolower( $opciones[0]); // 'v' o 'f'
-        $stmt = $pdo->prepare("SELECT es_correcta FROM opciones_pregunta WHERE pregunta_id = ?");
-        $stmt->execute([$pregunta_id]);
-        $correcta = $stmt->fetchColumn();
-        
-        // comparamos la respuesta enviada con la opcion correcta de la base de datos
-        (strtolower('v') == $respuesta) ? $respuesta = 1 : $respuesta = 0 ;
-        $es_correcta = $respuesta === $correcta ? 1 : 0 ;
-        // recoger el ID del texto de la pregunta
-        $stmt = $pdo->prepare("SELECT id FROM opciones_pregunta WHERE pregunta_id = ?");
-        $stmt->execute([$pregunta_id]);
-        $opcion_vf_id = $stmt->fetchColumn();
+        $respuesta_vf = ($opciones[0] === 'v') ? 'v' : 'f';
 
+        // Obtener la opción correcta desde opciones_pregunta
+        $stmt_op = $pdo->prepare("SELECT es_correcta FROM opciones_pregunta WHERE pregunta_id = ? AND texto_opcion = ?");
+        $stmt_op->execute([$pregunta_id, strtoupper($respuesta_vf)]);
+        $op_data = $stmt_op->fetch(PDO::FETCH_ASSOC);
 
-        $stmt = $pdo->prepare("INSERT INTO respuestas_estudiante (examenes_estudiantes_id, pregunta_id, opcion_seleccionada_id, es_correcta)
-                               VALUES (?, ?, ?,?)");
-        $stmt->execute([$examen_id, $pregunta_id, $opcion_vf_id, $es_correcta]);
+        $es_correcta = $op_data ? $op_data['es_correcta'] : 0;
+
+        $stmt = $pdo->prepare("
+            INSERT INTO respuestas_estudiante (examenes_estudiantes_id, pregunta_id, respuesta_texto, es_correcta)
+            VALUES (?, ?, ?, ?)
+        ");
+        $stmt->execute([$examenes_estudiantes_id, $pregunta_id, $respuesta_vf, $es_correcta]);
 
     } else {
-        // Obtener opciones correctas
-        $stmt = $pdo->prepare("SELECT id FROM opciones_pregunta WHERE pregunta_id = ? AND es_correcta = 1");
-        $stmt->execute([$pregunta_id]);
-        $correctas = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        // Tipo única o múltiple
+        foreach ($opciones as $opcion_id) {
+            $stmt_op = $pdo->prepare("SELECT es_correcta FROM opciones_pregunta WHERE id = ?");
+            $stmt_op->execute([intval($opcion_id)]);
+            $op_data = $stmt_op->fetch(PDO::FETCH_ASSOC);
 
-        $seleccionadas = array_map('intval', $opciones);
-        sort($seleccionadas);
-        sort($correctas);
+            $es_correcta = $op_data ? $op_data['es_correcta'] : 0;
 
-        $es_correcta = ($seleccionadas === $correctas) ? 1 : 0;
-
-        foreach ($seleccionadas as $opcion_id) {
-            $stmt = $pdo->prepare("INSERT INTO respuestas_estudiante (examenes_estudiantes_id, pregunta_id, opcion_seleccionada_id, es_correcta)
-                                   VALUES (?, ?, ?, ?)");
-            $stmt->execute([$examen_id, $pregunta_id, $opcion_id, $es_correcta]);
+            $stmt = $pdo->prepare("
+                INSERT INTO respuestas_estudiante (examenes_estudiantes_id, pregunta_id, opcion_seleccionada_id, es_correcta)
+                VALUES (?, ?, ?, ?)
+            ");
+            $stmt->execute([$examenes_estudiantes_id, $pregunta_id, intval($opcion_id), $es_correcta]);
         }
     }
 
-    // Contar respuestas registradas
-    $stmt = $pdo->prepare("SELECT COUNT(DISTINCT pregunta_id) FROM respuestas_estudiante WHERE examenes_estudiantes_id = ?");
-    $stmt->execute([$examen_id]);
-    $respuestas_totales = $stmt->fetchColumn();
-
-    if ($respuestas_totales >= (int)$examen['total_preguntas']) {
-        // Examen finalizado
-        $stmt = $pdo->prepare("SELECT COUNT(DISTINCT pregunta_id) FROM respuestas_estudiante 
-                               WHERE examenes_estudiantes_id = ? AND es_correcta = 1");
-        $stmt->execute([$examen_id]);
-        $aciertos = $stmt->fetchColumn();
-
-        $total = (int)$examen['total_preguntas'];
-        $porcentaje = round(($aciertos / $total) * 100);
-        $estado = $porcentaje >= 80 ? 'aprobado' : 'reprobado';
-
-        $stmt = $pdo->prepare("UPDATE examenes_estudiantes SET 
-            estado = ?,
-            fecha_realizacion = NOW(),
-            fecha_proximo_intento = DATE_ADD(NOW(), INTERVAL 3 DAY),
-            acceso_habilitado = 0,
-            intentos_examen = 0,
-            calificacion = ?
-            WHERE id = ?");
-        $stmt->execute([$estado, $porcentaje, $examen_id]);
-
-        $pdo->commit();
-        echo json_encode(['ok' => true, 'finalizado' => true]);
-        exit;
-    }
-
     $pdo->commit();
-    echo json_encode(['ok' => true, 'finalizado' => false]);
 
 } catch (Exception $e) {
     $pdo->rollBack();
-    echo json_encode(['ok' => false, 'error' => 'Error: ' . $e->getMessage()]);
+    echo json_encode(['ok' => false, 'mensaje' => 'Error al guardar respuesta', 'error' => $e->getMessage()]);
+    exit;
 }
+
+// Verificar si ya respondió todas las preguntas
+$stmt = $pdo->prepare("
+    SELECT COUNT(*) FROM preguntas WHERE examen_id = ?
+");
+$stmt->execute([$examen_id]);
+$total_preguntas = $stmt->fetchColumn();
+
+$stmt = $pdo->prepare("
+    SELECT COUNT(DISTINCT pregunta_id) FROM respuestas_estudiante
+    WHERE examenes_estudiantes_id = ?
+");
+$stmt->execute([$examenes_estudiantes_id]);
+$total_respondidas = $stmt->fetchColumn();
+
+$finalizado = ($total_respondidas >= $total_preguntas);
+$calificacion = null;
+
+if ($finalizado) {
+    // Calcular calificación basada en respuestas correctas
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) FROM respuestas_estudiante
+        WHERE examenes_estudiantes_id = ? AND es_correcta = 1
+    ");
+    $stmt->execute([$examenes_estudiantes_id]);
+    $correctas = $stmt->fetchColumn();
+
+    $calificacion = round(($correctas / $total_preguntas) * 100);
+    $estado = $calificacion >= 70 ? 'aprobado' : 'reprobado';
+
+    // Actualizar tabla `examenes_estudiantes`
+    $stmt = $pdo->prepare("
+        UPDATE examenes_estudiantes
+        SET estado = ?, acceso_habilitado = 0, fecha_realizacion = NOW(), calificacion = ?
+        WHERE id = ?
+    ");
+    $stmt->execute([$estado, $calificacion, $examenes_estudiantes_id]);
+}
+
+// Enviar respuesta al frontend
+echo json_encode([
+    'ok' => true,
+    'mensaje' => $finalizado ? 'Examen finalizado' : 'Respuesta guardada',
+    'finalizado' => $finalizado,
+    'calificacion' => $calificacion
+]);

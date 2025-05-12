@@ -50,7 +50,7 @@ if ($categoria_carne) {
                         <strong>Importante:</strong> Al hacer clic en "Comenzar Examen", confirmas que has leído y aceptas todas las políticas y condiciones mencionadas anteriormente. ¡Mucho éxito!
                     </div>
 
-                    <a href="examen.php?id=<?= $examen['id'] ?>" class="btn btn-start-exam btn-block mt-4">Comenzar Examen</a>
+                    <a href="evaluacion.php?id=<?= $examen['id'] ?>" class="btn btn-start-exam btn-block mt-4">Comenzar Examen</a>
                   
                 </div>
             </div>

@@ -1,105 +1,119 @@
- 
-
 <?php
-session_start();
-require_once '../config/conexion.php';
+// Iniciar sesión si no está iniciada
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
+// Verificar si el usuario está logueado
+if (!isset($_SESSION['estudiante'])) {
+    // Redirigir si no está logueado
+    header('Location: ../aspirantes/index.php');
+    exit;
+}
+
+// Incluir archivo de conexión
+require_once '../config/conexion.php';
+$pdo = $pdo->getConexion(); // Asegúrate de que esta función retorne una instancia válida de PDO
+
+// Validar conexión a la base de datos
+if (!$pdo) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Error de conexión a la base de datos.']);
+    exit;
+}
+
+$estudiante = $_SESSION['estudiante'];
+$estudiante_id = $estudiante['id'];
+
+// Consultar examen más reciente para el estudiante
+$sql = "SELECT id, acceso_habilitado, intentos_examen, total_preguntas 
+        FROM examenes_estudiantes 
+        WHERE estudiante_id = ? 
+        ORDER BY id DESC 
+        LIMIT 1";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$estudiante_id]);
+$examen = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Validar si el examen existe
+if (!$examen) {
+    header('Location: ../aspirantes/aspirante.php');
+    exit;
+}
+
+// Validar si tiene acceso habilitado
+if ((int) $examen['acceso_habilitado'] !== 1) {
+    header('Location: ../aspirantes/aspirante.php');
+    exit;
+}
+
+// Establecer cabecera JSON
 header('Content-Type: application/json');
 
-// Manejo de errores global con try-catch
+// Inicializar pregunta actual (se podría calcular desde la BD si se desea)
+$cant_respondidas = 0;
+
 try {
-    // Validación de existencia de variables necesarias
-    $examen_id = filter_input(INPUT_GET, 'examen_id', FILTER_VALIDATE_INT); 
-    
-    $estudiante = $_SESSION['estudiante'];
-    $estudiante_id = $estudiante['id'];
-    // Verificación de datos obligatorios
-    if (!$examen_id || !$estudiante_id) {
-        throw new Exception('Datos incompletos. examen_id o id_estudiante ausentes.');
-    }
+    // Obtener ID de examen desde GET
+    $id_examen = filter_input(INPUT_GET, 'examen_id', FILTER_VALIDATE_INT);
 
-    // Obtener conexión PDO desde clase Conexion
-    $pdo = $pdo->getConexion();
-
-    // Buscar intento activo del estudiante para la misma categoría del examen actual
-    $sql = "SELECT * FROM examenes_estudiantes 
-            WHERE estudiante_id = :estudiante_id 
-            AND categoria_carne_id = (
-                SELECT categoria_carne_id FROM examenes WHERE id = :examen_id
-            )
-            AND intentos_examen = 1 
-            LIMIT 1";
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        ':estudiante_id' => $estudiante_id,
-        ':examen_id' => $examen_id
-    ]);
-
-    $intento = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$intento) {
-        throw new Exception('No tiene intento activo para este examen.');
-    }
-
-    $intento_id = (int)$intento['id'];
-    $total_permitido = (int)$intento['total_preguntas'];
-
-    // Si no ha comenzado el examen, establecer la fecha de inicio
-    if (is_null($intento['fecha_realizacion'])) {
-        $update = $pdo->prepare("UPDATE examenes_estudiantes SET fecha_realizacion = NOW() WHERE id = :id");
-        $update->execute([':id' => $intento_id]);
-    }
-
-    // Contar cuántas preguntas ya ha respondido el estudiante
-    $sql = "SELECT COUNT(*) FROM respuestas_estudiante WHERE examenes_estudiantes_id = :intento_id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([':intento_id' => $intento_id]);
-    $cant_respondidas = (int)$stmt->fetchColumn();
-
-    // Verificar si ya alcanzó el límite de preguntas
-    if ($cant_respondidas >= $total_permitido) {
-        echo json_encode(['finalizado' => true]);
+    // Validar examen_id
+    if (!$id_examen) {
+        http_response_code(400);
+        echo json_encode(['error' => 'ID de examen inválido o ausente.']);
         exit;
     }
 
-    // Seleccionar aleatoriamente una pregunta no respondida aún
+    // Total de preguntas permitidas para este examen
+    $total_permitido = (int) $examen['total_preguntas'];
+    $examen_id = (int) $examen['id']; // ID de la tabla examenes_estudiantes
+
+
+    // Consultar una pregunta aleatoria no respondida aún por este estudiante
     $sql = "SELECT p.*
             FROM preguntas p
-            WHERE p.examen_id = :examen_id
+            WHERE p.examen_id = :id_examen
             AND p.id NOT IN (
-                SELECT pregunta_id FROM respuestas_estudiante 
-                WHERE examenes_estudiantes_id = :intento_id
+                SELECT pregunta_id 
+                FROM respuestas_estudiante 
+                WHERE examenes_estudiantes_id = :examen_id
             )
             ORDER BY RAND()
             LIMIT 1";
-    
+
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
-        ':examen_id' => $examen_id,
-        ':intento_id' => $intento_id
+        ':id_examen' => $id_examen,
+        ':examen_id' => $examen_id
     ]);
+
     $pregunta = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Si ya no hay preguntas disponibles
+    // Validar si se encontró una pregunta disponible
     if (!$pregunta) {
-        echo json_encode(['finalizado' => true]);
+        echo json_encode(['error' => 'No hay más preguntas disponibles.']);
         exit;
     }
 
-    // Obtener opciones de respuesta asociadas a la pregunta
-    $sql = "SELECT id, texto_opcion FROM opciones_pregunta WHERE pregunta_id = :pregunta_id";
+    // Obtener opciones de respuesta para la pregunta
+    $sql = "SELECT id, texto_opcion 
+            FROM opciones_pregunta 
+            WHERE pregunta_id = :pregunta_id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([':pregunta_id' => $pregunta['id']]);
     $opciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Obtener imagen asociada a la pregunta si existe
-    $sql = "SELECT ruta_imagen FROM imagenes_pregunta WHERE pregunta_id = :pregunta_id LIMIT 1";
+    // Obtener imagen asociada a la pregunta, si existe
+    $sql = "SELECT ruta_imagen 
+            FROM imagenes_pregunta 
+            WHERE pregunta_id = :pregunta_id 
+            LIMIT 1";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([':pregunta_id' => $pregunta['id']]);
     $imagen = $stmt->fetchColumn() ?: null;
 
-    // Enviar respuesta al frontend con todos los datos de la pregunta
+    // Enviar los datos al frontend en formato JSON
     echo json_encode([
         'pregunta_id' => $pregunta['id'],
         'texto_pregunta' => $pregunta['texto_pregunta'],
@@ -111,6 +125,7 @@ try {
         'total_preguntas' => $total_permitido
     ]);
 
+
 } catch (PDOException $e) {
     // Error con la base de datos
     echo json_encode(['error' => 'Error en base de datos: ' . $e->getMessage()]);
@@ -120,3 +135,6 @@ try {
     echo json_encode(['error' => $e->getMessage()]);
     http_response_code(400);
 }
+
+
+

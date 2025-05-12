@@ -23,12 +23,14 @@ try {
     $pdo = $pdo->getConexion();
 
     // Buscar intento activo del estudiante (último intento válido)
-    $sql = "SELECT id FROM examenes_estudiantes 
-            WHERE estudiante_id = :estudiante_id 
-            AND intentos_examen = 1 
-            ORDER BY id DESC 
-            LIMIT 1";
-    
+    $sql = "SELECT * FROM examenes_estudiantes 
+                            WHERE estudiante_id = ? 
+                            AND (estado = 'pendiente' OR estado = 'reprobado') 
+                            AND acceso_habilitado = 1 
+                            ORDER BY id DESC 
+                            LIMIT 1
+                            ";
+
     $stmt = $pdo->prepare($sql);
     $stmt->execute([':estudiante_id' => $estudiante_id]);
     $intento = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -37,13 +39,13 @@ try {
         throw new Exception('No hay intento activo para el estudiante.');
     }
 
-    $examen_estudiante_id = (int)$intento['id'];
+    $examen_estudiante_id = (int) $intento['id'];
 
     // Obtener opciones correctas para la pregunta
     $sql = "SELECT id FROM opciones_pregunta 
             WHERE pregunta_id = :pregunta_id 
             AND es_correcta = 1";
-    
+
     $stmt = $pdo->prepare($sql);
     $stmt->execute([':pregunta_id' => $pregunta_id]);
     $correctas = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -57,7 +59,7 @@ try {
     $sql = "INSERT INTO respuestas_estudiante 
             (examenes_estudiantes_id, pregunta_id, opcion_seleccionada_id, es_correcta) 
             VALUES (:examen_id, :pregunta_id, :opcion_id, :es_correcta)";
-    
+
     $stmt = $pdo->prepare($sql);
 
     foreach ($opciones as $opcion_id) {

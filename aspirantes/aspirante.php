@@ -6,87 +6,71 @@ $pdo = $pdo->getConexion();
 
 // ----------------------------------------
 // Validar aqui si hay sesión activa
-// ----------------------------------------
- 
+// ---------------------------------------- 
 
 $estudiante = $_SESSION['estudiante'];
 $estudiante_id = $estudiante['id'];
 
 // Inicialización de variables
-$estadoExamen = "NO ENCONTRADO";
+$estadoExamen = null;
 $intentosCompletados = 0;
 $promedio = 0;
 $examenesRealizados = [];
 $accesoExamen = 0;
 $alerta = null;
 
-try {
-    // ----------------------------------------
-    // Obtener el estado actual del examen
-    // ----------------------------------------
-    $stmtEstado = $pdo->prepare("
-        SELECT estado, acceso_habilitado 
-        FROM examenes_estudiantes 
-        WHERE estudiante_id = :id 
-        ORDER BY id DESC 
-        LIMIT 1
-    ");
+try { 
+    // Obtener el último examen del estudiante
+    $stmtEstado = $pdo->prepare("SELECT 
+                                    ee.estado, 
+                                    ee.acceso_habilitado, 
+                                    ee.calificacion,
+                                    ee.fecha_realizacion,
+                                    ee.fecha_proximo_intento,
+                                    ee.total_preguntas,
+                                    ee.intentos_examen,
+                                    cc.nombre AS nombre_categoria_carne,
+                                    e.titulo AS nombre_examen 
+                                FROM examenes_estudiantes ee
+                                LEFT JOIN examenes e ON e.categoria_carne_id = ee.categoria_carne_id
+                                LEFT JOIN categorias_carne cc ON cc.id = ee.categoria_carne_id
+                                WHERE ee.estudiante_id = :id 
+                                ORDER BY ee.id DESC  
+                                ");
     $stmtEstado->execute(['id' => $estudiante_id]);
-    $resultado = $stmtEstado->fetch(PDO::FETCH_ASSOC);
+    $examen = $stmtEstado->fetch(PDO::FETCH_ASSOC);
 
-    if ($resultado) {
-        $estadoExamen = ucfirst($resultado['estado']);
-        $accesoExamen = (int)$resultado['acceso_habilitado'];
+    if ($examen) {
+        $estadoExamen = $examen['estado'];
+        $calificacionExamen = $examen['calificacion'];
+        $accesoExamen = (int) $examen['acceso_habilitado'];
+        $categoria = $examen['nombre_categoria_carne'];
+        $nombre_examen = $examen['nombre_examen'];
+
+        // Puedes usar también los demás campos si lo deseas
+// Ejemplo:
+// $intentosRestantes = (int)$examen['intentos_examen'];
     }
 
-    // ----------------------------------------
-    // Calcular el promedio de notas
-    // ----------------------------------------
-    $stmtPromedio = $pdo->prepare("
-        SELECT AVG(
-            (SELECT COUNT(*) FROM respuestas_estudiante WHERE intento_examen_id = i.id AND es_correcta = 1) /
-            NULLIF((SELECT COUNT(*) FROM respuestas_estudiante WHERE intento_examen_id = i.id), 0) * 100
-        ) AS promedio
-        FROM intentos_examen i
-        WHERE estudiante_id = :id AND completado = 1
-    ");
-    $stmtPromedio->execute(['id' => $estudiante_id]);
-    $fila = $stmtPromedio->fetch(PDO::FETCH_ASSOC);
-    $promedio = $fila && $fila['promedio'] !== null ? round($fila['promedio']) : 0;
 
-    // ----------------------------------------
-    // Contar intentos completados
-    // ----------------------------------------
-    $stmtIntentos = $pdo->prepare("
-        SELECT COUNT(*) AS total 
-        FROM intentos_examen 
-        WHERE estudiante_id = :id AND completado = 1
-    ");
-    $stmtIntentos->execute(['id' => $estudiante_id]);
-    $intentoRow = $stmtIntentos->fetch(PDO::FETCH_ASSOC);
-    $intentosCompletados = $intentoRow['total'];
+    /* -------- DAR PERMISOS SI LA FECHA ASPIRÓ ---------- */
+    $ahora = date('Y-m-d H:i:s');
+    $intento = $examen['fecha_proximo_intento'];
 
-    // ----------------------------------------
-    // Últimos exámenes completados
-    // ----------------------------------------
-    $stmtUltimos = $pdo->prepare("
-        SELECT e.titulo, i.fecha_fin,
-            ROUND((
-                (SELECT COUNT(*) FROM respuestas_estudiante WHERE intento_examen_id = i.id AND es_correcta = 1) /
-                NULLIF((SELECT COUNT(*) FROM respuestas_estudiante WHERE intento_examen_id = i.id), 0) * 100
-            )) AS nota,
-            (SELECT estado FROM examenes_estudiantes WHERE id = i.examen_estudiante_id) AS estado_examen
-        FROM intentos_examen i
-        INNER JOIN examenes e ON i.examen_id = e.id
-        WHERE i.estudiante_id = :id AND i.completado = 1
-        ORDER BY i.fecha_fin DESC
-        LIMIT 5
-    ");
-    $stmtUltimos->execute(['id' => $estudiante_id]);
-    $examenesRealizados = $stmtUltimos->fetchAll(PDO::FETCH_ASSOC);
+    // Si la fecha ya pasó, se habilita el acceso
+    if ($intento <= $ahora) {
+        $update = $pdo->prepare(" UPDATE 
+            examenes_estudiantes 
+            SET acceso_habilitado = 1, 
+            intentos_examen = intentos_examen + 1 
+            WHERE estudiante_id = :id
+        ");
+        $update->execute(['id' => $estudiante_id]);
+    }
+
 
 } catch (PDOException $e) {
-    $estadoExamen = "ERROR: " . htmlspecialchars($e->getMessage());
+
     $alerta = [
         'tipo' => 'danger',
         'mensaje' => 'Ocurrió un error al cargar los datos del examen. Intenta nuevamente más tarde.'
@@ -132,8 +116,8 @@ if (!$data) {
     if ($intentos['total'] >= 1) {
         $alerta = [
             'tipo' => 'danger',
-            'mensaje' => 'Ya has realizado un intento. Podrás volver a intentarlo el <strong>' . 
-                         htmlspecialchars($data['fecha_proximo_intento']) . '</strong>.'
+            'mensaje' => 'Ya has realizado un intento. Podrás volver a intentarlo el <strong>' .
+                htmlspecialchars($data['fecha_proximo_intento']) . '</strong>.'
         ];
     }
 }
@@ -168,8 +152,8 @@ if (!$data) {
             <div class="card shadow-sm h-100">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-muted">Completados</h6>
-                        <h4 class="text-success fw-bold"><?= $intentosCompletados ?></h4>
+                        <h6 class="text-muted">Calificacion</h6>
+                        <h4 class="text-success fw-bold"><?= htmlspecialchars($estadoExamen) ?></h4>
                     </div>
                     <div class="fs-2 text-success">✅</div>
                 </div>
@@ -180,7 +164,7 @@ if (!$data) {
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>
                         <h6 class="text-muted">Promedio</h6>
-                        <h4 class="text-warning fw-bold"><?= $promedio ?>%</h4>
+                        <h4 class="text-warning fw-bold"><?= htmlspecialchars($calificacionExamen) ?>%</h4>
                     </div>
                     <div class="fs-2 text-warning">📊</div>
                 </div>
@@ -223,32 +207,47 @@ if (!$data) {
                 <table class="table table-striped mb-0">
                     <thead class="table-light">
                         <tr>
+                            <th>Tipo Carné</th>
                             <th>Examen</th>
-                            <th>Fecha</th>
+                            <th>total preguntas</th>
+                            <th>Fecha realizado</th>
+                            <?php if (strtolower($examen['estado']) == 'reprobado'): ?>
+                                <th>Fecha proximo intento</th>
+                            <?php endif; ?>
                             <th>Calificación</th>
                             <th>Estado</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (!empty($examenesRealizados)): ?>
-                            <?php foreach ($examenesRealizados as $examen): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($examen['titulo']) ?></td>
-                                    <td><?= date('d/m/Y', strtotime($examen['fecha_fin'])) ?></td>
-                                    <td><?= intval($examen['nota']) ?>%</td>
+                        <?php if (!empty($examen)): ?>
+
+                            <tr>
+                                <td>Nivel <?= htmlspecialchars($examen['nombre_categoria_carne']) ?></td>
+                                <td><?= htmlspecialchars($examen['nombre_examen']) ?></td>
+                                <td><?= intval($examen['total_preguntas']) ?></td>
+                                <td><?= date('d/m/Y', strtotime($examen['fecha_realizacion'])) ?></td>
+                                <?php if (strtolower($examen['estado']) == 'reprobado'): ?>
                                     <td>
-                                        <?php
-                                        $estado = strtolower($examen['estado_examen']);
-                                        $badge = match ($estado) {
-                                            'aprobado' => 'bg-success',
-                                            'reprobado' => 'bg-danger',
-                                            default => 'bg-secondary'
-                                        };
-                                        ?>
-                                        <span class="badge <?= $badge ?>"><?= ucfirst($estado) ?></span>
+                                        <span class="contador-intento"
+                                            data-fecha="<?= date('Y-m-d H:i:s', strtotime($examen['fecha_proximo_intento'])) ?>">
+                                            Calculando...
+                                        </span>
                                     </td>
-                                </tr>
-                            <?php endforeach; ?>
+                                <?php endif; ?>
+                                <td><?= intval($examen['calificacion']) ?>%</td>
+                                <td>
+                                    <?php
+                                    $estado = strtolower($examen['estado']);
+                                    $badge = match ($estado) {
+                                        'aprobado' => 'bg-success',
+                                        'reprobado' => 'bg-danger',
+                                        default => 'bg-secondary'
+                                    };
+                                    ?>
+                                    <span class="badge <?= $badge ?>"><?= ucfirst($estado) ?></span>
+                                </td>
+                            </tr>
+
                         <?php else: ?>
                             <tr>
                                 <td colspan="4" class="text-center">No has completado exámenes aún.</td>
@@ -263,4 +262,38 @@ if (!$data) {
 
 <!-- Bootstrap JS (Popper incluido) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+function iniciarCuentaRegresiva() {
+    const elementos = document.querySelectorAll('.contador-intento');
+
+    elementos.forEach(el => {
+        const fechaObjetivo = new Date(el.dataset.fecha).getTime();
+
+        function actualizarContador() {
+            const ahora = new Date().getTime();
+            const diferencia = fechaObjetivo - ahora;
+
+            if (diferencia <= 0) {
+                el.textContent = "¡Ya puedes volver a intentarlo!";
+                return;
+            }
+
+            const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+            const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
+
+            el.textContent = `${dias}d ${horas}h ${minutos}m ${segundos}s`;
+
+            setTimeout(actualizarContador, 1000);
+        }
+
+        actualizarContador();
+    });
+}
+
+document.addEventListener('DOMContentLoaded', iniciarCuentaRegresiva);
+</script>
+
 </body>
