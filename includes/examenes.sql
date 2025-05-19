@@ -4,6 +4,7 @@ CREATE TABLE usuarios (
     email VARCHAR(100) UNIQUE NOT NULL,
     contrasena_hash VARCHAR(255) NOT NULL,
     rol ENUM('admin', 'examinador', 'operador') DEFAULT 'operador',
+    activo BOOLEAN DEFAULT 1,
     creado_en DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -54,7 +55,7 @@ CREATE TABLE estudiante_categorias (
 CREATE TABLE preguntas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     texto TEXT NOT NULL,
-    tipo ENUM('opcion_unica', 'multiple_opcion', 'verdadero_falso') NOT NULL,
+    tipo ENUM('unica', 'multiple', 'vf') NOT NULL,
     tipo_contenido ENUM('texto', 'ilustracion') NOT NULL,
     activa BOOLEAN DEFAULT TRUE,
     creado_en DATETIME DEFAULT CURRENT_TIMESTAMP
