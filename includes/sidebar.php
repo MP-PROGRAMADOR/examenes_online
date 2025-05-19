@@ -31,7 +31,9 @@
         style="background: #1976D2; backdrop-filter: blur(10px);">
         <div class="d-flex align-items-center gap-2 position-relative">
           <i class="bi bi-person-circle fs-3 text-white"></i>
-          <span class="text-white fw-semibold text-truncate" style="max-width: 180px;"><?= htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8'); ?> ( <?= htmlspecialchars($rol, ENT_QUOTES, 'UTF-8'); ?>)</span>
+          <span class="text-white fw-semibold text-truncate" style="max-width: 180px;">
+            <?= htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8'); ?> 
+            ( <?= htmlspecialchars($rol, ENT_QUOTES, 'UTF-8'); ?>)</span>
 
         </div>
         <a href="../admin/index.php" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1 px-3 shadow-sm"
@@ -53,7 +55,7 @@
   <a href="#" class="nav-link"><i class="bi bi-house-door"></i><span class="link-text">Inicio</span></a>
 
   <div class="section-title">Gestión Académica</div>
-  <a href="#" class="nav-link"><i class="bi bi-people"></i><span class="link-text">Estudiantes</span></a>
+  <a href="../admin/estudiantes.php" class="nav-link"><i class="bi bi-people"></i><span class="link-text">Estudiantes</span></a>
   <a href="#" class="nav-link"><i class="bi bi-card-list"></i><span class="link-text">Exámenes</span></a>
   <a href="#" class="nav-link"><i class="bi bi-ui-checks"></i><span class="link-text">Asignar Preguntas</span></a>
   <a href="#" class="nav-link"><i class="bi bi-check-circle"></i><span class="link-text">Respuestas</span></a>
@@ -63,13 +65,13 @@
   <a href="#" class="nav-link"><i class="bi bi-collection"></i><span class="link-text">Preguntas</span></a>
   <a href="#" class="nav-link"><i class="bi bi-card-image"></i><span class="link-text">Imágenes</span></a>
   <a href="#" class="nav-link"><i class="bi bi-list-ul"></i><span class="link-text">Opciones</span></a>
-  <a href="#" class="nav-link"><i class="bi bi-tags"></i><span class="link-text">Categorías</span></a>
+  <a href="../admin/categorias.php" class="nav-link"><i class="bi bi-tags"></i><span class="link-text">Categorías</span></a>
 
   <div class="section-title">Configuración</div>
-  <a href="#" class="nav-link"><i class="bi bi-bank"></i><span class="link-text">Escuelas</span></a>
+  <a href="../admin/escuelas.php" class="nav-link"><i class="bi bi-bank"></i><span class="link-text">Escuelas</span></a>
   <a href="../admin/usuarios.php" class="nav-link"><i class="bi bi-person-gear"></i><span
       class="link-text">Usuarios</span></a>
-  <a href="#" class="nav-link"><i class="bi bi-shield-lock"></i><span class="link-text">Roles</span></a>
+ <!--  <a href="#" class="nav-link"><i class="bi bi-shield-lock"></i><span class="link-text">Roles</span></a> -->
 </div>
 
 <!-- Overlay para móviles -->

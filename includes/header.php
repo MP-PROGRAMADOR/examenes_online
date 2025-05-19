@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
+   require '../includes/conexion.php';
 if (!isset($_SESSION['usuario'])) {
      header('location: ../index.php');
 } 
@@ -48,14 +48,14 @@ $correo = $_SESSION['usuario']['email'];
   --border-color: #e0e0e0;
 }
 
-
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: var(--main-bg);
-     overflow-x: hidden;
-  }
-
+  /* Establece altura completa para el body y html */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--main-bg);
+  overflow: hidden; /* evita scroll global */
+}
 /* Navbar fijo */
 .navbar {
   height: 56px;
@@ -176,21 +176,24 @@ $correo = $_SESSION['usuario']['email'];
   }
 }
 
-  /* MAIN CONTENT */
-  .main-content { 
-    box-sizing: border-box;
-    margin-left: 120px;
-    padding: 1.5rem;
-    padding-top: 56px;
-    height: calc(100vh - 6px);
-    overflow-y: auto;
-    background-color: var(--main-bg);
-    transition: margin-left 0.3s ease; 
-  }
 
-  .main-content.collapsed {
-    margin-left: 0px;
-  }
+
+/* MAIN CONTENT */
+.main-content { 
+  box-sizing: border-box;
+  margin-left: 120px;
+  padding: 1.5rem;
+  padding-top: 56px;
+  height: 100%; /* usa 100% del espacio disponible */
+  overflow-y: auto; /* solo este div tiene scroll vertical */
+  background-color: var(--main-bg);
+  transition: margin-left 0.3s ease;
+}
+
+.main-content.collapsed {
+  margin-left: 0px;
+}
+
  
 
   /* TOGGLE */

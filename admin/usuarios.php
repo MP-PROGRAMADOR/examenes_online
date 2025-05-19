@@ -105,15 +105,7 @@ include_once("../includes/sidebar.php");
                           rol: '<?= addslashes(htmlspecialchars($usuario['rol'], ENT_QUOTES, 'UTF-8')); ?>'
                         })">
                       <i class="bi bi-pencil-square me-1"></i> Editar
-                    </button>
-
-
-
-
-                    <!-- <a href="#"
-                      class="btn btn-sm btn-outline-primary" title="Editar">
-                      <i class="bi bi-pencil-square me-1"></i>Editar
-                    </a> -->
+                    </button> 
                     <?php if (($rol === 'admin')): ?>
                       <button class="btn btn-sm btn-outline-danger eliminar-usuario-btn"
                         onclick="eliminarUsuario(<?= htmlspecialchars($usuario['id'], ENT_QUOTES, 'UTF-8') ?>, '<?= htmlspecialchars($usuario['nombre'], ENT_QUOTES, 'UTF-8') ?>')"
@@ -285,7 +277,7 @@ include_once("../includes/sidebar.php");
 
         if (resultado.status) {
           mostrarToast('success', resultado.message);
-          console.log(resultado.message)
+         // console.log(resultado.message)
           // Opcional: cerrar modal
           const modal = bootstrap.Modal.getInstance(document.getElementById('modalUsuario'));
           modal.hide();
@@ -343,7 +335,7 @@ include_once("../includes/sidebar.php");
 
         if (resultado.status) {
           mostrarToast('success', resultado.message);
-          console.log(resultado.message)
+          
           // Opcional: cerrar modal
           const modal = bootstrap.Modal.getInstance(document.getElementById('modalUsuario'));
           modal.hide();
