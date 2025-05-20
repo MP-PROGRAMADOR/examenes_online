@@ -62,7 +62,7 @@
   <a href="#" class="nav-link"><i class="bi bi-send"></i><span class="link-text">Correos Enviados</span></a>
 
   <div class="section-title">Contenido</div>
-  <a href="#" class="nav-link"><i class="bi bi-collection"></i><span class="link-text">Preguntas</span></a>
+  <a href="../admin/preguntas.php" class="nav-link"><i class="bi bi-collection"></i><span class="link-text">Preguntas</span></a>
   <a href="#" class="nav-link"><i class="bi bi-card-image"></i><span class="link-text">Imágenes</span></a>
   <a href="#" class="nav-link"><i class="bi bi-list-ul"></i><span class="link-text">Opciones</span></a>
   <a href="../admin/categorias.php" class="nav-link"><i class="bi bi-tags"></i><span class="link-text">Categorías</span></a>
