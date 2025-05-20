@@ -46,8 +46,8 @@ try {
             <option value="25">25 registros</option>
           </select>
         </div>
-         <button class="btn btn-primary" onclick="abrirModalRegistroEstudiante()">
-          <i class="bi bi-person-plus-fill me-2"></i> 
+        <button class="btn btn-primary" onclick="abrirModalRegistroEstudiante()">
+          <i class="bi bi-person-plus-fill me-2"></i>
           Crear Nuevo
         </button>
         <!-- <a href="registrar_estudiantes.php" class="btn btn-light fw-semibold shadow-sm">
@@ -83,7 +83,8 @@ try {
                 <tr>
                   <td class="text-center"><?= htmlspecialchars($estudiante['id'], ENT_QUOTES, 'UTF-8'); ?></td>
                   <td><?= htmlspecialchars($estudiante['nombre'], ENT_QUOTES, 'UTF-8'); ?>
-                    <?= htmlspecialchars($estudiante['apellidos'], ENT_QUOTES, 'UTF-8'); ?></td>
+                    <?= htmlspecialchars($estudiante['apellidos'], ENT_QUOTES, 'UTF-8'); ?>
+                  </td>
                   <td><?= htmlspecialchars($estudiante['dni'], ENT_QUOTES, 'UTF-8'); ?></td>
                   <td><?= htmlspecialchars($estudiante['escuela'], ENT_QUOTES, 'UTF-8'); ?> </td>
                   <td>
@@ -95,23 +96,24 @@ try {
                   <td><?= htmlspecialchars($estudiante['categoria'], ENT_QUOTES, 'UTF-8'); ?></td>
                   <td><?= htmlspecialchars($estudiante['usuario'], ENT_QUOTES, 'UTF-8'); ?></td>
                   <td class="text-center">
-                    <?php if ($estudiante['activo']): ?>
+                    <?php if ($estudiante['estado'] === 'activo'): ?>
                       <button
                         class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                        title="Haz clic para desactivar" onclick="cambiarEstadoEstudiante(<?= $estudiante['id'] ?>, false)">
+                        title="Haz clic para desactivar"
+                        onclick="cambiarEstadoEstudiante(<?= $estudiante['id'] ?>, 'inactivo')">
                         <i class="bi bi-toggle-on fs-5"></i>
                         Activo
                       </button>
                     <?php else: ?>
                       <button
                         class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                        title="Haz clic para activar" onclick="cambiarEstadoEstudiante(<?= $estudiante['id'] ?>, true)">
+                        title="Haz clic para activar" onclick="cambiarEstadoEstudiante(<?= $estudiante['id'] ?>, 'activo')">
                         <i class="bi bi-toggle-off fs-5"></i>
                         Inactivo
                       </button>
                     <?php endif; ?>
-
                   </td>
+
                   <td class="text-center">
                     <div class="d-flex gap-2 justify-content-center flex-wrap">
                       <button class="btn btn-sm btn-outline-warning" onclick="abrirModalEdicionEstudiante({
@@ -129,6 +131,13 @@ try {
                         })">
                         <i class="bi bi-pencil-square me-1"></i> Editar
                       </button>
+                      <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2   shadow-sm"
+                        onclick="abrirModalCategorias(<?= $estudiante['id'] ?>, '<?= htmlspecialchars($estudiante['nombre'], ENT_QUOTES, 'UTF-8') ?>')"
+                        title="Ver detalles de categorias del estudiante">
+                        <i class="bi bi-eye "></i> Categorias
+                      </button>
+
+
                       <?php if (($rol === 'admin')): ?>
                         <button class="btn btn-sm btn-outline-danger eliminar-estudiante-btn"
                           onclick="eliminarEstudiante(<?= htmlspecialchars($estudiante['id'], ENT_QUOTES, 'UTF-8') ?>, '<?= htmlspecialchars($estudiante['nombre'], ENT_QUOTES, 'UTF-8') ?>')"
@@ -238,15 +247,29 @@ try {
             </select>
           </div>
 
-          <!-- Usuario -->
+
+          <!-- Categoría de Carné -->
           <div class="mb-3 col-12 col-md-6">
+            <label for="categorias_id" class="form-label fw-semibold">
+              <i class="bi bi-card-list me-2 text-primary"></i>Categoría de Carné <span class="text-danger">*</span>
+            </label>
+            <select name="categoria_id" id="categorias_id" class="form-select" disabled required>
+              <option value="">Seleccione una categoría</option>
+            </select>
+            <div class="invalid-feedback">
+              Por favor selecciona una categoría de carné.
+            </div>
+          </div>
+
+          <!-- Usuario -->
+          <!--  <div class="mb-3 col-12 col-md-6">
             <label for="usuario_estudiante" class="form-label fw-semibold">
               <i class="bi bi-person-badge-fill me-2 text-primary"></i>Usuario <span class="text-danger">*</span>
             </label>
             <input type="text" class="form-control shadow-sm" id="usuario_estudiante" name="usuario" required>
             <div class="invalid-feedback">Por favor asigna un nombre de usuario único.</div>
-          </div> 
-         
+          </div> -->
+
 
           <!-- Estado (solo en edición) -->
           <div class="form-check form-switch mb-3 col-12 col-md-6 d-none" id="activo-estudiante-container">
@@ -268,15 +291,111 @@ try {
   </div>
 </div>
 
+<!-- MODAL listado de categorías asignadas al estudiante basado en su ID -->
+<div class="modal fade" id="modalAsignarCategoria" tabindex="-1" aria-labelledby="modalLabelCategoria"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <!-- Encabezado del modal -->
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-card-checklist me-2 text-white"></i>
+           Categorías asignadas al estudiante: 
+          <span id="nombreEstudiante" class="fw-semibold"></span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div> 
+
+      <!-- Cuerpo del modal -->
+      <div class="modal-body">
+        <table class="table table-bordered table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th><i class="bi bi-hash text-secondary me-1"></i>ID</th>
+              <th><i class="bi bi-award-fill text-primary me-1"></i>Categoría</th>
+              <th><i class="bi bi-check2-circle text-success me-1"></i>Estado</th>
+              <th><i class="bi bi-calendar-event text-info me-1"></i>Fecha Asignación</th>
+              <th><i class="bi bi-tools text-dark me-1"></i>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaCategoriasEstudiante">
+            <tr>
+              <td colspan="5" class="text-center text-muted">
+                <i class="bi bi-hourglass-split me-2"></i>Cargando...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 
 <script>
-  // Mostrar/Ocultar contraseña estudiante
-  document.getElementById('toggle-password-estudiante').addEventListener('click', () => {
-    const pwdInput = document.getElementById('contrasena_estudiante');
-    const icon = document.querySelector('#toggle-password-estudiante i');
-    pwdInput.type = pwdInput.type === 'password' ? 'text' : 'password';
-    icon.classList.toggle('bi-eye-fill');
-    icon.classList.toggle('bi-eye-slash-fill');
+
+  // Función para calcular edad a partir de fecha de nacimiento
+  function calcularEdad(fechaNacimiento) {
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const m = hoy.getMonth() - nacimiento.getMonth();
+    if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edad--;
+    }
+    return edad;
+  }
+
+  // Función para cargar y filtrar categorías por edad
+  async function filtrarCategoriasPorEdad(edad) {
+    const select = document.getElementById("categorias_id"); //capturamos el id del campo categoria
+
+    try {
+      const res = await fetch('../api/obtener_categorias.php');
+      const result = await res.json();
+
+      // Limpiar el select
+      select.innerHTML = "<option value=''>Seleccione una categoría</option>";
+
+      if (result.status && Array.isArray(result.data)) {
+        let tieneOpciones = false;
+
+        result.data.forEach(categoria => {
+          if (edad >= categoria.edad_minima) {
+            const option = document.createElement("option");
+            option.value = categoria.id;
+            option.textContent = categoria.nombre;
+            select.appendChild(option);
+            tieneOpciones = true;
+          }
+        });
+
+        if (tieneOpciones) {
+          select.disabled = false; //habilitar si existen categias para la edad ingresada en el campo fecha de nacimiento
+
+        } else {
+          select.disabled = true; //deshabilitar el campo categorias si no hay edad
+          mostrarToast('warning', 'No hay ninguna categoría habilitada para la edad ingresada.')
+        }
+
+      } else {
+        mostrarToast('warning', result.message || 'No se pudieron cargar las categorías.');
+      }
+
+    } catch (error) {
+      console.error('Error cargando categorías:', error);
+      mostrarToast('danger', 'Error al conectar con el servidor.');
+    }
+  }
+
+  // Escuchar cambios en el campo de fecha de nacimiento
+  document.getElementById("fecha_nacimiento").addEventListener("change", function () {
+    const edad = calcularEdad(this.value);
+    if (!isNaN(edad)) {
+      filtrarCategoriasPorEdad(edad);
+    }
   });
 
   // Abrir modal de registro
@@ -318,6 +437,16 @@ try {
     if ('estado' in estudiante) {
       document.getElementById('activo-estudiante-container').classList.remove('d-none');
       document.getElementById('activo_estudiante').checked = estudiante.estado === 'activo' || estudiante.estado === 1;
+    }
+
+    // Mostrar opciones de categoría según edad si fecha está presente
+    if (estudiante.fecha_nacimiento) {
+      const edad = calcularEdad(estudiante.fecha_nacimiento);
+      filtrarCategoriasPorEdad(edad);
+    }
+
+    if (estudiante.escuela_id) {
+      document.getElementById('escuela_id').value = estudiante.escuela_id;
     }
 
     const modal = new bootstrap.Modal(document.getElementById('modalEstudiante'));
@@ -394,23 +523,181 @@ try {
   async function cargarEscuelas() {
     try {
       const res = await fetch('../api/obtener_escuelas.php');
-      const data = await res.json();
-      const select = document.getElementById('escuela_id');
-      select.innerHTML = '<option value="">Selecciona una escuela</option>';
-      data.forEach(escuela => {
-        const option = document.createElement('option');
-        option.value = escuela.id;
-        option.textContent = escuela.nombre;
-        select.appendChild(option);
-      });
+      const result = await res.json();
+
+      // Validar que la respuesta sea exitosa
+      if (result.status) {
+        const select = document.getElementById('escuela_id');
+        select.innerHTML = '<option value="">Selecciona una escuela</option>';
+
+        result.data.forEach(escuela => {
+          const option = document.createElement('option');
+          option.value = escuela.id;
+          option.textContent = escuela.nombre;
+          select.appendChild(option);
+        });
+      } else {
+        // En caso de que status sea false, muestra el mensaje del backend
+        mostrarToast('warning', result.message || 'No se pudo cargar la lista de escuelas.');
+      }
     } catch (error) {
       console.error('Error cargando escuelas:', error);
-      mostrarToast('danger', 'No se pudo cargar la lista de escuelas.');
+      mostrarToast('danger', 'Error al conectar con el servidor.');
     }
   }
 
+
+
   // Ejecutar al cargar la página
   document.addEventListener('DOMContentLoaded', cargarEscuelas);
+
+  // modal de confirmacion al dar clic sobre el boton categoria
+  /*  function confirmarAsignacionCategoria(estudianteId, nombreEstudiante) {
+     mostrarConfirmacionToast(
+       `¿Deseas asignar una categoría a ${nombreEstudiante}?`,
+       () => abrirModalCategorias(estudianteId, nombreEstudiante)
+     );
+   } */
+
+  function abrirModalCategorias(estudianteId, nombreEstudiante) {
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('modalAsignarCategoria'));
+    modal.show();
+
+    // Mostrar nombre
+    document.getElementById('nombreEstudiante').textContent = nombreEstudiante;
+
+    // Cargar categorías asignadas
+    fetch(`../api/obtener_categorias_estudiante.php?estudiante_id=${estudianteId}`)
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.getElementById('tablaCategoriasEstudiante');
+        tbody.innerHTML = '';
+
+        if (data.status && data.data.length > 0) {
+          data.data.forEach(cat => {
+            tbody.innerHTML += `
+                            <tr>
+                              <td>${cat.id}</td>
+                              <td>${cat.categoria}</td>
+                              <td><span class="badge bg-${estadoColor(cat.estado)}">${cat.estado}</span></td>
+                              <td>${cat.fecha_asignacion}</td> 
+                              
+                              <td class="text-center">
+                                <button class="btn btn-sm btn-outline-primary me-1" title="Asignar nueva categoría"
+                                  onclick="asignarNuevaCategoria(${cat.estudiante_id})">
+                                  <i class="bi bi-plus-circle"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning me-1" title="Editar asignación"
+                                  onclick="editarCategoriaAsignada(${cat.id})">
+                                  <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" title="Eliminar asignación"
+                                  onclick="eliminarCategoriaAsignada(${cat.id})">
+                                  <i class="bi bi-trash"></i>
+                                </button>
+                              </td>
+                            </tr>
+                            `;
+
+          });
+        } else {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No tiene categorías asignadas</td></tr>`;
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('tablaCategoriasEstudiante').innerHTML =
+          `<tr><td colspan="4" class="text-center text-danger">Error al cargar datos</td></tr>`;
+      });
+  }
+
+  function estadoColor(estado) {
+    switch (estado) {
+      case 'aprobado': return 'success';
+      case 'rechazado': return 'danger';
+      case 'en_proceso': return 'warning';
+      default: return 'secondary';
+    }
+  }
+
+
+
+
+
+/* function mostrarCategoriasEstudiante(estudiante_id) {
+  fetch(`api/obtener_categorias_estudiante.php?estudiante_id=${estudiante_id}`)
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.getElementById('categoriasEstudianteBody');
+      tbody.innerHTML = '';
+      data.forEach(cat => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${cat.id}</td>
+            <td>${cat.categoria}</td>
+            <td><span class="badge bg-${estadoColor(cat.estado)}">${cat.estado}</span></td>
+            <td>${cat.fecha_asignacion}</td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-outline-primary me-1" title="Nueva categoría"
+                onclick="asignarNuevaCategoria(${cat.estudiante_id})">
+                <i class="bi bi-plus-circle"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-warning me-1" title="Editar asignación"
+                onclick="editarCategoriaAsignada(${cat.id})">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" title="Eliminar asignación"
+                onclick="eliminarCategoriaAsignada(${cat.id})">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      const modal = new bootstrap.Modal(document.getElementById('modalCategoriaEstudiante'));
+      modal.show();
+    });
+}
+ */
+function asignarCategoriaEstudiante(estudiante_id, nombre_estudiante) {
+  mostrarConfirmacionToast(`¿Deseas asignar categoría a ${nombre_estudiante}?`, () => {
+    mostrarCategoriasEstudiante(estudiante_id);
+  });
+}
+
+function asignarNuevaCategoria(estudiante_id) {
+  // Aquí podrías abrir otro modal con un <select> de categorías disponibles y un botón de "Guardar"
+  alert(`Abrir modal para asignar nueva categoría a estudiante ID ${estudiante_id}`);
+}
+
+function editarCategoriaAsignada(asignacion_id) {
+  alert(`Abrir modal de edición para asignación ID ${asignacion_id}`);
+}
+
+function eliminarCategoriaAsignada(asignacion_id) {
+  if (confirm("¿Estás seguro de eliminar esta asignación?")) {
+    fetch(`api/eliminar_categoria_asignada.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: asignacion_id })
+    })
+      .then(res => res.json())
+      .then(resp => {
+        if (resp.status) {
+          alert("Asignación eliminada.");
+          document.querySelector(`#modalCategoriaEstudiante`).querySelector('.modal-body').scrollTop = 0;
+          mostrarCategoriasEstudiante(resp.estudiante_id);
+        } else {
+          alert("Error: " + resp.message);
+        }
+      });
+  }
+}
+
+
+
+
 </script>
 
 
