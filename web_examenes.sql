@@ -101,6 +101,7 @@ CREATE TABLE `estudiantes` (
   `dni` varchar(20) NOT NULL,
   `nombre` varchar(100) NOT NULL,
   `email` varchar(100) DEFAULT NULL,
+  `usuario` varchar(100) UNIQUE NOT NULL,
   `telefono` varchar(20) DEFAULT NULL,
   `fecha_nacimiento` date DEFAULT NULL,
   `escuela_id` int(11) DEFAULT NULL,
