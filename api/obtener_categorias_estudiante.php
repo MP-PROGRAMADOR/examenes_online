@@ -9,10 +9,18 @@ if ($estudiante_id <= 0) {
     exit;
 }
 
-$sql = "SELECT ec.id, ec.estado, ec.fecha_asignacion, c.nombre AS categoria
-        FROM estudiante_categorias ec
-        JOIN categorias c ON ec.categoria_id = c.id
-        WHERE ec.estudiante_id = ?";
+$sql = "SELECT 
+            ec.id, 
+            c.nombre AS categoria,
+            CONCAT(e.nombre, ' ', e.apellidos) AS estudiante,
+            e.fecha_nacimiento AS edad,
+            ec.estado, 
+            ec.fecha_asignacion
+            FROM estudiante_categorias ec
+            JOIN categorias c ON ec.categoria_id = c.id
+            JOIN estudiantes e ON ec.estudiante_id = e.id
+            WHERE ec.estudiante_id = ?
+            ";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$estudiante_id]);
 $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);

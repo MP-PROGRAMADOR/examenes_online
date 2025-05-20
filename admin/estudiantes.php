@@ -132,7 +132,7 @@ try {
                         <i class="bi bi-pencil-square me-1"></i> Editar
                       </button>
                       <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2   shadow-sm"
-                        onclick="abrirModalCategorias(<?= $estudiante['id'] ?>, '<?= htmlspecialchars($estudiante['nombre'], ENT_QUOTES, 'UTF-8') ?>')"
+                        onclick="abrirModalCategorias(<?= $estudiante['id'] ?>, '<?= htmlspecialchars($estudiante['nombre'], ENT_QUOTES, 'UTF-8') ?>',  '<?= htmlspecialchars($estudiante['fecha_nacimiento'], ENT_QUOTES, 'UTF-8') ?>')"
                         title="Ver detalles de categorias del estudiante">
                         <i class="bi bi-eye "></i> Categorias
                       </button>
@@ -308,10 +308,38 @@ try {
 
       <!-- Cuerpo del modal -->
       <div class="modal-body">
+        <!-- Sección de Asignación Nueva -->
+        <div id="seccionNuevaCategoria" class="mb-4 d-none">
+          <form id="formNuevaCategoria">
+            <p class="h3" id="edad"></p>
+            <input type="text" name="estudiante_id" id="nuevo_estudiante_id" >
+            <div class="row g-2 align-items-center">
+              <div class="col-md-8">
+                <label class="form-label">Selecciona nueva categoría:</label>
+                <select class="form-select" name="categoria_id" id="selectNuevaCategoria" required>
+                  <option value="">-- Seleccionar --</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <button type="submit" class="btn btn-success w-100 mt-4">
+                  <i class="bi bi-plus-circle me-1"></i>Guardar Categoría
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tabla de Categorías Asignadas -->
+        <div class="d-flex justify-content-end mb-2">
+          <button class="btn btn-sm btn-outline-primary" onclick="mostrarFormularioNuevaCategoria()">
+            <i class="bi bi-plus-circle me-1"></i> Nueva Categoría
+          </button>
+        </div>
+         <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle">
           <thead class="table-light">
             <tr>
-              <th><i class="bi bi-hash text-secondary me-1"></i>ID</th>
+              <th><i class="bi bi-hash text-secondary me-1"></i>ID</th> 
               <th><i class="bi bi-award-fill text-primary me-1"></i>Categoría</th>
               <th><i class="bi bi-check2-circle text-success me-1"></i>Estado</th>
               <th><i class="bi bi-calendar-event text-info me-1"></i>Fecha Asignación</th>
@@ -326,6 +354,7 @@ try {
             </tr>
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   </div>
@@ -550,22 +579,18 @@ try {
 
   // Ejecutar al cargar la página
   document.addEventListener('DOMContentLoaded', cargarEscuelas);
+  
+let estudianteEdadGlobal = null;
 
-  // modal de confirmacion al dar clic sobre el boton categoria
-  /*  function confirmarAsignacionCategoria(estudianteId, nombreEstudiante) {
-     mostrarConfirmacionToast(
-       `¿Deseas asignar una categoría a ${nombreEstudiante}?`,
-       () => abrirModalCategorias(estudianteId, nombreEstudiante)
-     );
-   } */
-
-  function abrirModalCategorias(estudianteId, nombreEstudiante) {
+  function abrirModalCategorias(estudianteId, nombreEstudiante, fecha_nacimiento) {
     // Mostrar modal
     const modal = new bootstrap.Modal(document.getElementById('modalAsignarCategoria'));
     modal.show();
-
-    // Mostrar nombre
+    estudianteEdadGlobal =calcularEdad(fecha_nacimiento);
+    // Mostrar nombre 
+    document.getElementById('nuevo_estudiante_id').textContent = estudianteId;
     document.getElementById('nombreEstudiante').textContent = nombreEstudiante;
+    document.getElementById('edad').textContent =` ${estudianteEdadGlobal } Años`;
 
     // Cargar categorías asignadas
     fetch(`../api/obtener_categorias_estudiante.php?estudiante_id=${estudianteId}`)
@@ -620,81 +645,100 @@ try {
       default: return 'secondary';
     }
   }
+ 
 
+let estudianteIdGlobal = null;
 
-
-
-
-/* function mostrarCategoriasEstudiante(estudiante_id) {
-  fetch(`api/obtener_categorias_estudiante.php?estudiante_id=${estudiante_id}`)
-    .then(res => res.json())
-    .then(data => {
-      const tbody = document.getElementById('categoriasEstudianteBody');
-      tbody.innerHTML = '';
-      data.forEach(cat => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${cat.id}</td>
-            <td>${cat.categoria}</td>
-            <td><span class="badge bg-${estadoColor(cat.estado)}">${cat.estado}</span></td>
-            <td>${cat.fecha_asignacion}</td>
-            <td class="text-center">
-              <button class="btn btn-sm btn-outline-primary me-1" title="Nueva categoría"
-                onclick="asignarNuevaCategoria(${cat.estudiante_id})">
-                <i class="bi bi-plus-circle"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-warning me-1" title="Editar asignación"
-                onclick="editarCategoriaAsignada(${cat.id})">
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-danger" title="Eliminar asignación"
-                onclick="eliminarCategoriaAsignada(${cat.id})">
-                <i class="bi bi-trash"></i>
-              </button>
-            </td>
-          </tr>
-        `;
-      });
-      const modal = new bootstrap.Modal(document.getElementById('modalCategoriaEstudiante'));
-      modal.show();
-    });
-}
- */
 function asignarCategoriaEstudiante(estudiante_id, nombre_estudiante) {
   mostrarConfirmacionToast(`¿Deseas asignar categoría a ${nombre_estudiante}?`, () => {
+    estudianteIdGlobal = estudiante_id;
+    document.getElementById('nombreEstudianteModal').textContent = nombre_estudiante;
+    document.getElementById('nuevo_estudiante_id').value = estudiante_id;
+    ocultarFormularioNuevaCategoria();
     mostrarCategoriasEstudiante(estudiante_id);
+    const modal = new bootstrap.Modal(document.getElementById('modalCategoriasEstudiante'));
+    modal.show();
   });
 }
-
-function asignarNuevaCategoria(estudiante_id) {
-  // Aquí podrías abrir otro modal con un <select> de categorías disponibles y un botón de "Guardar"
-  mostrarConfirmacionToast(`Abrir modal para asignar nueva categoría a estudiante ID ${estudiante_id}`);
+ 
+function mostrarFormularioNuevaCategoria() {
+  const seccion = document.getElementById('seccionNuevaCategoria');
+  seccion.classList.remove('d-none');
+  cargarCategoriasDisponibles();
 }
 
-function editarCategoriaAsignada(asignacion_id) {
-  mostrarConfirmacionToast(`Abrir modal de edición para asignación ID ${asignacion_id}`);
+function ocultarFormularioNuevaCategoria() {
+  document.getElementById('seccionNuevaCategoria').classList.add('d-none');
 }
+ 
 
-function eliminarCategoriaAsignada(asignacion_id) {
-  if (mostrarConfirmacionToast("¿Estás seguro de eliminar esta asignación?")) {
-    fetch(`api/eliminar_categoria_asignada.php`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: asignacion_id })
-    })
-      .then(res => res.json())
-      .then(resp => {
-        if (resp.status) {
-          alert("Asignación eliminada.");
-          document.querySelector(`#modalCategoriaEstudiante`).querySelector('.modal-body').scrollTop = 0;
-          mostrarCategoriasEstudiante(resp.estudiante_id);
-        } else {
-          alert("Error: " + resp.message);
+function cargarCategoriasDisponibles() {
+  fetch('../api/obtener_categorias.php')
+    .then(res => res.json())
+    .then(data => {
+      const select = document.getElementById('selectNuevaCategoria');
+      select.innerHTML = '<option value="">-- Seleccionar --</option>';
+
+      data.data.forEach(cat => {
+        // Suponiendo que cada categoría tenga campos: edad_minima y edad_maxima
+        if (estudianteEdadGlobal >= cat.edad_minima ) {
+          select.innerHTML += `<option value="${cat.id}">${cat.nombre}</option>`;
         }
       });
-  }
+
+      if (select.options.length === 1) {
+        select.innerHTML += '<option disabled>No hay categorías disponibles para esta edad</option>';
+      }
+    });
 }
 
+
+
+ 
+
+document.getElementById('formNuevaCategoria').addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const form = e.target;
+  const formData = new FormData(form);
+  console.log(form);
+  fetch('../api/guardar_categoria_estudiante.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status) {
+      mostrarToast('success','Categoría asignada correctamente');
+      ocultarFormularioNuevaCategoria();
+     // mostrarCategoriasEstudiante('success', formData.get('estudiante_id')); // Refresca tabla
+    } else {
+      mostrarToast('warning', data.message || 'Error al guardar la categoría');
+    }
+  })
+  .catch(error => {
+    console.error(error);
+    mostrarToast('Error de red o servidor al guardar', 'danger');
+  });
+});
+
+
+function eliminarCategoriaAsignada(asignacion_id) {
+  mostrarConfirmacionToast(`¿Estás seguro de eliminar esta asignación?`, () => {
+    fetch('api/eliminar_categoria_estudiante.php', {
+      method: 'POST',
+      body: new URLSearchParams({ asignacion_id })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status) {
+          mostrarCategoriasEstudiante(estudianteIdGlobal);
+        } else {
+          alert(data.message || 'Error al eliminar.');
+        }
+      });
+  });
+}
 
 
 
