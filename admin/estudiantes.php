@@ -668,15 +668,15 @@ function asignarCategoriaEstudiante(estudiante_id, nombre_estudiante) {
 
 function asignarNuevaCategoria(estudiante_id) {
   // Aquí podrías abrir otro modal con un <select> de categorías disponibles y un botón de "Guardar"
-  alert(`Abrir modal para asignar nueva categoría a estudiante ID ${estudiante_id}`);
+  mostrarConfirmacionToast(`Abrir modal para asignar nueva categoría a estudiante ID ${estudiante_id}`);
 }
 
 function editarCategoriaAsignada(asignacion_id) {
-  alert(`Abrir modal de edición para asignación ID ${asignacion_id}`);
+  mostrarConfirmacionToast(`Abrir modal de edición para asignación ID ${asignacion_id}`);
 }
 
 function eliminarCategoriaAsignada(asignacion_id) {
-  if (confirm("¿Estás seguro de eliminar esta asignación?")) {
+  if (mostrarConfirmacionToast("¿Estás seguro de eliminar esta asignación?")) {
     fetch(`api/eliminar_categoria_asignada.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
