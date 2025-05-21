@@ -2,19 +2,20 @@
 require_once '../includes/conexion.php';
 header('Content-Type: application/json');
 
-$estudiante_id = isset($_GET['estudiante_id']) ? (int) $_GET['estudiante_id'] : 0;
+$categoria_id = isset($_GET['categoria_id']) ? (int) $_GET['categoria_id'] : 0;
 
-if ($estudiante_id <= 0) {
+if ($categoria_id <= 0) {
     echo json_encode(['status' => false, 'categorias' => [], 'message' => 'ID no válido']);
     exit;
 }
 
 $sql = "SELECT COUNT(*) AS total FROM pregunta_categoria WHERE categoria_id = ?";
 $stmt = $pdo->prepare($sql);
-$stmt->execute([$estudiante_id]);
-$total_categoria = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->execute([$categoria_id]);
+$total_categoria = $stmt->fetch(PDO::FETCH_ASSOC);
+$total = (int) $total_categoria['total'];
 
-echo json_encode(['status' => true, 'data' => $total_categoria]);
+echo json_encode(['status' => true, 'data' => $total]);
 
 
 

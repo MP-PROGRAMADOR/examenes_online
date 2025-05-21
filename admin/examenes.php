@@ -3,14 +3,14 @@
 include_once("../includes/header.php");
 include_once("../includes/sidebar.php");
 $sql = "SELECT 
-ex.id, est.nombre AS nombre_estudiante, cat.nombre AS nombre_categoria,
-us.nombre AS asignado_por_nombre, ex.fecha_asignacion, ex.total_preguntas,
-ex.estado, ex.calificacion, ex.codigo_acceso
-FROM examenes ex
-JOIN estudiantes est ON ex.estudiante_id = est.id
-JOIN categorias cat ON ex.categoria_id = cat.id
-LEFT JOIN usuarios us ON ex.asignado_por = us.id
-ORDER BY ex.fecha_asignacion DESC";
+              ex.id,  CONCAT(est.nombre, ' ', est.apellidos) AS estudiante, cat.nombre AS categoria,
+              us.nombre AS usuario, ex.fecha_asignacion, ex.total_preguntas,
+              ex.estado, ex.calificacion, ex.codigo_acceso
+              FROM examenes ex
+              JOIN estudiantes est ON ex.estudiante_id = est.id
+              JOIN categorias cat ON ex.categoria_id = cat.id
+              LEFT JOIN usuarios us ON ex.asignado_por = us.id
+              ORDER BY ex.fecha_asignacion DESC";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
@@ -67,9 +67,9 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php foreach ($examenes as $examen): ?>
               <tr>
                 <td class="text-center"><?= $examen['id'] ?></td>
-                <td><?= $examen['estudiante_id'] ?></td>
-                <td><?= $examen['categoria_id'] ?></td>
-                <td><?= $examen['asignado_por'] ?? '—' ?></td>
+                <td><?= $examen['estudiante'] ?></td>
+                <td><?= $examen['categoria'] ?></td>
+                <td><?= $examen['usuario'] ?? '—' ?></td>
                 <td><?= $examen['fecha_asignacion'] ?></td>
                 <td><?= $examen['total_preguntas'] ?></td>
                 <td>
@@ -117,8 +117,8 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </div>
       <form id="formExamen">
         <div class="modal-body row g-3 px-4 py-3">
-          <input type="hidden" name="id" id="examen_id">
-          <input type="hidden" name="usuario_id" id="usuario_id" value="<?= $_SESSION['usuario']['id'] ?>">
+          <input type="hidden" name="examen_id" id="examen_id">
+          <input type="hidden" name="usuario_id" id="usuario_id" value="<?= (int) $_SESSION['usuario']['id'] ?>">
 
 
           <div class="col-md-6">
@@ -134,6 +134,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <div class="col-md-6">
             <label for="total_preguntas" class="form-label">Total de Preguntas</label>
             <input type="number" class="form-control" id="total_preguntas" name="total_preguntas" min="1" required>
+            <span id="preguntas_disponibles" class="text-fs-2"></span>
           </div>
 
           <div class="col-md-6">
@@ -145,11 +146,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </select>
           </div>
 
-          <!--  <div class="col-md-6">
-            <label for="codigo_acceso" class="form-label">Código de Acceso</label>
-            <input type="text" class="form-control" id="codigo_acceso" name="codigo_acceso" required>
-          </div>
-        </div> -->
+
 
           <div class="modal-footer px-4 py-3">
             <button type="submit" class="btn btn-primary">
@@ -207,15 +204,15 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
       if (!estudianteId) return;
 
-      fetch(`../api/obtener_categorias_estudiante.php?id=${estudianteId}`)
+      fetch(`../api/obtener_categorias_estudiante.php?estudiante_id=${estudianteId}`)
         .then(res => res.json())
         .then(data => {
-          if(data.status){
+          if (data.status) {
             mostrarToast('success', data.message);
             data.data.forEach(c => {
               categoriaSelect.innerHTML += `<option value="${c.categoria_id}">${c.categoria}</option>`;
             });
-          }else{
+          } else {
             mostrarToast('warning', data.message);
 
           }
@@ -229,12 +226,13 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
       if (!categoriaId || isNaN(valor)) return;
 
-      const res = await fetch(`../api/obtener_total_categorias_estudiante.php?id=${categoriaId}`);
+      const res = await fetch(`../api/obtener_total_categorias_estudiante.php?categoria_id=${categoriaId}`);
       const data = await res.json();
-
-      if (valor > data.data.total_categoria) {
-        mostrarToast('warning', `No puedes ingresar más de ${data.data.total_categoria} preguntas para esta categoría`);
-        totalPreguntasInput.value = data.data.total_categoria;
+      let preguntasDisponible = document.getElementById('preguntas_disponibles');
+      preguntasDisponible.textContent = `Preguntas disponibles: ${data.data}`;
+      if (valor > data.data) {
+        mostrarToast('warning', `No puedes ingresar más de ${data.data} preguntas para esta categoría`);
+        totalPreguntasInput.value = data.data.total;
       }
     });
 
@@ -249,19 +247,27 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       // Generar código único
       formData.append("codigo_acceso", generarCodigo());
 
-      const res = await fetch("../api/guardar_examen.php", {
-        method: "POST",
-        body: formData
-      });
+      try {
+        const res = await fetch("../api/guardar_examen.php", {
+          method: "POST",
+          body: formData
+        });
 
-      const result = await res.json();
-      if (result.status) {
-        alert("Examen guardado correctamente");
-        // cerrar modal, recargar tabla, etc.
-      } else {
-        alert("Error al guardar: " + result.message);
+        const data = await res.json(); // Asegúrate de usar "data", no "result"
+
+        if (data.status) {
+          mostrarToast('success', data.message || "Examen guardado correctamente");
+          setTimeout(() => location.reload(), 1200);
+        } else {
+          mostrarToast('warning', "Error: " + (data.message || "No se pudo guardar el examen."));
+        }
+
+      } catch (error) {
+        console.error("Error en la solicitud:", error);
+        mostrarToast('error', "Error en la conexión con el servidor.");
       }
     });
+
 
     function generarCodigo() {
       return "EXAM" + Date.now().toString().slice(-6);

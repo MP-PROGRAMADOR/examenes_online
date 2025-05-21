@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 $estudiante_id = isset($_GET['estudiante_id']) ? (int) $_GET['estudiante_id'] : 0;
 
 if ($estudiante_id <= 0) {
-    echo json_encode(['status' => false, 'categorias' => [], 'message' => 'ID no válido']);
+    echo json_encode(['status' => false,  'message' => 'ID no válido para la categoria']);
     exit;
 }
 
@@ -24,8 +24,14 @@ $sql = "SELECT
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$estudiante_id]);
 $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+if($categorias){
+    echo json_encode(['status' => true, 'message' => 'categorias disponibles para ', 'data' => $categorias]);
+    exit;
+}else{
+    echo json_encode(['status' => false, 'message' => 'Sin categorias disponibles para ', 'data' => $categorias]);
+exit;
+}
 
-echo json_encode(['status' => true, 'data' => $categorias]);
 
 
 
