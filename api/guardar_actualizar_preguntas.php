@@ -35,11 +35,7 @@ try {
     throw new Exception('Faltan campos obligatorios');
   }
 
-  // === 2. INSERTAR o ACTUALIZAR PREGUNTA ===
-  if ($id) {
-    $stmt = $pdo->prepare("UPDATE preguntas SET texto = ?, tipo = ?, tipo_contenido = ?, activa = ? WHERE id = ?");
-    $stmt->execute([$texto, $tipo, $tipo_contenido, $activa, $id]);
-  } else {
+ 
     $stmt = $pdo->prepare("INSERT INTO preguntas (texto, tipo, tipo_contenido, activa) VALUES (?, ?, ?, ?)");
     $stmt->execute([$texto, $tipo, $tipo_contenido, $activa]);
     $id_registro = $pdo->lastInsertId();
@@ -65,6 +61,8 @@ try {
     }
   
     // === 4. GUARDAR CATEGORÍAS (si aplica) ===
+
+
     
     if ($_POST['asignar_categoria'] === 'si' && isset($_POST['categorias']) && is_array($_POST['categorias'])) {
       foreach ($_POST['categorias'] as $cat_id) {
@@ -92,7 +90,7 @@ try {
         }
       }
     }
-  }
+  
 
 
   $pdo->commit();

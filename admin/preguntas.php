@@ -10,7 +10,6 @@ $stmt = $pdo->prepare($sql);
 if ($stmt->execute()) {
   // Obtener los resultados como un array asociativo
   $preguntas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 }
 
 
@@ -57,59 +56,59 @@ if ($stmt->execute()) {
               <th><i class="bi bi-calendar-event-fill me-1"></i>Creada</th>
               <th><i class="bi bi-gear-fill me-1"></i>Acciones</th>
             </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($preguntas as $pregunta): ?>
-              <tr>
-                <td class="text-center"><?= htmlspecialchars($pregunta['id']); ?></td>
-                <td><?= htmlspecialchars($pregunta['texto']); ?></td>
-                <td class="text-center">
-                  <span class="badge bg-info text-uppercase">
-                    <?= strtoupper($pregunta['tipo']); ?>
-                  </span>
-                </td>
-                <td class="text-center">
-                  <span class="badge bg-secondary text-capitalize">
-                    <?= htmlspecialchars($pregunta['tipo_contenido']); ?>
-                  </span>
-                </td>
-                <td class="text-center">
-                  <?php if ($pregunta['activa']): ?>
-                    <button class="btn btn-outline-success btn-sm rounded-pill shadow-sm px-3 py-1"
-                      onclick="cambiarEstadoPregunta(<?= $pregunta['id'] ?>, false)" title="Desactivar">
-                      <i class="bi bi-toggle-on fs-5"></i> Activa
-                    </button>
-                  <?php else: ?>
-                    <button class="btn btn-outline-danger btn-sm rounded-pill shadow-sm px-3 py-1"
-                      onclick="cambiarEstadoPregunta(<?= $pregunta['id'] ?>, true)" title="Activar">
-                      <i class="bi bi-toggle-off fs-5"></i> Inactiva
+        </thead>
+        <tbody>
+          <?php foreach ($preguntas as $pregunta): ?>
+            <tr>
+              <td class="text-center"><?= htmlspecialchars($pregunta['id']); ?></td>
+              <td><?= htmlspecialchars($pregunta['texto']); ?></td>
+              <td class="text-center">
+                <span class="badge bg-info text-uppercase">
+                  <?= strtoupper($pregunta['tipo']); ?>
+                </span>
+              </td>
+              <td class="text-center">
+                <span class="badge bg-secondary text-capitalize">
+                  <?= htmlspecialchars($pregunta['tipo_contenido']); ?>
+                </span>
+              </td>
+              <td class="text-center">
+                <?php if ($pregunta['activa']): ?>
+                  <button class="btn btn-outline-success btn-sm rounded-pill shadow-sm px-3 py-1"
+                    onclick="cambiarEstadoPregunta(<?= $pregunta['id'] ?>, false)" title="Desactivar">
+                    <i class="bi bi-toggle-on fs-5"></i> Activa
+                  </button>
+                <?php else: ?>
+                  <button class="btn btn-outline-danger btn-sm rounded-pill shadow-sm px-3 py-1"
+                    onclick="cambiarEstadoPregunta(<?= $pregunta['id'] ?>, true)" title="Activar">
+                    <i class="bi bi-toggle-off fs-5"></i> Inactiva
+                  </button>
+                <?php endif; ?>
+              </td>
+              <td><?= htmlspecialchars($pregunta['creado_en']); ?></td>
+              <td class="text-center">
+                <div class="d-flex gap-2 justify-content-center flex-wrap">
+                  <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2   shadow-sm"
+                    onclick="abrirModalCategorias(<?= (int) $pregunta['id'] ?>)"
+                    title="Ver detalles de categorias del estudiante">
+                    <i class="bi bi-eye "></i> categorias
+                  </button>
+
+                  <?php if (($rol === 'admin')): ?>
+                    <button class="btn btn-sm btn-outline-danger" onclick="eliminarPregunta(<?= $pregunta['id'] ?>)"
+                      title="Eliminar pregunta">
+                      <i class="bi bi-trash me-1"></i> Eliminar
                     </button>
                   <?php endif; ?>
-                </td>
-                <td><?= htmlspecialchars($pregunta['creado_en']); ?></td>
-                <td class="text-center">
-                  <div class="d-flex gap-2 justify-content-center flex-wrap">
-                    <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2   shadow-sm"
-                      onclick="abrirModalCategorias(<?= (int) $pregunta['id'] ?>)"
-                      title="Ver detalles de categorias del estudiante">
-                      <i class="bi bi-eye "></i> categorias
-                    </button>
-
-                    <?php if (($rol === 'admin')): ?>
-                      <button class="btn btn-sm btn-outline-danger" onclick="eliminarPregunta(<?= $pregunta['id'] ?>)"
-                        title="Eliminar pregunta">
-                        <i class="bi bi-trash me-1"></i> Eliminar
-                      </button>
-                    <?php endif; ?>
-                  </div>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          <?php else: ?>
-            <div class="alert alert-warning text-center m-3">
-              <i class="bi bi-exclamation-circle-fill me-2"></i>⚠️ No hay preguntas registradas actualmente.
-            </div>
-          <?php endif; ?>
+                </div>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="alert alert-warning text-center m-3">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>⚠️ No hay preguntas registradas actualmente.
+          </div>
+        <?php endif; ?>
         </tbody>
       </table>
     </div>
@@ -255,16 +254,16 @@ if ($stmt->execute()) {
     document.getElementById('modalBotonTexto').textContent = 'Registrar';
     const modal = new bootstrap.Modal(document.getElementById('modalPregunta'));
     modal.show();
-    document.getElementById('formPregunta').addEventListener('submit', function (e) {
+    document.getElementById('formPregunta').addEventListener('submit', function(e) {
       e.preventDefault(); // prevenir envío tradicional
 
       const form = e.target;
       const formData = new FormData(form);
 
       fetch('../api/guardar_actualizar_preguntas.php', {
-        method: 'POST',
-        body: formData
-      })
+          method: 'POST',
+          body: formData
+        })
         .then(res => res.json())
         .then(data => {
           if (data.status) {
@@ -279,8 +278,7 @@ if ($stmt->execute()) {
             setTimeout(() => location.reload(), 1200);
           } else {
             // ⚠️ Error con mensaje del backend
-            mostrarToast('warning', data.message || 'Ocurrió un error al guardar la pregunta'
-            );
+            mostrarToast('warning', data.message || 'Ocurrió un error al guardar la pregunta');
           }
         })
         .catch(err => {
@@ -382,20 +380,26 @@ if ($stmt->execute()) {
       }
     });
 
+
+
     // Crear opciones
-    const crearOpcionHTML = (texto = '', valor = '', checked = false) => {
+    const crearOpcionHTML = (texto = '', checked = false) => {
+      const index = contadorOpciones++;
+
       const div = document.createElement('div');
       div.className = 'input-group mb-2';
       div.innerHTML = `
-      <div class="input-group-text">
-        <input type="checkbox" name="es_correcta[]" class="form-check-input mt-0" value="${contadorOpciones}" ${checked ? 'checked' : ''}>
-      </div>
-      <input type="text" name="opciones[]" class="form-control" placeholder="Texto de la opción" value="${texto}" required>
-      <button type="button" class="btn btn-outline-danger btnEliminarOpcion"><i class="bi bi-x-lg"></i></button>
-    `;
+    <div class="input-group-text">
+      <input type="checkbox" name="opciones[${index}][es_correcta]" class="form-check-input mt-0" ${checked ? 'checked' : ''}>
+    </div>
+    <input type="text" name="opciones[${index}][texto]" class="form-control" placeholder="Texto de la opción" value="${texto}" required>
+    <button type="button" class="btn btn-outline-danger btnEliminarOpcion"><i class="bi bi-x-lg"></i></button>
+  `;
       contenedorOpciones.appendChild(div);
-      contadorOpciones++;
     };
+
+
+
 
     const cargarVF = () => {
       contenedorOpciones.innerHTML = '';
@@ -456,9 +460,9 @@ if ($stmt->execute()) {
         formData.append('id', id);
 
         fetch('../api/eliminar_pregunta.php', {
-          method: 'POST',
-          body: formData
-        })
+            method: 'POST',
+            body: formData
+          })
           .then(res => res.json())
           .then(data => {
             if (data.status) {
@@ -487,9 +491,9 @@ if ($stmt->execute()) {
         formData.append('estado', nuevoEstado ? 1 : 0);
 
         fetch('../api/cambiar_estado_pregunta.php', {
-          method: 'POST',
-          body: formData
-        })
+            method: 'POST',
+            body: formData
+          })
           .then(res => res.json())
           .then(data => {
             if (data.status) {
@@ -594,9 +598,9 @@ if ($stmt->execute()) {
     formData.append('categoria_id', categoriaId);
 
     fetch('../api/categorias_pregunta.php', {
-      method: 'POST',
-      body: formData
-    })
+        method: 'POST',
+        body: formData
+      })
       .then(res => res.json())
       .then(data => {
         if (data.status) {
@@ -611,27 +615,26 @@ if ($stmt->execute()) {
 
 
   function eliminarCategoriaPregunta(rel_id) {
-  mostrarConfirmacionToast('¿Eliminar esta categoría de la pregunta?', () => {
-    const formData = new FormData();
-    formData.append('accion', 'eliminar');
-    formData.append('rel_id', rel_id);
+    mostrarConfirmacionToast('¿Eliminar esta categoría de la pregunta?', () => {
+      const formData = new FormData();
+      formData.append('accion', 'eliminar');
+      formData.append('rel_id', rel_id);
 
-    fetch('../api/categorias_pregunta.php', {
-      method: 'POST',
-      body: formData
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status) {
-          mostrarToast('success', data.message);
-          cargarCategoriasPregunta(idPreguntaActual);
-        } else {
-          mostrarToast('warning', data.message || 'Error al eliminar');
-        }
-      });
-  });
-}
-
+      fetch('../api/categorias_pregunta.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status) {
+            mostrarToast('success', data.message);
+            cargarCategoriasPregunta(idPreguntaActual);
+          } else {
+            mostrarToast('warning', data.message || 'Error al eliminar');
+          }
+        });
+    });
+  }
 </script>
 
 
