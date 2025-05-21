@@ -1,322 +1,638 @@
 <?php
 include_once("../includes/header.php");
 include_once("../includes/sidebar.php");
+
+
+// Preparar la consulta para obtener los datos
+$sql = "SELECT * FROM preguntas";
+$stmt = $pdo->prepare($sql);
+
+if ($stmt->execute()) {
+  // Obtener los resultados como un array asociativo
+  $preguntas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+}
+
+
 ?>
+
+
+<!-- Main -->
 <div class="main-content">
-    <!-- Modal de Alerta -->
-    <?php if ($alerta): ?>
-        <div class="modal fade show" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="false"
-            style="display: block;">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header <?php echo $alerta['tipo'] == 'success' ? 'bg-success' : 'bg-danger'; ?>">
-                        <h5 class="modal-title text-white" id="alertModalLabel">
-                            <?php echo $alerta['tipo'] == 'success' ? '¡Éxito!' : 'Error'; ?>
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="text-center"><?php echo $alerta['mensaje']; ?></p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
-    <div class="container-fluid mt-5">
-        <div class="card shadow border-0 rounded-4">
-            <div
-                class="card-header d-flex flex-wrap justify-content-between align-items-center rounded-top-4 px-4 py-3 bg-white border-bottom">
-                <h5 class="mb-0 fw-semibold">
-                    <i class="bi bi-question-circle-fill me-2 text-primary"></i>Listado de preguntas
-                </h5>
-                <div class="search-box position-relative">
-                    <input type="text" class="form-control ps-5" id="customSearch" placeholder="Buscar pregunta...">
-                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                </div>
-                <div class="d-flex flex-wrap gap-5 align-items-center">
-                    <div class="d-flex align-items-center">
-                        <label for="container-length" class="me-2 fw-medium mb-0">
-                            <i class="bi bi-eye-fill me-1"></i>Mostrar:
-                        </label>
-                        <select id="container-length" class="form-select w-auto shadow-sm">
-                            <option value="5">5 registros</option>
-                            <option value="10" selected>10 registros</option>
-                            <option value="15">15 registros</option>
-                            <option value="20">20 registros</option>
-                            <option value="25">25 registros</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-primary" onclick="abrirModalRegistroEstudiante()">
-                        <i class="bi bi-person-plus-fill me-2"></i>
-                        Crear Nuevo
-                    </button>
-                </div>
-            </div>
-
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table id="container-table" class="table table-striped table-hover align-middle">
-                        <thead class="table-light">
-                            <?php if (!empty($preguntas)): ?>
-                                <tr>
-                                    <th><i class="bi bi-hash me-1"></i>ID</th>
-                                    <th><i class="bi bi-journal-text me-1"></i>Examen</th>
-                                    <th><i class="bi bi-chat-left-dots me-1"></i>Pregunta</th>
-                                    <th><i class="bi bi-ui-checks me-1"></i>Tipo</th>
-                                    <th><i class="bi bi-file-earmark-image me-1"></i>Contenido</th>
-                                    <th><i class="bi bi-calendar3 me-1"></i>Registro</th>
-                                    <th><i class="bi bi-gear-fill me-1"></i>Acciones</th>
-                                </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($preguntas as $pregunta): ?>
-                                <tr>
-                                    <td class="text-center"><?= htmlspecialchars($pregunta['id']) ?></td>
-                                    <td><?= htmlspecialchars($pregunta['examen']) ?></td>
-                                    <td>
-                                        <?php if ($pregunta['tipo_contenido'] === 'imagen'): ?>
-                                            <?php foreach ($pregunta['imagenes'] as $img): ?>
-                                                <img src="<?= htmlspecialchars($img) ?>" alt="img" class="img-thumbnail me-1"
-                                                    style="width: 70px; height: auto;">
-                                            <?php endforeach; ?>
-                                            <div class="mt-2 text-muted small">
-                                                <i class="bi bi-card-text me-1"></i>
-                                                <?= nl2br(htmlspecialchars($pregunta['texto_pregunta'])) ?>
-                                            </div>
-                                        <?php else: ?>
-                                            <i class="bi bi-card-text me-1"></i>
-                                            <?= nl2br(htmlspecialchars($pregunta['texto_pregunta'])) ?>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="text-center">
-                                        <?php
-                                        $tipos = [
-                                            'multiple' => 'Opción Múltiple',
-                                            'unica' => 'Respuesta Única',
-                                            'vf' => 'Verdadero / Falso'
-                                        ];
-                                        echo $tipos[$pregunta['tipo_pregunta']] ?? 'Desconocido';
-                                        ?>
-                                    </td>
-                                    <td class="text-center">
-                                        <?php if ($pregunta['tipo_contenido'] === 'ilustracion'): ?>
-                                            <span class="badge badge-contenido badge-ilustracion"><i
-                                                    class="bi bi-image me-1"></i>Ilustración</span>
-                                        <?php else: ?>
-                                            <span class="badge badge-contenido badge-texto"><i
-                                                    class="bi bi-card-text me-1"></i>Texto</span>
-                                        <?php endif; ?>
-
-                                    </td>
-                                    <td class="text-center">
-                                        <i
-                                            class="bi bi-clock me-1"></i><?= date('d/m/Y H:i', strtotime($pregunta['fecha_creacion'])) ?>
-                                    </td>
-                                    <td class="text-center dropdown-actions">
-                                        <!-- Botones visibles en escritorio -->
-                                        <a href="detalles_preguntas.php?id=<?= urlencode($pregunta['id']) ?>"
-                                            class="btn btn-sm btn-outline-success me-1 d-none d-md-inline-flex">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="editar_pregunta.php?id=<?= urlencode($pregunta['id']) ?>"
-                                            class="btn btn-sm btn-outline-primary me-1 d-none d-md-inline-flex">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <a href="../php/eliminar_pregunta.php?id=<?= urlencode($pregunta['id']) ?>"
-                                            class="btn btn-sm btn-outline-danger d-none d-md-inline-flex"
-                                            onclick="return confirm('¿Estás seguro de eliminar esta pregunta? Esta acción no se puede deshacer.')">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
-
-                                        <!-- Dropdown en móviles -->
-                                        <div class="dropdown d-md-none">
-                                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
-                                                data-bs-toggle="dropdown">
-                                                <i class="bi bi-three-dots-vertical"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li>
-                                                    <a class="dropdown-item"
-                                                        href="editar_pregunta.php?id=<?= urlencode($pregunta['id']) ?>">
-                                                        <i class="bi bi-pencil-square me-2"></i>Editar
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item text-danger"
-                                                        href="../php/eliminar_pregunta.php?id=<?= urlencode($pregunta['id']) ?>"
-                                                        onclick="return confirm('¿Estás seguro de eliminar esta pregunta? Esta acción no se puede deshacer.')">
-                                                        <i class="bi bi-trash-fill me-2"></i>Eliminar
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="alert alert-warning text-center mt-3">
-                                <i class="bi bi-exclamation-circle-fill me-2"></i>⚠️ No hay preguntas registradas
-                                actualmente.
-                            </div>
-                        <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-<!-- Modal Registro / Edición Estudiante -->
-<div class="modal fade" id="modalEstudiante" tabindex="-1" aria-labelledby="modalEstudianteLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content border-0 shadow rounded-4">
-      <div class="modal-header bg-primary text-white rounded-top">
-        <h5 class="modal-title" id="modalEstudianteLabel">
-          <i class="bi bi-person-plus-fill me-2"></i><span id="modalEstudianteTitulo">Registrar Estudiante</span>
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+  <div class="card shadow border-0 rounded-4">
+    <div
+      class="card-header bg-primary text-white d-flex flex-wrap justify-content-between align-items-center rounded-top-4 px-4 py-3">
+      <h5 class="mb-0"><i class="bi bi-question-circle-fill me-2"></i>Gestión de Preguntas</h5>
+      <div class="search-box position-relative">
+        <input type="text" class="form-control ps-5" id="buscarPregunta" placeholder="Buscar pregunta...">
+        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
       </div>
-      <form id="formularioEstudiante" method="POST" class="needs-validation" novalidate>
-        <div class="row modal-body p-4 ">
-          <input type="hidden" name="estudiante_id" id="estudiante_id">
+      <div class="d-flex flex-wrap gap-5 align-items-center">
+        <div class="d-flex align-items-center">
+          <label for="preguntas-length" class="me-2 text-white fw-medium mb-0">Mostrar:</label>
+          <select id="preguntas-length" class="form-select w-auto shadow-sm">
+            <option value="5">5 registros</option>
+            <option value="10" selected>10 registros</option>
+            <option value="15">15 registros</option>
+            <option value="20">20 registros</option>
+            <option value="25">25 registros</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="abrirModalRegistro()">
+          <i class="bi bi-plus-circle-fill me-2"></i>Nueva Pregunta
+        </button>
+      </div>
+    </div>
 
-          <!-- DNI -->
-          <div class="mb-3 col-12 col-md-6">
-            <label for="dni_estudiante" class="form-label fw-semibold">
-              <i class="bi bi-card-text me-2 text-primary"></i>DNI <span class="text-danger">*</span>
-            </label>
-            <input type="text" class="form-control shadow-sm" id="dni_estudiante" name="dni" required>
-            <div class="invalid-feedback">Por favor ingresa el DNI del estudiante.</div>
-          </div>
+    <div class="table-responsive">
+      <table id="preguntas-table" class="table table-hover align-middle shadow-sm rounded-3 overflow-hidden">
+        <thead class="table-light text-center">
+          <?php if (!empty($preguntas)): ?>
+            <tr>
+              <th><i class="bi bi-hash me-1"></i>ID</th>
+              <th><i class="bi bi-chat-left-dots-fill me-1"></i>Texto</th>
+              <th><i class="bi bi-ui-checks-grid me-1"></i>Tipo</th>
+              <th><i class="bi bi-image-fill me-1"></i>Contenido</th>
+              <th><i class="bi bi-toggle-on me-1"></i>Activa</th>
+              <th><i class="bi bi-calendar-event-fill me-1"></i>Creada</th>
+              <th><i class="bi bi-gear-fill me-1"></i>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($preguntas as $pregunta): ?>
+              <tr>
+                <td class="text-center"><?= htmlspecialchars($pregunta['id']); ?></td>
+                <td><?= htmlspecialchars($pregunta['texto']); ?></td>
+                <td class="text-center">
+                  <span class="badge bg-info text-uppercase">
+                    <?= strtoupper($pregunta['tipo']); ?>
+                  </span>
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-secondary text-capitalize">
+                    <?= htmlspecialchars($pregunta['tipo_contenido']); ?>
+                  </span>
+                </td>
+                <td class="text-center">
+                  <?php if ($pregunta['activa']): ?>
+                    <button class="btn btn-outline-success btn-sm rounded-pill shadow-sm px-3 py-1"
+                      onclick="cambiarEstadoPregunta(<?= $pregunta['id'] ?>, false)" title="Desactivar">
+                      <i class="bi bi-toggle-on fs-5"></i> Activa
+                    </button>
+                  <?php else: ?>
+                    <button class="btn btn-outline-danger btn-sm rounded-pill shadow-sm px-3 py-1"
+                      onclick="cambiarEstadoPregunta(<?= $pregunta['id'] ?>, true)" title="Activar">
+                      <i class="bi bi-toggle-off fs-5"></i> Inactiva
+                    </button>
+                  <?php endif; ?>
+                </td>
+                <td><?= htmlspecialchars($pregunta['creado_en']); ?></td>
+                <td class="text-center">
+                  <div class="d-flex gap-2 justify-content-center flex-wrap">
+                    <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2   shadow-sm"
+                      onclick="abrirModalCategorias(<?= (int) $pregunta['id'] ?>)"
+                      title="Ver detalles de categorias del estudiante">
+                      <i class="bi bi-eye "></i> categorias
+                    </button>
 
-          <!-- Nombres -->
-          <div class="mb-3 col-12 col-md-6">
-            <label for="nombre_estudiante" class="form-label fw-semibold">
-              <i class="bi bi-person-fill me-2 text-primary"></i>Nombres <span class="text-danger">*</span>
-            </label>
-            <input type="text" class="form-control shadow-sm" id="nombre_estudiante" name="nombre" required>
-            <div class="invalid-feedback">Por favor ingresa el nombre.</div>
-          </div>
-
-          <!-- Apellidos -->
-          <div class="mb-3 col-12 col-md-6">
-            <label for="apellidos_estudiante" class="form-label fw-semibold">
-              <i class="bi bi-person-vcard me-2 text-primary"></i>Apellidos
-            </label>
-            <input type="text" class="form-control shadow-sm" id="apellidos_estudiante" name="apellidos">
-          </div>
-
-          <!-- Email -->
-          <div class="mb-3 col-12 col-md-6">
-            <label for="email_estudiante" class="form-label fw-semibold">
-              <i class="bi bi-envelope-fill me-2 text-primary"></i>Email (Opcional)
-            </label>
-            <input type="email" class="form-control shadow-sm" id="email_estudiante" name="email">
-          </div>
-
-          <!-- Teléfono -->
-          <div class="mb-3 col-12 col-md-6">
-            <label for="telefono_estudiante" class="form-label fw-semibold">
-              <i class="bi bi-telephone-fill me-2 text-primary"></i>Teléfono
-            </label>
-            <input type="text" class="form-control shadow-sm" id="telefono_estudiante" name="telefono">
-          </div>
-
-          <!-- Fecha de nacimiento -->
-          <div class="mb-3 col-12 col-md-6">
-            <label for="fecha_nacimiento" class="form-label fw-semibold">
-              <i class="bi bi-calendar-date-fill me-2 text-primary"></i>Fecha de Nacimiento
-            </label>
-            <input type="date" class="form-control shadow-sm" id="fecha_nacimiento" name="fecha_nacimiento">
-          </div>
-
-          <!-- Dirección -->
-          <div class="mb-3 col-12 col-md-6">
-            <label for="direccion_estudiante" class="form-label fw-semibold">
-              <i class="bi bi-geo-alt-fill me-2 text-primary"></i>Dirección
-            </label>
-            <textarea class="form-control shadow-sm" id="direccion_estudiante" name="direccion" rows="2"></textarea>
-          </div>
-
-          <!-- Escuela de conducción -->
-          <div class="mb-3 col-12 col-md-6">
-            <label for="escuela_id" class="form-label fw-semibold">
-              <i class="bi bi-building me-2 text-primary"></i>Escuela de Conducción
-            </label>
-            <select class="form-select shadow-sm" id="escuela_id" name="escuela_id">
-              <option value="">Selecciona una escuela</option>
-              <!-- Opciones se llenan dinámicamente desde backend -->
-            </select>
-          </div>
-
-
-          <!-- Categoría de Carné -->
-          <div class="mb-3 col-12 col-md-6">
-            <label for="categorias_id" class="form-label fw-semibold">
-              <i class="bi bi-card-list me-2 text-primary"></i>Categoría de Carné <span class="text-danger">*</span>
-            </label>
-            <select name="categoria_id" id="categorias_id" class="form-select" disabled required>
-              <option value="">Seleccione una categoría</option>
-            </select>
-            <div class="invalid-feedback">
-              Por favor selecciona una categoría de carné.
+                    <?php if (($rol === 'admin')): ?>
+                      <button class="btn btn-sm btn-outline-danger" onclick="eliminarPregunta(<?= $pregunta['id'] ?>)"
+                        title="Eliminar pregunta">
+                        <i class="bi bi-trash me-1"></i> Eliminar
+                      </button>
+                    <?php endif; ?>
+                  </div>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="alert alert-warning text-center m-3">
+              <i class="bi bi-exclamation-circle-fill me-2"></i>⚠️ No hay preguntas registradas actualmente.
             </div>
-          </div>
-
-          <!-- Usuario -->
-          <!--  <div class="mb-3 col-12 col-md-6">
-            <label for="usuario_estudiante" class="form-label fw-semibold">
-              <i class="bi bi-person-badge-fill me-2 text-primary"></i>Usuario <span class="text-danger">*</span>
-            </label>
-            <input type="text" class="form-control shadow-sm" id="usuario_estudiante" name="usuario" required>
-            <div class="invalid-feedback">Por favor asigna un nombre de usuario único.</div>
-          </div> -->
-
-
-          <!-- Estado (solo en edición) -->
-          <div class="form-check form-switch mb-3 col-12 col-md-6 d-none" id="activo-estudiante-container">
-            <input class="form-check-input" type="checkbox" id="activo_estudiante" name="estado" value="activo">
-            <label class="form-check-label fw-semibold" for="activo_estudiante">Estudiante activo</label>
-          </div>
-        </div>
-
-        <div class="modal-footer bg-light p-3">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-            <i class="bi bi-x-circle me-2"></i>Cancelar
-          </button>
-          <button type="submit" class="btn btn-primary">
-            <i class="bi bi-save2-fill me-2"></i><span id="modalEstudianteBotonTexto">Registrar</span>
-          </button>
-        </div>
-      </form>
+          <?php endif; ?>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
 
 
 
-<script>   
 
-  // Abrir modal de registro
-  function abrirModalRegistroEstudiante() {
-    document.getElementById('modalEstudianteTitulo').textContent = 'Registrar Estudiante';
-    document.getElementById('modalEstudianteBotonTexto').textContent = 'Registrar';
-    document.getElementById('formularioEstudiante').reset();
-    document.getElementById('estudiante_id').value = '';
-    document.getElementById('activo-estudiante-container').classList.add('d-none');
+<!-- Modal Pregunta -->
+<div class="modal fade" id="modalPregunta" tabindex="-1" aria-labelledby="modalPreguntaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="margin-top: 4rem; max-width: 50vw;">
+    <form id="formPregunta" enctype="multipart/form-data" class="needs-validation w-100" novalidate>
+      <div class="modal-content shadow-lg rounded-4 border-0">
+        <div class="modal-header bg-gradient bg-primary text-white rounded-top-4 px-4 py-3">
+          <h5 class="modal-title d-flex align-items-center gap-2" id="modalPreguntaLabel">
+            <i class="bi bi-patch-question-fill fs-4"></i> Nueva Pregunta
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body px-4 py-3 bg-light">
+          <input type="hidden" name="pregunta_id" id="pregunta_id">
 
-    const modal = new bootstrap.Modal(document.getElementById('modalEstudiante'));
+          <!-- Tipo contenido -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold"><i class="bi bi-file-earmark-text me-1"></i> Tipo de contenido</label>
+            <select name="tipo_contenido" id="tipo_contenido" class="form-select rounded-pill shadow-sm" required>
+              <option value="texto">Texto</option>
+              <option value="ilustracion">Ilustración</option>
+            </select>
+          </div>
+
+          <!-- Texto obligatorio -->
+          <div class="mb-3" id="textoPreguntaContainer">
+            <label for="texto" class="form-label fw-semibold"><i class="bi bi-card-text me-1"></i> Texto de la pregunta</label>
+            <textarea name="texto" id="texto" class="form-control shadow-sm rounded-3" rows="2" required></textarea>
+          </div>
+
+          <!-- Galería de imágenes -->
+          <div class="mb-3 d-none" id="imagenesPreguntaContainer">
+            <label class="form-label fw-semibold"><i class="bi bi-images me-1"></i> Imágenes</label>
+            <div id="contenedorImagenes" class="border rounded-3 p-2 bg-white shadow-sm"></div>
+            <button type="button" class="btn btn-outline-primary btn-sm mt-2 rounded-pill" id="agregarImagen">
+              <i class="bi bi-plus-circle me-1"></i> Añadir imagen
+            </button>
+          </div>
+
+          <!-- Tipo de pregunta -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold"><i class="bi bi-ui-checks me-1"></i> Tipo de pregunta</label>
+            <select name="tipo" id="tipo" class="form-select rounded-pill shadow-sm" required>
+              <option value="unica">Opción única</option>
+              <option value="multiple">Opción múltiple</option>
+              <option value="vf">Verdadero / Falso</option>
+            </select>
+          </div>
+
+          <!-- Opciones -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold"><i class="bi bi-list-check me-1"></i> Opciones</label>
+            <div id="contenedorOpciones" class="border rounded-3 p-2 bg-white shadow-sm"></div>
+            <button type="button" class="btn btn-outline-primary btn-sm mt-2 rounded-pill" id="agregarOpcion">
+              <i class="bi bi-plus-circle me-1"></i> Añadir opción
+            </button>
+          </div>
+
+          <!-- Asignar categoría -->
+          <div class="mb-3" id="divCategoria">
+            <div class="mb-3">
+              <label class="form-label fw-semibold"><i class="bi bi-tags me-1"></i> ¿Asignar categoría?</label><br>
+              <button type="button" id="toggleCategoria"
+                class="btn btn-outline-dark d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
+                onclick="toggleAsignarCategoria()">
+                <i id="iconCategoria" class="bi bi-toggle-off fs-5"></i>
+                <span id="textoCategoria">No</span>
+              </button>
+              <input type="hidden" name="asignar_categoria" id="asignar_categoria" value="no">
+            </div>
+
+            <div id="contenedorCategorias" class="mt-3 d-none">
+              <label for="categoria_id" class="form-label fw-semibold"><i class="bi bi-folder-check me-1"></i> Categorías</label>
+              <div id="listaCategorias" class="d-flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer bg-white border-top-0 px-4 py-3">
+          <button type="submit" class="btn btn-primary rounded-pill shadow-sm" id="modalBotonTexto">
+            <i class="bi bi-save2 me-1"></i> Guardar Pregunta
+          </button>
+          <button type="button" class="btn btn-outline-secondary rounded-pill shadow-sm" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> Cancelar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- MODAL listado de categorías asignadas al estudiante basado en su ID -->
+<div class="modal fade" id="modalCategoriasPregunta" tabindex="-1" aria-labelledby="tituloCategorias"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable" style="margin-top: 3vh;">
+    <div class="modal-content shadow-lg rounded-4 border-0">
+      <div class="modal-header bg-primary text-white rounded-top-4">
+        <h5 class="modal-title" id="tituloCategorias">
+          <i class="bi bi-tags-fill me-2"></i> Categorías asignadas
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Tabla -->
+        <div id="tablaCategoriasPregunta" class="table-responsive mb-4"></div>
+
+        <!-- Botón + Nueva categoría -->
+        <div class="text-end mb-3">
+          <button class="btn btn-success w-100 w-md-auto" onclick="mostrarSelectorNuevaCategoria()">
+            <i class="bi bi-plus-circle-fill me-1"></i> Nueva categoría
+          </button>
+        </div>
+
+        <!-- Contenedor selector -->
+        <div id="contenedorNuevaCategoria" class="d-none">
+          <div class="d-flex flex-column flex-md-row justify-content-end align-items-stretch gap-3">
+            <select id="selectNuevaCategoria" class="form-select w-100 w-md-auto"></select>
+            <button class="btn btn-primary" onclick="asignarNuevaCategoria()">
+              <i class="bi bi-check2-circle me-1"></i> Asignar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const contenedorCategorias = document.getElementById('contenedorCategorias');
+  const listaCategorias = document.getElementById('listaCategorias');
+
+  /* funcion para abrir modal modo registro pregunta*/
+  function abrirModalRegistro() {
+    document.getElementById('modalPreguntaLabel').textContent = 'Registrar Pregunta';
+    document.getElementById('modalBotonTexto').textContent = 'Registrar';
+    const modal = new bootstrap.Modal(document.getElementById('modalPregunta'));
     modal.show();
+    document.getElementById('formPregunta').addEventListener('submit', function (e) {
+      e.preventDefault(); // prevenir envío tradicional
 
-    configurarSubmitEstudiante();
+      const form = e.target;
+      const formData = new FormData(form);
+
+      fetch('../api/guardar_actualizar_preguntas.php', {
+        method: 'POST',
+        body: formData
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status) {
+            // ✅ Éxito
+            mostrarToast(
+              'success', 'Pregunta guardada correctamente');
+            form.reset(); // opcional
+            // Aquí podrías cerrar el modal si deseas
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalPregunta'));
+            if (modal) modal.hide();
+            // Recargar tabla o lista de usuarios si corresponde
+            setTimeout(() => location.reload(), 1200);
+          } else {
+            // ⚠️ Error con mensaje del backend
+            mostrarToast('warning', data.message || 'Ocurrió un error al guardar la pregunta'
+            );
+          }
+        })
+        .catch(err => {
+          console.error('Error en fetch:', err);
+          mostrarToast(
+            'danger',
+            'Error de red. No se pudo conectar con el servidor'
+          );
+        });
+    });
+
+
   }
+
+
+
+  // Función para mostrar u ocultar el selector de categorías
+  function toggleAsignarCategoria() {
+    const input = document.getElementById('asignar_categoria');
+    const btn = document.getElementById('toggleCategoria');
+    const icon = document.getElementById('iconCategoria');
+    const texto = document.getElementById('textoCategoria');
+    const asignar = input.value === 'no'; // vamos a activar
+
+    input.value = asignar ? 'si' : 'no';
+    icon.className = asignar ? 'bi bi-toggle-on fs-5' : 'bi bi-toggle-off fs-5';
+    texto.textContent = asignar ? 'Sí' : 'No';
+
+    btn.classList.toggle('btn-outline-success', asignar);
+    btn.classList.toggle('btn-outline-danger', !asignar);
+
+    contenedorCategorias.classList.toggle('d-none', !asignar);
+
+    if (asignar) {
+      cargarCategorias();
+    }
+  }
+
+  // Función para cargar categorías desde backend
+  function cargarCategorias(categoriasSeleccionadas = []) {
+    fetch('../api/obtener_categorias.php')
+      .then(res => res.json())
+      .then(categorias => {
+        listaCategorias.innerHTML = '';
+        categorias.data.forEach(cat => {
+          const div = document.createElement('div');
+          div.className = 'form-check form-check-inline';
+          div.innerHTML = `
+          <input class="form-check-input" type="checkbox" name="categorias[]" id="cat_${cat.id}" value="${cat.id}" ${categoriasSeleccionadas.includes(cat.id) ? 'checked' : ''}>
+          <label class="form-check-label" for="cat_${cat.id}">${cat.nombre}</label>
+        `;
+          listaCategorias.appendChild(div);
+        });
+      })
+      .catch(err => {
+        console.error('Error al obtener categorías:', err);
+        listaCategorias.innerHTML = '<div class="text-danger">No se pudieron cargar las categorías.</div>';
+      });
+  }
+
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const tipoContenido = document.getElementById('tipo_contenido');
+    const textoPreguntaContainer = document.getElementById('textoPreguntaContainer');
+    const imagenesPreguntaContainer = document.getElementById('imagenesPreguntaContainer');
+    const contenedorImagenes = document.getElementById('contenedorImagenes');
+    const agregarImagenBtn = document.getElementById('agregarImagen');
+    const tipoPregunta = document.getElementById('tipo');
+    const contenedorOpciones = document.getElementById('contenedorOpciones');
+    const agregarOpcionBtn = document.getElementById('agregarOpcion');
+    const selectCategoria = document.getElementById('categoria_id');
+    const catSi = document.getElementById('cat_si');
+    const catNo = document.getElementById('cat_no');
+
+    let contadorOpciones = 0;
+
+    // Mostrar u ocultar input imágenes
+    tipoContenido.addEventListener('change', () => {
+      const isIlustracion = tipoContenido.value === 'ilustracion';
+      imagenesPreguntaContainer.classList.toggle('d-none', !isIlustracion);
+      textoPreguntaContainer.classList.remove('d-none'); // El texto siempre visible
+    });
+
+
+    // Crear inputs de imágenes
+    agregarImagenBtn.addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.className = 'input-group mb-2';
+      div.innerHTML = `
+      <input type="file" name="imagenes[]" class="form-control" required>
+      <button type="button" class="btn btn-outline-danger btnEliminarImagen"><i class="bi bi-x-lg"></i></button>
+    `;
+      contenedorImagenes.appendChild(div);
+    });
+
+    contenedorImagenes.addEventListener('click', e => {
+      if (e.target.closest('.btnEliminarImagen')) {
+        e.target.closest('.input-group').remove();
+      }
+    });
+
+    // Crear opciones
+    const crearOpcionHTML = (texto = '', valor = '', checked = false) => {
+      const div = document.createElement('div');
+      div.className = 'input-group mb-2';
+      div.innerHTML = `
+      <div class="input-group-text">
+        <input type="checkbox" name="es_correcta[]" class="form-check-input mt-0" value="${contadorOpciones}" ${checked ? 'checked' : ''}>
+      </div>
+      <input type="text" name="opciones[]" class="form-control" placeholder="Texto de la opción" value="${texto}" required>
+      <button type="button" class="btn btn-outline-danger btnEliminarOpcion"><i class="bi bi-x-lg"></i></button>
+    `;
+      contenedorOpciones.appendChild(div);
+      contadorOpciones++;
+    };
+
+    const cargarVF = () => {
+      contenedorOpciones.innerHTML = '';
+      contenedorOpciones.innerHTML = `
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="es_correcta_vf" id="vf_verdadero" value="verdadero">
+        <label class="form-check-label" for="vf_verdadero">Verdadero</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="es_correcta_vf" id="vf_falso" value="falso">
+        <label class="form-check-label" for="vf_falso">Falso</label>
+      </div>
+    `;
+      agregarOpcionBtn.classList.add('d-none');
+    };
+
+    tipoPregunta.addEventListener('change', () => {
+      contenedorOpciones.innerHTML = '';
+      agregarOpcionBtn.classList.remove('d-none');
+      contadorOpciones = 0;
+      if (tipoPregunta.value === 'vf') {
+        cargarVF();
+      } else {
+        for (let i = 0; i < 2; i++) crearOpcionHTML();
+      }
+    });
+
+    agregarOpcionBtn.addEventListener('click', () => crearOpcionHTML());
+
+    contenedorOpciones.addEventListener('click', e => {
+      if (e.target.closest('.btnEliminarOpcion')) {
+        e.target.closest('.input-group').remove();
+      }
+    });
+
+    // Reiniciar formulario al abrir
+    const modal = document.getElementById('modalPregunta');
+    modal.addEventListener('show.bs.modal', () => {
+      document.getElementById('formPregunta').reset();
+      contenedorImagenes.innerHTML = '';
+      contenedorOpciones.innerHTML = '';
+      selectCategoria.classList.add('d-none');
+      catNo.checked = true;
+      contadorOpciones = 0;
+      tipoContenido.dispatchEvent(new Event('change'));
+      tipoPregunta.dispatchEvent(new Event('change'));
+    });
+
+
+
+  });
+
+  function eliminarPregunta(id) {
+    mostrarConfirmacionToast('¿Estás seguro de que deseas eliminar esta pregunta?',
+      () => {
+
+        const formData = new FormData();
+        formData.append('id', id);
+
+        fetch('../api/eliminar_pregunta.php', {
+          method: 'POST',
+          body: formData
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status) {
+              mostrarToast('success', data.message);
+              // Aquí puedes actualizar tu tabla o lista de preguntas
+              setTimeout(() => location.reload(), 1200);
+            } else {
+              mostrarToast('warning', data.message);
+            }
+          })
+          .catch(err => {
+            console.error('Error en la solicitud:', err);
+            mostrarToast('danger', 'Error al eliminar la pregunta');
+          });
+      })
+
+
+  }
+
+  function cambiarEstadoPregunta(idPregunta, nuevoEstado) {
+    mostrarConfirmacionToast(
+      `¿Estás seguro de que deseas ${nuevoEstado ? 'activar' : 'desactivar'} esta pregunta?`,
+      () => {
+        const formData = new FormData();
+        formData.append('id', idPregunta);
+        formData.append('estado', nuevoEstado ? 1 : 0);
+
+        fetch('../api/cambiar_estado_pregunta.php', {
+          method: 'POST',
+          body: formData
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status) {
+              mostrarToast('success', data.message);
+              setTimeout(() => location.reload(), 1200);
+            } else {
+              mostrarToast('warning', data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            mostrarToast('danger', 'Ocurrió un error al cambiar el estado.');
+          });
+      }
+    );
+  }
+
+
+
+  let idPreguntaActual = 0;
+
+  function abrirModalCategorias(preguntaId) {
+    idPreguntaActual = preguntaId;
+    cargarCategoriasPregunta(preguntaId);
+    const modal = new bootstrap.Modal(document.getElementById('modalCategoriasPregunta'));
+    modal.show();
+  }
+
+  function cargarCategoriasPregunta(preguntaId) {
+    fetch(`../api/categorias_pregunta.php?id=${preguntaId}`)
+      .then(res => res.json())
+      .then(data => {
+        const contenedor = document.getElementById('tablaCategoriasPregunta');
+        if (!data.status) {
+          contenedor.innerHTML = `<div class="alert alert-danger d-flex align-items-center" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          ${data.message}
+        </div>`;
+          return;
+        }
+
+        if (data.data.length === 0) {
+          contenedor.innerHTML = `<div class="alert alert-secondary d-flex align-items-center" role="alert">
+          <i class="bi bi-info-circle-fill me-2"></i>
+          Esta pregunta no tiene categorías asignadas.
+        </div>`;
+          return;
+        }
+
+        let html = `
+      <table class="table table-striped table-hover align-middle">
+        <thead class="table-primary">
+          <tr>
+            <th scope="col"><i class="bi bi-hash"></i> ID</th>
+            <th scope="col"><i class="bi bi-tag-fill"></i> Nombre</th>
+            <th scope="col" class="text-end"><i class="bi bi-gear-fill"></i> Acciones</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+        data.data.forEach(cat => {
+          html += `
+          <tr>
+            <td>${cat.id}</td>
+            <td>${cat.nombre}</td>
+            <td class="text-end">
+              <button class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1"
+                      onclick="eliminarCategoriaPregunta(${cat.rel_id})">
+                <i class="bi bi-trash-fill"></i> Eliminar
+              </button>
+            </td>
+          </tr>`;
+        });
+
+        html += `</tbody></table>`;
+        contenedor.innerHTML = html;
+      });
+  }
+
+  function mostrarSelectorNuevaCategoria() {
+    const contenedor = document.getElementById('contenedorNuevaCategoria');
+    contenedor.classList.remove('d-none');
+
+    fetch('../api/obtener_categorias.php')
+      .then(res => res.json())
+      .then(data => {
+        const select = document.getElementById('selectNuevaCategoria');
+        select.innerHTML = '<option value="">Seleccione una categoría</option>';
+        data.data.forEach(cat => {
+          select.innerHTML += `<option value="${cat.id}">${cat.nombre}</option>`;
+        });
+      });
+  }
+
+  function asignarNuevaCategoria() {
+    const categoriaId = document.getElementById('selectNuevaCategoria').value;
+    if (!categoriaId) return alert('Selecciona una categoría válida');
+
+    const formData = new FormData();
+    formData.append('accion', 'asignar');
+    formData.append('pregunta_id', idPreguntaActual);
+    formData.append('categoria_id', categoriaId);
+
+    fetch('../api/categorias_pregunta.php', {
+      method: 'POST',
+      body: formData
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status) {
+          mostrarToast('success', data.message);
+          cargarCategoriasPregunta(idPreguntaActual);
+          document.getElementById('contenedorNuevaCategoria').classList.add('d-none');
+        } else {
+          mostrarToast('warning', data.message || 'Error al asignar categoría');
+        }
+      });
+  }
+
+
+  function eliminarCategoriaPregunta(rel_id) {
+  mostrarConfirmacionToast('¿Eliminar esta categoría de la pregunta?', () => {
+    const formData = new FormData();
+    formData.append('accion', 'eliminar');
+    formData.append('rel_id', rel_id);
+
+    fetch('../api/categorias_pregunta.php', {
+      method: 'POST',
+      body: formData
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status) {
+          mostrarToast('success', data.message);
+          cargarCategoriasPregunta(idPreguntaActual);
+        } else {
+          mostrarToast('warning', data.message || 'Error al eliminar');
+        }
+      });
+  });
+}
+
 </script>
+
+
 <?php include_once('../includes/footer.php'); ?>

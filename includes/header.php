@@ -272,7 +272,21 @@ html, body {
   border-radius: 0.5rem;
 }
 
+/* MODALES */
+.modal.fade .modal-dialog {
+    transform: translateY(30px);
+    opacity: 0;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
 
+  .modal.fade.show .modal-dialog {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .modal-backdrop.show {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
 </style>
 
  

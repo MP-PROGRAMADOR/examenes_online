@@ -56,9 +56,9 @@
 
   <div class="section-title">Gestión Académica</div>
   <a href="../admin/estudiantes.php" class="nav-link"><i class="bi bi-people"></i><span class="link-text">Estudiantes</span></a>
-  <a href="#" class="nav-link"><i class="bi bi-card-list"></i><span class="link-text">Exámenes</span></a>
+  <a href="../admin/examenes.php" class="nav-link"><i class="bi bi-card-list"></i><span class="link-text">Exámenes</span></a>
   <a href="#" class="nav-link"><i class="bi bi-ui-checks"></i><span class="link-text">Asignar Preguntas</span></a>
-  <a href="#" class="nav-link"><i class="bi bi-check-circle"></i><span class="link-text">Respuestas</span></a>
+  <a href="../admin/preguntas.php" class="nav-link"><i class="bi bi-check-circle"></i><span class="link-text">Respuestas</span></a>
   <a href="#" class="nav-link"><i class="bi bi-send"></i><span class="link-text">Correos Enviados</span></a>
 
   <div class="section-title">Contenido</div>
