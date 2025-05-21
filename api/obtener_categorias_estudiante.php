@@ -10,7 +10,7 @@ if ($estudiante_id <= 0) {
 }
 
 $sql = "SELECT 
-            ec.id, 
+            ec.id, ec.categoria_id,
             c.nombre AS categoria,
             CONCAT(e.nombre, ' ', e.apellidos) AS estudiante,
             e.fecha_nacimiento AS edad,
@@ -26,3 +26,7 @@ $stmt->execute([$estudiante_id]);
 $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 echo json_encode(['status' => true, 'data' => $categorias]);
+
+
+
+ 
