@@ -312,7 +312,7 @@ try {
         <div id="seccionNuevaCategoria" class="mb-4 d-none">
           <form id="formNuevaCategoria">
             <p class="h3" id="edad"></p>
-            <input type="text" name="estudiante_id" id="nuevo_estudiante_id" >
+            <input type="text" name="estudiante_id" id="nuevo_estudiante_id" value="" >
             <div class="row g-2 align-items-center">
               <div class="col-md-8">
                 <label class="form-label">Selecciona nueva categoría:</label>
@@ -588,7 +588,8 @@ let estudianteEdadGlobal = null;
     modal.show();
     estudianteEdadGlobal =calcularEdad(fecha_nacimiento);
     // Mostrar nombre 
-    document.getElementById('nuevo_estudiante_id').textContent = estudianteId;
+    document.getElementById('nuevo_estudiante_id').value = estudianteId;
+
     document.getElementById('nombreEstudiante').textContent = nombreEstudiante;
     document.getElementById('edad').textContent =` ${estudianteEdadGlobal } Años`;
 
@@ -712,6 +713,7 @@ document.getElementById('formNuevaCategoria').addEventListener('submit', functio
       mostrarToast('success','Categoría asignada correctamente');
       ocultarFormularioNuevaCategoria();
      // mostrarCategoriasEstudiante('success', formData.get('estudiante_id')); // Refresca tabla
+       setTimeout(() => location.reload(), 1200);
     } else {
       mostrarToast('warning', data.message || 'Error al guardar la categoría');
     }
