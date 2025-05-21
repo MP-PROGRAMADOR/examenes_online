@@ -88,9 +88,11 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <button class="btn btn-sm btn-outline-warning" onclick="editarExamen(<?= $examen['id'] ?>)">
                       <i class="bi bi-pencil-fill me-1"></i> Editar
                     </button>
+
                     <button class="btn btn-sm btn-outline-danger" onclick="eliminarExamen(<?= $examen['id'] ?>)">
                       <i class="bi bi-trash-fill me-1"></i> Eliminar
                     </button>
+                    
                   </div>
                 </td>
               </tr>
