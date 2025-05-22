@@ -1,8 +1,8 @@
 <?php
 include_once("includes/header.php");
-require '../config/conexion.php';
+require '../includes/conexion.php';
 
-$pdo = $pdo->getConexion();
+ 
 
 // ----------------------------------------
 // Validar aqui si hay sesión activa

@@ -61,27 +61,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Consulta con alias para evitar confusión de ids
             $stmt = $pdo->prepare("
-               SELECT * FROM estudiantes WHERE usuario = :usuario AND estado = 'activo'
+                                        SELECT * 
+                                        FROM estudiantes 
+                                        WHERE usuario = :usuario AND estado = 'activo'
+                                    ");
 
-            ");
-            $stmt->execute(['codigo' => $codigo]);
+            $stmt->execute(['usuario' => $codigo]); // <-- debe coincidir con :usuario
             $estudiante = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
             if ($estudiante) {
-                $_SESSION['estudiante_id'] = $estudiante['estudiante_id'];
-                $_SESSION['estudiante_nombre'] = $estudiante['estudiante_nombre'];
-                $_SESSION['examen_id'] = $estudiante['examen_id'];
+                $_SESSION['estudiante_id'] = $estudiante['id'];
+                $_SESSION['estudiante_nombre'] = $estudiante['nombre'];                 
                 $_SESSION['estudiante'] = $estudiante; // puedes usarlo para detalles
 
                 $response = [
                     'status' => true,
-                    'message' => 'Bienvenido/a ' . htmlspecialchars($estudiante['estudiante_nombre']),
+                    'message' => 'Bienvenido/a ' . htmlspecialchars($estudiante['nombre']),
                     'redirect' => 'aspirante.php'
                 ];
-            } elseif($estudiante['estado'] !== 'activo') {
-                throw new Exception('Tu cuenta esta inactiva contacta con tu administrador.');
-                
-            }else  {
+            } else {
                 throw new Exception('Código inválido.');
             }
 

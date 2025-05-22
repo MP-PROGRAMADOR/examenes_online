@@ -55,30 +55,10 @@ if (isset($_SESSION['usuario'])) {
 
        <form method="post" id="formLogin" class="row d-flex justify-content-center">
 
-          <div class="col-md-8">
-
-
-            <!-- Toggle tipo de usuario -->
-            <!-- <div class="mb-4 text-center">
-              <label class="form-label d-block mb-2 fw-semibold">Tipo de Usuario</label>
-              <div class="btn-group" role="group" aria-label="Tipo de usuario" id="tipoUsuarioGroup">
-                <input type="radio" class="btn-check" name="tipoUsuario" id="usuarioBtn" value="usuario"
-                  autocomplete="off" checked>
-                <label class="btn btn-outline-primary" for="usuarioBtn">
-                  <i class="bi bi-person-fill me-1"></i>Usuario
-                </label>
-
-                <input type="radio" class="btn-check" name="tipoUsuario" id="estudianteBtn" value="estudiante"
-                  autocomplete="off">
-                <label class="btn btn-outline-primary" for="estudianteBtn">
-                  <i class="bi bi-mortarboard-fill me-1"></i>Estudiante
-                </label>
-              </div>
-            </div> -->
-
+          <div class="col-md-8"> 
             <!-- Usuario -->
             <div class="mb-3">
-              <label for="usuario" class="form-label fw-semibold">Usuario / Código de Acceso</label>
+              <label for="usuario" class="form-label fw-semibold">Usuario </label>
               <div class="input-group">
                 <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
                 <input type="text" class="form-control" id="usuario" placeholder="Ingrese su usuario o código" required>
@@ -114,7 +94,7 @@ if (isset($_SESSION['usuario'])) {
       e.preventDefault(); // Evita el envío tradicional
 
       const formData = new FormData();
-      const tipoUsuario = document.querySelector('input[name="tipoUsuario"]:checked').value;
+      const tipoUsuario = 'usuario';
       const usuario = document.getElementById('usuario').value.trim();
       const password = document.getElementById('password').value;
 

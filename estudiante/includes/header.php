@@ -1,8 +1,22 @@
 <?php
 session_start();
 
-
-
+/* 
+CREATE TABLE `estudiantes` (
+  `id` int(11) NOT NULL,
+  `dni` varchar(20) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `usuario` varchar(100) UNIQUE NOT NULL,
+  `telefono` varchar(20) DEFAULT NULL,
+  `fecha_nacimiento` date DEFAULT NULL,
+  `escuela_id` int(11) DEFAULT NULL,
+  `estado` enum('activo','inactivo') DEFAULT 'activo',
+  `creado_en` datetime DEFAULT current_timestamp(),
+  `apellidos` varchar(250) DEFAULT NULL,
+  `direccion` varchar(250) DEFAULT NULL
+)
+ */
 
 // Verificar si hay sesión activa
 if (!isset($_SESSION['estudiante'])) {
@@ -12,12 +26,9 @@ if (!isset($_SESSION['estudiante'])) {
 
 // Acceder a los datos del estudiante
 $estudiante = $_SESSION['estudiante'];
-$nombre = $estudiante['nombre'];
-$apellido = $estudiante['apellido'];
-$codigo = $estudiante['codigo'];
-$id_categoria_carne = $estudiante['categoria_carne'];
+$nombre = $estudiante['nombre'] . ' ' . $estudiante['apellidos'];
+$codigo = $estudiante['usuario'];
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 
@@ -25,138 +36,111 @@ $id_categoria_carne = $estudiante['categoria_carne'];
     <meta charset="UTF-8">
     <title>Panel del Estudiante</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Bootstrap CSS -->
+
+    <!-- Bootstrap 5 + Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         body {
-            background-color: #f2f4f6;
+            background-color: #f8f9fa;
         }
 
-        .navbar-custom {
+        .sidebar {
+            min-height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid #dee2e6;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .sidebar .nav-link {
+            font-size: 0.95rem;
+            color: #495057;
+            border-radius: 0.375rem;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #e9f2ff;
+            color: #0d6efd;
+        }
+
+        .sidebar .bi {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        .navbar {
             background-color: #0d6efd;
         }
 
-        .navbar-brand,
-        .nav-link,
-        .navbar-text {
-            color: #ffffff !important;
+        .color {
+            background-color: rgb(13, 82, 185);
         }
 
-        .btn-outline-light:hover {
-            background-color: #ffffff;
-            color: #2c3e50 !important;
+        .navbar .navbar-brand,
+        .navbar .nav-link,
+        .navbar .bi {
+            color: #fff !important;
         }
 
-        /* ---------------------POLITICAS------------------------------------- */
-        .header-shadow {
-            box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
-        }
-
-        .main-section {
-            padding: 40px 0;
-        }
-
-        .info-card {
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            border-radius: 10px;
-            padding: 30px;
-            margin-bottom: 30px;
-            background-color: white;
-        }
-
-        .info-card h2 {
-            color: #007bff;
-            font-weight: bold;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 10px;
-        }
-
-        .info-card h3 {
-            color: #28a745;
-            font-weight: bold;
-            margin-top: 20px;
-            margin-bottom: 10px;
-        }
-
-        .info-card p {
-            line-height: 1.7;
+        .sidebar h6 {
+            font-size: 0.85rem;
             color: #6c757d;
+            text-transform: uppercase;
+            margin-top: 1rem;
         }
 
-        .important-note {
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            color: #85640c;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            #mainContent {
+                margin-left: 0;
+            }
         }
 
-        .btn-start-exam {
-            background-color: #28a745;
-            border-color: #28a745;
-            color: white;
-            padding: 12px 25px;
-            font-size: 1.1em;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
+        @media (min-width: 769px) {
+            #mainContent {
+                margin-left: 260px;
+            }
         }
 
-        .btn-start-exam:hover {
-            background-color: #1e7e34;
-            border-color: #1e7e34;
+        .accordion-button {
+            transition: all 0.2s ease-in-out;
         }
 
-        .back-link {
-            display: block;
-            margin-top: 20px;
-            color: #007bff;
-            text-decoration: none;
+        .accordion-button:not(.collapsed) {
+            background-color: #e9f0ff;
+            color: #0d6efd;
         }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
-        /* 
-        
---------------------------------
-
-*/
     </style>
+
+
 </head>
+
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-custom fixed-top shadow-sm">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="aspirante.php">
-                <i class="bi bi-mortarboard-fill me-2 fs-4"></i> 
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="bi bi-mortarboard-fill me-2 fs-4"></i>
                 CÓDIGO DE ACCESO: <strong class="px-2"><?= htmlspecialchars($codigo) ?></strong>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContenido">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarContenido">
-                <ul class="navbar-nav mb-2 mb-lg-0 me-3">
+            <div class="collapse navbar-collapse" id="navbarEstudiante">
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="aspirante.php">
-                            <i class="bi bi-house-door-fill me-1"></i>Inicio
-                        </a>
+                        <a class="nav-link" href="#"><i class="bi bi-person-circle"></i>
+                            <strong><?= strtoupper(htmlspecialchars($nombre)) ?></strong></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-warning" href="logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar
+                            sesión</a>
                     </li>
                 </ul>
-                <span class="navbar-text me-3">
-                    <i class="bi bi-person-circle me-1"></i>
-                    Bienvenido, <strong><?= strtoupper(htmlspecialchars($nombre)) . ' ' . strtoupper(htmlspecialchars($apellido)) ?></strong>
-                </span>
-                <a href="cerrar_sesion.php" class="btn btn-sm btn-outline-light">
-                    <i class="bi bi-box-arrow-right me-1"></i> Cerrar sesión
-                </a>
             </div>
         </div>
     </nav>
 
-    <!-- Espacio para navbar fija -->
-    <div style="height: 80px;"></div>
+ 

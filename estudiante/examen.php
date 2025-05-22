@@ -1,312 +1,313 @@
 <?php
+include_once("includes/header.php");
+require '../includes/conexion.php';
 
-
-// Iniciar sesión si no está iniciada
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Verificar si el usuario está logueado
+// -------------------------------
+// Verificar sesión activa
+// -------------------------------
+session_start();
 if (!isset($_SESSION['estudiante'])) {
-    header('Location: index.php');
+    header("Location: login.php");
     exit;
 }
-
-// Conexión a la base de datos
-require_once '../config/conexion.php';
-$pdo = $pdo->getConexion();
-
 $estudiante = $_SESSION['estudiante'];
 $estudiante_id = $estudiante['id'];
 
-// Consultar si el usuario tiene acceso habilitado e intentos disponibles
-$sql = "SELECT acceso_habilitado, intentos_examen 
-        FROM examenes_estudiantes 
-        WHERE estudiante_id = ? 
-        ORDER BY id DESC 
-        LIMIT 1"; // Obtener el examen más reciente
+// -------------------------------
+// Consulta de exámenes finalizados
+// -------------------------------
+$sql = " 
+SELECT e.*, 
+       est.nombre AS estudiante_nombre, est.apellidos,
+       c.nombre AS categoria_nombre,
+       esc.nombre AS escuela_nombre
+FROM examenes e
+JOIN estudiantes est ON e.estudiante_id = est.id
+JOIN categorias c ON e.categoria_id = c.id
+LEFT JOIN escuelas_conduccion esc ON est.escuela_id = esc.id
+WHERE e.estado = 'finalizado' AND e.estudiante_id = :estudiante_id
+ORDER BY e.fecha_asignacion DESC";
 
 $stmt = $pdo->prepare($sql);
-$stmt->execute([$estudiante_id]);
-$examen = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt->bindParam(':estudiante_id', $estudiante_id, PDO::PARAM_INT);
+$stmt->execute();
+$examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Validar condiciones
-if (!$examen) {
-    header('Location: aspirante.php');
-    exit;
-
+// -------------------------------
+// Función para obtener preguntas por examen
+// -------------------------------
+function obtenerPreguntasExamen($examen_id, $pdo)
+{
+    $sql = "SELECT pregunta_id, respondida FROM examen_preguntas WHERE examen_id = :examen_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':examen_id', $examen_id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
-if ((int) $examen['acceso_habilitado'] !== 1) {
-    header('Location: aspirante.php');
-    exit;
-}
-
-if ((int) $examen['intentos_examen'] <= 0) {
-    header('Location: aspirante.php');
-    exit;
-}
-
-// Si pasa todas las validaciones, continúa el flujo normal
-
-
-$examen_id = $_GET['id'] ?? 0;
-
-
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Examen en Progreso</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #eef2f7;
-            font-family: 'Segoe UI', sans-serif;
-        }
 
-        .pregunta-card {
-            background: #ffffff;
-            border-radius: 1rem;
-            box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.075);
-            padding: 2rem;
-            transition: all 0.3s ease;
-        }
+<!-- Contenido Principal -->
+<main class="container p-4">
 
-        .pregunta-card:hover {
-            box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
-        }
+    <div class="container-fluid mt-5 pt-4">
+        <h2 class="text-primary fw-bold mb-4"><i class="bi bi-speedometer2"></i> Panel del Estudiante</h2>
+        <div class="row"></div>
+        <!-- Resumen de exámenes -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-journal-text text-primary"></i> Exámenes asignados</h5>
+                        <p class="display-6 fw-bold text-primary">3</p>
+                        <small class="text-muted">En espera de completar</small>
+                    </div>
+                </div>
+            </div>
 
-        .progreso {
-            height: 1rem;
-            border-radius: 1rem;
-        }
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-check-circle-fill text-success"></i> Exámenes aprobados
+                        </h5>
+                        <p class="display-6 fw-bold text-success">2</p>
+                        <small class="text-muted">Últimos resultados positivos</small>
+                    </div>
+                </div>
+            </div>
 
-        .opcion-card {
-            border: 2px solid #dee2e6;
-            border-radius: 0.75rem;
-            padding: 0.75rem 1rem;
-            margin-bottom: 0.75rem;
-            transition: background 0.2s ease, border-color 0.2s ease;
-            cursor: pointer;
-        }
-
-        .opcion-card:hover {
-            background-color: #f1f1f1;
-            border-color: #007bff;
-        }
-
-        .opcion-card input[type="radio"],
-        .opcion-card input[type="checkbox"] {
-            margin-right: 0.5rem;
-        }
-
-        #btnSiguiente {
-            font-weight: bold;
-            padding: 0.6rem 1.5rem;
-            border-radius: 0.5rem;
-        }
-    </style>
-
-</head>
-
-<body>
-
-    <div class="container py-4">
-        <div class="text-center mb-4">
-            <h2 class="fw-bold">Resolución del Examen</h2>
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-clock-history text-warning"></i> En proceso</h5>
+                        <p class="display-6 fw-bold text-warning">1</p>
+                        <small class="text-muted">Examen en curso</small>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div id="progreso"></div>
-        <div id="contenedor-pregunta"></div>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="row">
+
+            <!-- COLUMNA IZQUIERDA: PERFIL DEL ESTUDIANTE -->
+            <div class="col-12 col-md-6 col-lg-6 mb-4">
+                <div class="accordion" id="accordionPerfil">
+                    <div class="accordion-item border-0 shadow-sm rounded">
+                        <h2 class="accordion-header" id="headingPerfil">
+                            <button class="accordion-button collapsed bg-white text-dark fw-semibold rounded-top"
+                                type="button" data-bs-toggle="collapse" data-bs-target="#collapsePerfil"
+                                aria-expanded="false" aria-controls="collapsePerfil">
+                                <i class="bi bi-person-circle me-2 text-primary fs-5"></i> Mi Perfil
+                            </button>
+                        </h2>
+                        <div id="collapsePerfil" class="accordion-collapse collapse" aria-labelledby="headingPerfil"
+                            data-bs-parent="#accordionPerfil">
+                            <div class="accordion-body bg-light rounded-bottom">
+                                <h5 class="mb-3 text-secondary">
+                                    <i class="bi bi-person-lines-fill me-2 text-info"></i> Detalles del Estudiante
+                                </h5>
+                                <table class="table table-sm table-hover align-middle mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th><i class="bi bi-person-fill me-1 text-muted"></i> Nombre completo</th>
+                                            <td><?= htmlspecialchars($estudiante['nombre'] . ' ' . $estudiante['apellidos']) ?>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th><i class="bi bi-card-text me-1 text-muted"></i> DNI</th>
+                                            <td><?= htmlspecialchars($estudiante['dni']) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th><i class="bi bi-envelope-at me-1 text-muted"></i> Email</th>
+                                            <td><?= htmlspecialchars($estudiante['email']) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th><i class="bi bi-telephone me-1 text-muted"></i> Teléfono</th>
+                                            <td><?= htmlspecialchars($estudiante['telefono']) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th><i class="bi bi-building me-1 text-muted"></i> Escuela</th>
+                                            <td><?= htmlspecialchars($nombreEscuela ?? 'No asignada') ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th><i class="bi bi-geo-alt me-1 text-muted"></i> Dirección</th>
+                                            <td><?= htmlspecialchars($estudiante['direccion']) ?></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 
+            <!-- COLUMNA DERECHA: SIDEBAR A MODO DE ACORDEÓN -->
+            <div class="col-12 col-md-6 col-lg-6 mb-4">
+                <div class="accordion" id="accordionSidebar">
+
+                    <!-- Módulo de Contenido -->
+                    <div class="accordion-item border-0 rounded shadow-sm">
+                        <h2 class="accordion-header" id="headingContenido">
+                            <button class="accordion-button collapsed bg-white text-dark fw-semibold" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#collapseContenido" aria-expanded="false"
+                                aria-controls="collapseContenido">
+                                <i class="bi bi-journal-text me-2 text-primary"></i> Gestión de Contenido
+                            </button>
+                        </h2>
+                        <div id="collapseContenido" class="accordion-collapse collapse"
+                            aria-labelledby="headingContenido" data-bs-parent="#accordionSidebar">
+                            <div class="accordion-body ps-4">
+                                <nav class="nav flex-column">
+                                    <a href="#"
+                                        class="nav-link text-dark d-flex align-items-center mb-1 text-decoration-none">
+                                        <i class="bi bi-house-door me-2 text-secondary"></i> Página principal
+                                    </a>
+                                    <a href="#"
+                                        class="nav-link text-dark d-flex align-items-center mb-1 text-decoration-none">
+                                        <i class="bi bi-tags me-2 text-secondary"></i> Listado de categorías
+                                    </a>
+                                    <a href="#"
+                                        class="nav-link text-dark d-flex align-items-center mb-1 text-decoration-none">
+                                        <i class="bi bi-clock-history me-2 text-warning"></i> Pendientes
+                                    </a>
+                                    <a href="#"
+                                        class="nav-link text-dark d-flex align-items-center mb-1 text-decoration-none">
+                                        <i class="bi bi-check2-square me-2 text-success"></i> Completados
+                                    </a>
+                                    <a href="#"
+                                        class="nav-link text-dark d-flex align-items-center mb-1 text-decoration-none">
+                                        <i class="bi bi-clipboard-data me-2 text-info"></i> Ver resultados
+                                    </a>
+                                </nav>
+
+                                <hr class="my-3">
+
+                                <a href="logout.php"
+                                    class="btn btn-sm btn-outline-danger d-flex align-items-center fw-bold">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="accordion" id="accordionExamenesRealizados">
+                <h2 class="mb-4 text-primary">
+                    <i class="bi bi-clipboard-check me-2"></i> Exámenes Realizados
+                </h2>
+
+                <?php if (count($examenes) > 0): ?>
+                    <div class="accordion" id="accordionExamenes">
+                        <?php foreach ($examenes as $index => $examen): ?>
+                            <div class="accordion-item mb-3 border-0 shadow-sm rounded">
+                                <h2 class="accordion-header" id="heading<?= $index ?>">
+                                    <button class="accordion-button collapsed bg-white fw-semibold" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#collapse<?= $index ?>" aria-expanded="false"
+                                        aria-controls="collapse<?= $index ?>">
+                                        <i class="bi bi-file-earmark-text me-2 text-primary"></i>
+                                        <?= htmlspecialchars($examen['categoria_nombre']) ?> -
+                                        <?= htmlspecialchars($examen['fecha_asignacion']) ?> |
+                                        Calificación: <strong class="text-success"><?= $examen['calificacion'] ?></strong>
+                                    </button>
+                                </h2>
+                                <div id="collapse<?= $index ?>" class="accordion-collapse collapse"
+                                    aria-labelledby="heading<?= $index ?>" data-bs-parent="#accordionExamenes">
+                                    <div class="accordion-body bg-light rounded-bottom">
+                                        <ul class="list-unstyled mb-3">
+                                            <li><i class="bi bi-person-fill me-1 text-muted"></i> <strong>Estudiante:</strong>
+                                                <?= htmlspecialchars($examen['estudiante_nombre'] . ' ' . $examen['apellidos']) ?>
+                                            </li>
+                                            <li><i class="bi bi-building me-1 text-muted"></i> <strong>Escuela:</strong>
+                                                <?= htmlspecialchars($examen['escuela_nombre'] ?? 'No asignada') ?>
+                                            </li>
+                                            <li><i class="bi bi-list-ol me-1 text-muted"></i> <strong>Total de
+                                                    preguntas:</strong>
+                                                <?= $examen['total_preguntas'] ?>
+                                            </li>
+                                            <li><i class="bi bi-flag me-1 text-muted"></i> <strong>Estado:</strong>
+                                                <?= ucfirst($examen['estado']) ?>
+                                            </li>
+                                            <li><i class="bi bi-key me-1 text-muted"></i> <strong>Código de acceso:</strong>
+                                                <?= htmlspecialchars($examen['codigo_acceso']) ?>
+                                            </li>
+                                        </ul>
+
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-sm mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th><i class="bi bi-question-circle me-1 text-muted"></i> ID Pregunta
+                                                        </th>
+                                                        <th><i class="bi bi-check-circle me-1 text-muted"></i> Respondida</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                    $preguntas = obtenerPreguntasExamen($examen['id'], $pdo);
+                                                    foreach ($preguntas as $i => $pregunta):
+                                                        ?>
+                                                        <tr>
+                                                            <td><?= $i + 1 ?></td>
+                                                            <td><?= $pregunta['pregunta_id'] ?></td>
+                                                            <td>
+                                                                <?php if ($pregunta['respondida']): ?>
+                                                                    <span class="badge bg-success"><i
+                                                                            class="bi bi-check-circle me-1"></i> Sí</span>
+                                                                <?php else: ?>
+                                                                    <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>
+                                                                        No</span>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                    <?php if (empty($preguntas)): ?>
+                                                        <tr>
+                                                            <td colspan="3" class="text-center text-muted">
+                                                                No hay preguntas registradas.
+                                                            </td>
+                                                        </tr>
+                                                    <?php endif; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="alert alert-info d-flex align-items-center" role="alert">
+                        <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                        No hay exámenes finalizados registrados.
+                    </div>
+                <?php endif; ?>
+            </div>
+
+        </div>
     </div>
 
-    <script>
-        let examenId = <?php echo $examen_id; ?>;
-        let contenedor = document.getElementById('contenedor-pregunta');
-        let progreso = document.getElementById('progreso');
-
-        function cargarPregunta() {
-            fetch(`../php/obtener_pregunta.php?examen_id=${examenId}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.finalizado) {
-                        contenedor.innerHTML = "<h3>¡Has completado el examen!</h3>";
-                        return;
-                    }
-                    mostrarPregunta(data);
-                })
-                .catch(err => {
-                    console.error("Error al cargar la pregunta:", err);
-                    contenedor.innerHTML = "<p>Error al cargar pregunta</p>";
-                });
-        }
-
-        function mostrarPregunta(p) {
-            let opcionesHtml = '';
-            const tipo = p.tipo_pregunta;
-
-            // Tipo VF personalizado
-            if (tipo === 'vf') {
-                opcionesHtml += `
-                    <div>
-                        <label>
-                            <input type="radio" name="opcion_vf" value="v"> Verdadero
-                        </label>
-                    </div>
-                    <div>
-                        <label>
-                            <input type="radio" name="opcion_vf" value="f"> Falso
-                        </label>
-                    </div>
-                    `;
-            } else {
-                // Unica o multiple
-                p.opciones.forEach(op => {
-                    const inputType = tipo === 'multiple' ? 'checkbox' : 'radio';
-                    opcionesHtml += `
-            <div>
-                <label>
-                    <input type="${inputType}" name="opcion" value="${op.id}">
-                    ${op.texto_opcion}
-                </label>
-            </div>
-            `;
-                });
-            }
-
-            const imagenHtml = p.tipo_contenido === 'ilustracion' && p.ruta_imagen
-                ? `<img src="../imagenes/${p.ruta_imagen}" style="max-width: 300px;">`
-                : '';
-
-            contenedor.innerHTML = `
-                    <div>
-                        <h4>Pregunta ${p.pregunta_actual} de ${p.total_preguntas}</h4>
-                        ${imagenHtml}
-                        <p>${p.texto_pregunta}</p>
-                        <form id="form-respuesta">
-                            ${opcionesHtml}
-                            <button type="submit">Siguiente</button>
-                        </form>
-                    </div>
-                    `;
-
-            document.getElementById('form-respuesta').onsubmit = (e) => {
-                e.preventDefault();
-                enviarRespuesta(p.pregunta_id, tipo);
-            };
-        }
-
-        function enviarRespuesta(pregunta_id, tipo) {
-            const form = document.getElementById('form-respuesta');
-            let seleccion = [];
-
-            if (tipo === 'vf') {
-                const seleccionada = form.querySelector('input[name="opcion_vf"]:checked');
-                if (!seleccionada) {
-                    alert("Debes seleccionar Verdadero o Falso.");
-                    return;
-                }
-                seleccion = [seleccionada.value]; // 'v' o 'f'
-            } else {
-                const seleccionados = Array.from(form.elements['opcion']).filter(el => el.checked);
-                if (seleccionados.length === 0) {
-                    alert("Debes seleccionar una opción.");
-                    return;
-                }
-                seleccion = seleccionados.map(el => el.value);
-            }
-
-            fetch('../php/guardar_evaluacion.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    pregunta_id: pregunta_id,
-                    opciones: seleccion,
-                    tipo: tipo // opcional, por si necesitas manejar en el backend
-                })
-            })
-                .then(res => res.json())
-                .then(res => {
-                    if (res.ok) {
-                        if (res.finalizado) {
-                            alert(`Examen finalizado. Calificación: ${res.calificacion}%`);
-                            // Mostrar mensaje de finalización
-                            const mensaje = document.createElement('div');
-                            mensaje.innerText = "¡Examen finalizado! Redirigiendo...";
-                            mensaje.classList.add('alert', 'alert-success', 'mt-3');
-                            document.getElementById('contenedor-pregunta').innerHTML = '';
-                            document.getElementById('contenedor-pregunta').appendChild(mensaje);
-
-                            // Redirigir después de 2 segundos
-                            setTimeout(() => {
-                                window.location.href = "aspirante.php";
-                            }, 2000);
-                        } else {
-                            // Cargar siguiente pregunta
-                            cargarPregunta();
-                            console.log(res.mensaje);
-                        }
-                    } else {
-                        console.error(res);
-                        alert("Error al guardar la respuesta.");
-                    }
 
 
-                }
-                );
-        }
 
-        cargarPregunta(); // Inicializar
-    </script>
+</main>
 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
+
+
+
+
 </html>
-
-
-
- 
- 
-// Obtener opciones
-$sqlOpciones = "SELECT id, texto_opcion FROM opciones_pregunta WHERE pregunta_id = :id";
-$stmt = $pdo->prepare($sqlOpciones);
-$stmt->execute([':id' => $pregunta['id']]);
-$opciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Obtener ruta de imagen si es ilustración
-$rutaImagen = null;
-if ($pregunta['tipo_contenido'] === 'ilustracion') {
-    $sqlImagen = "SELECT ruta_imagen FROM imagenes_pregunta WHERE pregunta_id = :id LIMIT 1";
-    $stmt = $pdo->prepare($sqlImagen);
-    $stmt->execute([':id' => $pregunta['id']]);
-    $imagen = $stmt->fetch(PDO::FETCH_ASSOC);
-    $rutaImagen = $imagen ? $imagen['ruta_imagen'] : null;
-}
-
-// Total preguntas para mostrar número
-$sqlTotal = "SELECT COUNT(*) FROM preguntas WHERE examen_id = :id";
-$stmt = $pdo->prepare($sqlTotal);
-$stmt->execute([':id' => $examenEstudianteId]);
-$totalPreguntas = $stmt->fetchColumn();
-
-echo json_encode([
-    'id' => $pregunta['id'],
-    'texto_pregunta' => $pregunta['texto_pregunta'],
-    'tipo_pregunta' => $pregunta['tipo_pregunta'],
-    'tipo_contenido' => $pregunta['tipo_contenido'],
-    'ruta_imagen' => $rutaImagen,
-    'opciones' => $opciones,
-    'pregunta_actual' => 1, // Puedes llevar un contador real en sesión si deseas
-    'total_preguntas' => (int)$examen_estudiante['total_preguntas'],
-    'examen_id' => (int)$examenEstudianteId
-]);

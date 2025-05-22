@@ -152,8 +152,11 @@ unset($_SESSION['error']);
 </head>
 
 <body>
-
+ <div id="toast-container" class="position-fixed top-0 start-50 translate-middle-x p-3"
+    style="z-index: 1060; max-width: 90%; width: 400px;"></div> <!-- alerta modal -->
   <div class="login-container">
+
+
     <div class="card-login">
 
       <!-- Columna izquierda: Información animada de seguridad vial -->
@@ -184,73 +187,77 @@ unset($_SESSION['error']);
 
       <!-- Columna derecha: Login -->
       <div class="login-right">
-        
+
         <h2><i class="bi bi-person-circle"></i> Iniciar sesión</h2>
-        <form id="formLogin"  method="POST" autocomplete="off">
+        <form id="formLogin" method="POST" autocomplete="off">
           <div class="mb-3">
-            <label for="codigo" class="form-label"><i class="bi bi-key-fill"></i> Código de acceso</label>
-            <input type="text" name="codigo" id="codigo" class="form-control" required maxlength="50" placeholder="Tu código personal">
+            <label for="codigo" class="form-label">
+              <i class="bi bi-key-fill"></i> Código de acceso
+            </label>
+            <input type="text" name="codigo" id="codigo" class="form-control" required maxlength="50"
+              placeholder="Tu código personal">
           </div>
-          <button type="submit" class="btn btn-custom w-100"><i class="bi bi-box-arrow-in-right"></i> Entrar</button>
-          <a href="aspirante.php">registrar</a>
-        </form> 
+          <button type="submit" class="btn btn-custom w-100">
+            <i class="bi bi-box-arrow-in-right"></i> Entrar
+          </button>
+          <div class="mt-2 text-center">
+            <a href="aspirante.php">¿No tienes cuenta? Regístrate aquí</a>
+          </div>
+        </form>
+
 
       </div>
     </div>
 
   </div>
   </div>
-
+ 
   <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Script para desaparecer el mensaje -->
+ <script src="../js/alerta.js"></script>
   <script>
-  setTimeout(() => {
-    const mensaje = document.getElementById('mensajeError');
-    if (mensaje) {
-      mensaje.style.opacity = '0';
-      setTimeout(() => mensaje.style.display = 'none', 1000);
-    }
-  }, 5000);
-</script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById('formLogin');
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById('formLogin');
+      form.addEventListener('submit', function (e) {
+        e.preventDefault(); // Previene el envío tradicional
 
-    form.addEventListener('submit', function (e) {
-      e.preventDefault(); // Evita el envío tradicional
+        const codigo = document.getElementById('codigo').value.trim();
 
-      const formData = new FormData();
-      const tipoUsuario = 'estudiante';
-      const usuario = document.getElementById('codigo').value.trim(); 
-
-      formData.append('tipoUsuario', tipoUsuario);
-      formData.append('usuario', usuario); 
-  
-      fetch('../api/login.php', {
-        method: 'POST',
-        body: formData
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status) {
-          // Mostrar mensaje y redirigir, por ejemplo:
-          // mostrarToast('success', data.message);
-          setTimeout(() => window.location.href = data.redirect || 'aspirante.php', 1200);
-        } else {
-          // mostrarToast('danger', data.message || 'Credenciales incorrectas');
+        if (!codigo) {
+          mostrarToast('warning', 'Por favor, ingresa tu código de acceso.');
+          return;
         }
-      })
-      .catch(error => {
-        console.error('Error en la solicitud:', error);
-        // mostrarToast('danger', 'Ocurrió un error al procesar el login: ');
+
+        const formData = new FormData();
+        formData.append('tipoUsuario', 'estudiante'); // ← ¡debe ser "tipo"!
+        formData.append('usuario', codigo);
+
+
+        fetch('../api/login.php', {
+          method: 'POST',
+          body: formData
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log(data)
+            if (data.status) {
+               mostrarToast('success', data.message || 'Inicio de sesión exitoso');
+               setTimeout(() => {
+                 window.location.href = data.redirect || 'aspirante.php';
+               }, 1200);
+            } else {
+               mostrarToast('danger', data.message || 'Credenciales incorrectas');
+            }
+          })
+          .catch(error => {
+            console.error('Error en la solicitud:', error);
+             mostrarToast('danger', 'Ocurrió un error al procesar el login.');
+          });
       });
     });
-  });
-</script>
-
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
