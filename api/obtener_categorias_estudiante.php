@@ -10,16 +10,19 @@ if ($estudiante_id <= 0) {
 }
 
 $sql = "SELECT 
-            ec.id, ec.categoria_id,
-            c.nombre AS categoria,
-            CONCAT(e.nombre, ' ', e.apellidos) AS estudiante,
-            e.fecha_nacimiento AS edad,
-            ec.estado, 
-            ec.fecha_asignacion
-            FROM estudiante_categorias ec
-            JOIN categorias c ON ec.categoria_id = c.id
-            JOIN estudiantes e ON ec.estudiante_id = e.id
-            WHERE ec.estudiante_id = ?
+    ec.id, 
+    ec.categoria_id, 
+    c.nombre AS categoria,
+    CONCAT(e.nombre, ' ', e.apellidos) AS estudiante,
+    e.fecha_nacimiento AS edad,
+    ec.estado, 
+    ec.fecha_asignacion,
+    (SELECT COUNT(*) FROM estudiante_categorias WHERE estudiante_id = ec.estudiante_id) AS total
+FROM estudiante_categorias ec
+JOIN categorias c ON ec.categoria_id = c.id
+JOIN estudiantes e ON ec.estudiante_id = e.id
+WHERE ec.estudiante_id = ?
+
             ";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$estudiante_id]);

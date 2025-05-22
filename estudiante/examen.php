@@ -13,6 +13,31 @@ if (!isset($_SESSION['estudiante'])) {
 $estudiante = $_SESSION['estudiante'];
 $estudiante_id = $estudiante['id'];
 
+
+
+$nota_aprobacion = 5.0;
+
+// Consultas usando PDO ($pdo)
+$examenesAsignados = $pdo->prepare("SELECT COUNT(*) FROM examenes WHERE estudiante_id = ? AND estado = 'pendiente'");
+$examenesAsignados->execute([$estudiante_id]);
+$totalAsignados = $examenesAsignados->fetchColumn();
+
+$examenesAprobados = $pdo->prepare("SELECT COUNT(*) FROM examenes WHERE estudiante_id = ? AND estado = 'finalizado' AND calificacion >= ?");
+$examenesAprobados->execute([$estudiante_id, $nota_aprobacion]);
+$totalAprobados = $examenesAprobados->fetchColumn();
+
+$examenesEnProceso = $pdo->prepare("SELECT COUNT(*) FROM examenes WHERE estudiante_id = ? AND estado = 'en_progreso'");
+$examenesEnProceso->execute([$estudiante_id]);
+$totalEnProceso = $examenesEnProceso->fetchColumn();
+
+$examenesReprobados = $pdo->prepare("SELECT COUNT(*) FROM examenes WHERE estudiante_id = ? AND estado = 'finalizado' AND calificacion < ?");
+$examenesReprobados->execute([$estudiante_id, $nota_aprobacion]);
+$totalReprobados = $examenesReprobados->fetchColumn();
+
+$categoriasAsignadas = $pdo->prepare("SELECT COUNT(*) FROM estudiante_categorias WHERE estudiante_id = ?");
+$categoriasAsignadas->execute([$estudiante_id]);
+$totalCategorias = $categoriasAsignadas->fetchColumn();
+
 // -------------------------------
 // Consulta de exámenes finalizados
 // -------------------------------
@@ -55,37 +80,71 @@ function obtenerPreguntasExamen($examen_id, $pdo)
         <h2 class="text-primary fw-bold mb-4"><i class="bi bi-speedometer2"></i> Panel del Estudiante</h2>
         <div class="row"></div>
         <!-- Resumen de exámenes -->
-        <div class="row g-4 mb-5">
-            <div class="col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0">
+        <div class="row g-3 mb-5">
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card shadow-sm border-0 card-compact h-100">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="bi bi-journal-text text-primary"></i> Exámenes asignados</h5>
-                        <p class="display-6 fw-bold text-primary">3</p>
+                        <h5 class="card-title text-primary">
+                            <i class="bi bi-journal-text"></i> Exámenes asignados
+                        </h5>
+                        <p class="display-6 fw-bold text-primary"><?= $totalAsignados ?></p>
                         <small class="text-muted">En espera de completar</small>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0">
+            <div class="col-md-6 col-lg-3">
+                <div class="card shadow-sm border-0 card-compact h-100">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="bi bi-check-circle-fill text-success"></i> Exámenes aprobados
+                        <h5 class="card-title text-success">
+                            <i class="bi bi-check-circle-fill"></i> Exámenes aprobados
                         </h5>
-                        <p class="display-6 fw-bold text-success">2</p>
+                        <p class="display-6 fw-bold text-success"><?= $totalAprobados ?></p>
                         <small class="text-muted">Últimos resultados positivos</small>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0">
+            <div class="col-md-6 col-lg-3">
+                <div class="card shadow-sm border-0 card-compact h-100">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="bi bi-clock-history text-warning"></i> En proceso</h5>
-                        <p class="display-6 fw-bold text-warning">1</p>
+                        <h5 class="card-title text-warning">
+                            <i class="bi bi-clock-history"></i> En proceso
+                        </h5>
+                        <p class="display-6 fw-bold text-warning"><?= $totalEnProceso ?></p>
                         <small class="text-muted">Examen en curso</small>
                     </div>
                 </div>
             </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card shadow-sm border-0 card-compact h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger">
+                            <i class="bi bi-x-circle-fill"></i> Exámenes reprobados
+                        </h5>
+                        <p class="display-6 fw-bold text-danger"><?= $totalReprobados ?></p>
+                        <small class="text-muted">Resultados negativos</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100" style="cursor:pointer;" data-bs-toggle="modal"
+                    data-bs-target="#categoriasModal">
+                    <div class="card-body">
+                        <h5 class="card-title text-info">
+                            <i class="bi bi-award"></i> Categorías asignadas
+                        </h5>
+                        <p class="display-6 fw-bold text-info" id="totalCategorias"><?= $totalCategorias ?></p>
+                        <small class="text-muted">Programas en los que está inscrito</small>
+                    </div>
+                </div>
+            </div>
+
+
+
         </div>
 
 
@@ -166,11 +225,12 @@ function obtenerPreguntasExamen($examen_id, $pdo)
                                         class="nav-link text-dark d-flex align-items-center mb-1 text-decoration-none">
                                         <i class="bi bi-house-door me-2 text-secondary"></i> Página principal
                                     </a>
-                                    <a href="#"
+                                    <a href="#" style="cursor:pointer;" data-bs-toggle="modal"
+                                        data-bs-target="#categoriasModal"
                                         class="nav-link text-dark d-flex align-items-center mb-1 text-decoration-none">
                                         <i class="bi bi-tags me-2 text-secondary"></i> Listado de categorías
                                     </a>
-                                    <a href="#"
+                                    <a href="#" id=""
                                         class="nav-link text-dark d-flex align-items-center mb-1 text-decoration-none">
                                         <i class="bi bi-clock-history me-2 text-warning"></i> Pendientes
                                     </a>
@@ -297,12 +357,109 @@ function obtenerPreguntasExamen($examen_id, $pdo)
     </div>
 
 
+    <!-- MODAL MOSTAR CATEGORIAS  -->
+    <!-- Modal Categorías -->
+    <div class="modal fade" id="categoriasModal" tabindex="-1" aria-labelledby="categoriasModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="categoriasModalLabel">
+                        <i class="bi bi-award-fill"></i> Categorías asignadas
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div id="loadingCategorias" class="text-center py-3">
+                        <div class="spinner-border text-info" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+                    <div id="errorCategorias" class="alert alert-danger m-3 d-none"></div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-info">
+                                <tr>
+                                    <th><i class="bi bi-card-text"></i> Categoría</th>
+                                    <th><i class="bi bi-calendar-event"></i> Fecha de asignación</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaCategorias">
+                                <!-- Se llenará con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <small class="text-muted me-auto">Total categorías asignadas:
+                        <span><?= $totalCategorias ?></span></small>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 
 
 </main>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const estudianteId = <?= (int) $estudiante_id ?>;
+    const modalCategorias = document.getElementById('categoriasModal');
+    const listaCategorias = document.getElementById('listaCategorias');
+    const loadingCategorias = document.getElementById('loadingCategorias');
+    const errorCategorias = document.getElementById('errorCategorias');
+
+    modalCategorias.addEventListener('show.bs.modal', () => {
+        listaCategorias.innerHTML = '';
+        errorCategorias.classList.add('d-none');
+        loadingCategorias.style.display = 'block';
+
+        fetch(`../api/obtener_categorias_estudiante.php?estudiante_id=${estudianteId}`)
+            .then(response => response.json())
+            .then(data => {
+                loadingCategorias.style.display = 'none';
+
+                if (!data.status) {
+                    errorCategorias.textContent = data.message || 'Error desconocido al cargar categorías.';
+                    errorCategorias.classList.remove('d-none');
+                    return;
+                }
+
+                if (!data.data || data.data.length === 0) {
+                    listaCategorias.innerHTML = `<tr><td colspan="2" class="text-center text-muted">No hay categorías asignadas.</td></tr>`;
+                } else {
+                    data.data.forEach(cat => {
+                        const fecha = new Date(cat.fecha_asignacion);
+                        const fechaFormateada = fecha.toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                        });
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+              <td><i class="bi bi-tag-fill text-info me-2"></i>${cat.categoria}</td>
+              <td><i class="bi bi-calendar3 text-secondary me-2"></i>${fechaFormateada}</td>
+            `;
+                        listaCategorias.appendChild(tr);
+                    });
+                }
+            })
+            .catch(() => {
+                loadingCategorias.style.display = 'none';
+                errorCategorias.textContent = 'Error cargando categorías.';
+                errorCategorias.classList.remove('d-none');
+            });
+    });
+</script>
 
 </body>
 

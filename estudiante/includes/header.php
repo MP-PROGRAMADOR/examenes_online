@@ -115,6 +115,75 @@ $codigo = $estudiante['usuario'];
             background-color: #e9f0ff;
             color: #0d6efd;
         }
+
+        /* Custom compact card styles */
+        .card-compact .card-body {
+            padding: 0.75rem 1rem;
+        }
+
+        .card-compact .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-compact .display-6 {
+            font-size: 2.5rem;
+            /* menos que el original (3.5rem aprox) */
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .card-compact i {
+            font-size: 1.3rem;
+            /* iconos un poco más pequeños */
+            vertical-align: middle;
+            margin-right: 0.3rem;
+        }
+
+        .card-compact small {
+            font-size: 0.75rem;
+        }
+         /* Misma CSS que antes para card y panel */
+    .card-categorias-container {
+        display: flex;
+        max-width: 600px;
+        cursor: pointer;
+        user-select: none;
+        transition: max-width 0.4s ease;
+    }
+    .card-categorias {
+        flex-shrink: 0;
+        width: 180px;
+        transition: border-radius 0.4s ease;
+    }
+    .panel-categorias {
+        overflow-x: hidden;
+        white-space: nowrap;
+        width: 0;
+        transition: width 0.4s ease;
+        border: 1px solid #ddd;
+        border-left: none;
+        background-color: #f8f9fa;
+        padding: 0;
+    }
+    .panel-categorias.show {
+        width: 400px;
+        padding: 1rem;
+        border-left: 1px solid #ddd;
+    }
+    .card-categorias.expanded {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    .lista-categorias {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+    }
+    .lista-categorias li {
+        padding: 0.25rem 0;
+        border-bottom: 1px solid #dee2e6;
+    }
     </style>
 
 
@@ -142,5 +211,3 @@ $codigo = $estudiante['usuario'];
             </div>
         </div>
     </nav>
-
- 
