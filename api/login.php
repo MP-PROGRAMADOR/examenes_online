@@ -61,26 +61,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Consulta con alias para evitar confusión de ids
             $stmt = $pdo->prepare("
-                SELECT 
-                    ex.id AS examen_id,
-                    ex.codigo_acceso,
-                    ex.estudiante_id,
-                    ex.categoria_id,
-                    ex.asignado_por,
-                    ex.estado AS examen_estado,
-                    es.id AS estudiante_id,
-                    es.nombre AS estudiante_nombre,
-                    es.estado AS estudiante_estado,
-                    cat.id AS categoria_id,
-                    cat.nombre AS categoria_nombre,
-                    us.id AS usuario_id,
-                    us.nombre AS usuario_nombre
-                FROM examenes ex
-                LEFT JOIN estudiantes es ON es.id = ex.estudiante_id
-                LEFT JOIN categorias cat ON cat.id = ex.categoria_id
-                LEFT JOIN usuarios us ON us.id = ex.asignado_por
-                WHERE ex.codigo_acceso = :codigo AND es.estado = 'activo'
-                LIMIT 1
+               SELECT 
+                        e.id AS estudiante_id,
+                        e.dni,
+                        CONCAT(e.nombre,' ',e.apellidos),                        
+                        e.email,
+                        e.usuario,
+                        ec.categoria_id,
+                        ec.estado AS estado_categoria,
+                        ec.fecha_asignacion AS fecha_asignacion_categoria,
+                        ex.id AS examen_id,
+                        ex.fecha_asignacion AS fecha_asignacion_examen,
+                        ex.total_preguntas,
+                        ex.estado AS estado_examen,
+                        ex.calificacion,
+                        ex.codigo_acceso
+                        FROM estudiantes e
+                        INNER JOIN estudiante_categorias ec ON e.id = ec.estudiante_id
+                        LEFT JOIN examenes ex ON ec.estudiante_id = ex.estudiante_id AND ec.categoria_id = ex.categoria_id
+                        WHERE e.usuario = ?
+                        ORDER BY ec.categoria_id, ex.fecha_asignacion DESC;
+
             ");
             $stmt->execute(['codigo' => $codigo]);
             $estudiante = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -94,10 +95,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = [
                     'status' => true,
                     'message' => 'Bienvenido/a ' . htmlspecialchars($estudiante['estudiante_nombre']),
-                    'redirect' => 'estudiante/index.php'
+                    'redirect' => 'aspirante.php'
                 ];
-            } else {
-                throw new Exception('Código inválido o estudiante inactivo.');
+            } elseif($estudiante['estado'] !== 'activo') {
+                throw new Exception('Tu cuenta esta inactiva contacta con tu administrador.');
+                
+            }else  {
+                throw new Exception('Código inválido.');
             }
 
         } else {

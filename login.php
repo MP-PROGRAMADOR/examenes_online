@@ -59,7 +59,7 @@ if (isset($_SESSION['usuario'])) {
 
 
             <!-- Toggle tipo de usuario -->
-            <div class="mb-4 text-center">
+            <!-- <div class="mb-4 text-center">
               <label class="form-label d-block mb-2 fw-semibold">Tipo de Usuario</label>
               <div class="btn-group" role="group" aria-label="Tipo de usuario" id="tipoUsuarioGroup">
                 <input type="radio" class="btn-check" name="tipoUsuario" id="usuarioBtn" value="usuario"
@@ -74,7 +74,7 @@ if (isset($_SESSION['usuario'])) {
                   <i class="bi bi-mortarboard-fill me-1"></i>Estudiante
                 </label>
               </div>
-            </div>
+            </div> -->
 
             <!-- Usuario -->
             <div class="mb-3">
@@ -104,19 +104,7 @@ if (isset($_SESSION['usuario'])) {
     </div>
   </div>
 <script src="js/alerta.js"></script>
-  <script>
-    const tipoUsuarioRadios = document.querySelectorAll('input[name="tipoUsuario"]');
-    const grupoPassword = document.getElementById('grupoPassword');
-
-    function togglePassword() {
-      const seleccionado = document.querySelector('input[name="tipoUsuario"]:checked').value;
-      grupoPassword.style.display = seleccionado === 'estudiante' ? 'none' : 'block';
-    }
-
-    tipoUsuarioRadios.forEach(radio => radio.addEventListener('change', togglePassword));
-    togglePassword(); // Al cargar
-  </script>
-
+   
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
