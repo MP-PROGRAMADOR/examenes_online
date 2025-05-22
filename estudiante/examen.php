@@ -246,7 +246,7 @@ function obtenerPreguntasExamen($examen_id, $pdo)
 
                                 <hr class="my-3">
 
-                                <a href="logout.php"
+                                <a href="cerrar_sesion.php"
                                     class="btn btn-sm btn-outline-danger d-flex align-items-center fw-bold">
                                     <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
                                 </a>

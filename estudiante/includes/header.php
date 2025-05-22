@@ -204,7 +204,7 @@ $codigo = $estudiante['usuario'];
                             <strong><?= strtoupper(htmlspecialchars($nombre)) ?></strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-warning" href="logout.php"><i class="bi bi-box-arrow-right"></i> Cerrar
+                        <a class="nav-link text-warning" href="cerrar_sesion.php"><i class="bi bi-box-arrow-right"></i> Cerrar
                             sesión</a>
                     </li>
                 </ul>
