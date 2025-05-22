@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+
+
+
 // Verificar si hay sesión activa
 if (!isset($_SESSION['estudiante'])) {
     header("Location: index.php");

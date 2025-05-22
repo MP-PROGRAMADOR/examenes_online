@@ -61,26 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Consulta con alias para evitar confusión de ids
             $stmt = $pdo->prepare("
-               SELECT 
-                        e.id AS estudiante_id,
-                        e.dni,
-                        CONCAT(e.nombre,' ',e.apellidos),                        
-                        e.email,
-                        e.usuario,
-                        ec.categoria_id,
-                        ec.estado AS estado_categoria,
-                        ec.fecha_asignacion AS fecha_asignacion_categoria,
-                        ex.id AS examen_id,
-                        ex.fecha_asignacion AS fecha_asignacion_examen,
-                        ex.total_preguntas,
-                        ex.estado AS estado_examen,
-                        ex.calificacion,
-                        ex.codigo_acceso
-                        FROM estudiantes e
-                        INNER JOIN estudiante_categorias ec ON e.id = ec.estudiante_id
-                        LEFT JOIN examenes ex ON ec.estudiante_id = ex.estudiante_id AND ec.categoria_id = ex.categoria_id
-                        WHERE e.usuario = ?
-                        ORDER BY ec.categoria_id, ex.fecha_asignacion DESC;
+               SELECT * FROM estudiantes WHERE usuario = :usuario AND estado = 'activo'
 
             ");
             $stmt->execute(['codigo' => $codigo]);

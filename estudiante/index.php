@@ -224,11 +224,11 @@ unset($_SESSION['error']);
 
       const formData = new FormData();
       const tipoUsuario = 'estudiante';
-      const usuario = document.getElementById('usuario').value.trim(); 
+      const usuario = document.getElementById('codigo').value.trim(); 
 
       formData.append('tipoUsuario', tipoUsuario);
       formData.append('usuario', usuario); 
-      console.log(password)
+  
       fetch('../api/login.php', {
         method: 'POST',
         body: formData
@@ -237,15 +237,15 @@ unset($_SESSION['error']);
       .then(data => {
         if (data.status) {
           // Mostrar mensaje y redirigir, por ejemplo:
-          mostrarToast('success', data.message);
-          setTimeout(() => window.location.href = data.redirect || 'dashboard.php', 1200);
+          // mostrarToast('success', data.message);
+          setTimeout(() => window.location.href = data.redirect || 'aspirante.php', 1200);
         } else {
-          mostrarToast('danger', data.message || 'Credenciales incorrectas');
+          // mostrarToast('danger', data.message || 'Credenciales incorrectas');
         }
       })
       .catch(error => {
         console.error('Error en la solicitud:', error);
-        mostrarToast('danger', 'Ocurrió un error al procesar el login: ');
+        // mostrarToast('danger', 'Ocurrió un error al procesar el login: ');
       });
     });
   });
