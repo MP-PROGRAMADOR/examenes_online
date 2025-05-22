@@ -317,6 +317,12 @@ if ($stmt->execute()) {
     }
   }
 
+
+
+
+
+
+
   // Función para cargar categorías desde backend
   function cargarCategorias(categoriasSeleccionadas = []) {
     fetch('../api/obtener_categorias.php')
@@ -338,6 +344,13 @@ if ($stmt->execute()) {
         listaCategorias.innerHTML = '<div class="text-danger">No se pudieron cargar las categorías.</div>';
       });
   }
+
+
+
+
+
+
+
 
 
   document.addEventListener('DOMContentLoaded', () => {

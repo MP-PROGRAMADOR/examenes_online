@@ -1,5 +1,5 @@
 
-<?php 
+<?php
 
 /* 
 recibe los parametros para registro
@@ -16,11 +16,11 @@ recibe los parametros para registro
 
 
 
-   
+
 header('Content-Type: application/json');
 require_once '../includes/conexion.php'; // Ajusta la ruta según tu estructura
 
-try { 
+try {
   $pdo->beginTransaction();
 
   // === 1. DATOS DEL FORMULARIO ===
@@ -35,62 +35,63 @@ try {
     throw new Exception('Faltan campos obligatorios');
   }
 
- 
-    $stmt = $pdo->prepare("INSERT INTO preguntas (texto, tipo, tipo_contenido, activa) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$texto, $tipo, $tipo_contenido, $activa]);
-    $id_registro = $pdo->lastInsertId();
-    // === 3. GUARDAR OPCIONES ===
-   
-    if ($tipo === 'unica' || $tipo === 'multiple') { 
-      foreach ($_POST['opciones'] ?? [] as $i => $opcion) {
-        $texto_opcion = trim($opcion['texto'] ?? '');
-        $es_correcta = isset($opcion['es_correcta']) ? 1 : 0;
-        if ($texto_opcion !== '') {
-          $pdo->prepare("INSERT INTO opciones_pregunta (pregunta_id, texto, es_correcta) VALUES (?, ?, ?)")
-              ->execute([$id_registro, $texto_opcion, $es_correcta]);
-        }
-      }
-    } elseif ($tipo === 'vf') {
-      $valor = $_POST['es_correcta_vf'] ?? '';
-      if (in_array($valor, ['verdadero', 'falso'])) {
-          $es_correcta = strtolower($valor) === 'verdadero' ? 1 : 0;
-  
+
+  $stmt = $pdo->prepare("INSERT INTO preguntas (texto, tipo, tipo_contenido, activa) VALUES (?, ?, ?, ?)");
+  $stmt->execute([$texto, $tipo, $tipo_contenido, $activa]);
+  $id_registro = $pdo->lastInsertId();
+  // === 3. GUARDAR OPCIONES ===
+
+  if ($tipo === 'unica' || $tipo === 'multiple') {
+    foreach ($_POST['opciones'] ?? [] as $i => $opcion) {
+      $texto_opcion = trim($opcion['texto'] ?? '');
+      $es_correcta = isset($opcion['es_correcta']) ? 1 : 0;
+      if ($texto_opcion !== '') {
         $pdo->prepare("INSERT INTO opciones_pregunta (pregunta_id, texto, es_correcta) VALUES (?, ?, ?)")
-            ->execute([$id_registro, $texto,  $es_correcta ]);
+          ->execute([$id_registro, $texto_opcion, $es_correcta]);
       }
     }
-  
-    // === 4. GUARDAR CATEGORÍAS (si aplica) ===
+  } elseif ($tipo === 'vf') {
+    $valor = $_POST['es_correcta_vf'] ?? '';
+    if (in_array($valor, ['verdadero', 'falso'])) {
+      $es_correcta = strtolower($valor) === 'verdadero' ? 1 : 0;
 
-
-    
-    if ($_POST['asignar_categoria'] === 'si' && isset($_POST['categorias']) && is_array($_POST['categorias'])) {
-      foreach ($_POST['categorias'] as $cat_id) {
-        $pdo->prepare("INSERT INTO pregunta_categoria (pregunta_id, categoria_id) VALUES (?, ?)")
-            ->execute([$id_registro, $cat_id]);
-      }
+      $pdo->prepare("INSERT INTO opciones_pregunta (pregunta_id, texto, es_correcta) VALUES (?, ?, ?)")
+        ->execute([$id_registro, $texto,  $es_correcta]);
     }
-  
-    // === 5. GUARDAR IMÁGENES (si hay) ===
-    if (isset($_FILES['imagenes']) && is_array($_FILES['imagenes']['tmp_name'])) {
-      $dir = "uploads/preguntas/";
-      if (!file_exists($dir)) {
-        mkdir($dir, 0777, true);
-      }
-  
-      foreach ($_FILES['imagenes']['tmp_name'] as $i => $tmpPath) {
-        if ($_FILES['imagenes']['error'][$i] === UPLOAD_ERR_OK) {
-          $nombreArchivo = uniqid() . "_" . basename($_FILES['imagenes']['name'][$i]);
-          $rutaFinal = $dir . $nombreArchivo;
-  
-          if (move_uploaded_file($tmpPath, $rutaFinal)) {
-            $pdo->prepare("INSERT INTO imagenes_pregunta (pregunta_id, ruta_imagen) VALUES (?, ?)")
-                ->execute([$id, $rutaFinal]);
-          }
+  }
+
+  // === 4. GUARDAR CATEGORÍAS (si aplica) ===
+
+  if ($_POST['asignar_categoria'] === 'si' && isset($_POST['categorias']) && is_array($_POST['categorias'])) {
+    foreach ($_POST['categorias'] as $cat_id) {
+      $pdo->prepare("INSERT INTO pregunta_categoria (pregunta_id, categoria_id) VALUES (?, ?)")
+        ->execute([$id_registro, $cat_id]);
+    }
+  }
+
+
+
+
+  // === 5. GUARDAR IMÁGENES (si hay) ===
+  if (isset($_FILES['imagenes']) && is_array($_FILES['imagenes']['tmp_name'])) {
+    $dir = "uploads/preguntas/";
+    if (!file_exists($dir)) {
+      mkdir($dir, 0777, true);
+    }
+
+    foreach ($_FILES['imagenes']['tmp_name'] as $i => $tmpPath) {
+      if ($_FILES['imagenes']['error'][$i] === UPLOAD_ERR_OK) {
+        $nombreArchivo = uniqid() . "_" . basename($_FILES['imagenes']['name'][$i]);
+        $rutaFinal = $dir . $nombreArchivo;
+
+        if (move_uploaded_file($tmpPath, $rutaFinal)) {
+          $pdo->prepare("INSERT INTO imagenes_pregunta (pregunta_id, ruta_imagen) VALUES (?, ?)")
+            ->execute([$id, $rutaFinal]);
         }
       }
     }
-  
+  }
+
 
 
   $pdo->commit();
@@ -100,4 +101,3 @@ try {
   if ($pdo->inTransaction()) $pdo->rollBack();
   echo json_encode(['status' => false, 'message' => $e->getMessage()]);
 }
-
