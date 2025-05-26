@@ -76,26 +76,93 @@ $codigo = $estudiante['usuario'];
             color: #0d6efd;
             margin-right: 10px;
         }
+
+
+        /* Estilo moderno de tarjeta de examen */
+        .pregunta-card {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 1rem;
+            padding: 2rem;
+        }
+
+        /* Botón de acción */
+        #btnSiguiente:disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Transición suave para barra */
+        #progresoBarra {
+            transition: width 0.4s ease-in-out;
+        }
+
+        /* Opcional: animación al mostrar pregunta */
+        #preguntaContenido {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="container py-5">
-        <div id="vistaExamen" class="pregunta-card">
-            <div class="mb-3">
-                <div class="barra-progreso">
-                    <div class="progreso" id="barraProgreso" style="width: 0%;"></div>
+        <div id="vistaExamen" class="shadow-lg rounded-4 bg-white overflow-hidden position-relative">
+
+            <!-- Progreso tipo navbar -->
+            <div class="bg-light px-4 py-3 border-bottom sticky-top z-1">
+                <div class="progress rounded-pill" style="height: 0.9rem;">
+                    <div class="progress-bar bg-success" id="progresoBarra" style="width: 0%;">
+                        <!-- texto opcional como: Pregunta 2 de 10 -->
+                    </div>
                 </div>
             </div>
-            <div id="preguntaContenido">
-                <!-- Pregunta dinámica -->
+
+            <!-- Tarjeta principal -->
+            <div class="card border-0 rounded-0">
+
+                <!-- Cabecera con pregunta -->
+                <div class="card-header bg-white border-bottom py-4">
+                    <h5 id="preguntaTitulo" class="mb-0 fw-semibold text-primary d-flex align-items-start">
+                        <i class="bi bi-question-circle me-2"></i> Texto de la pregunta aquí
+                    </h5>
+                </div>
+
+                <!-- Cuerpo: imagen + opciones -->
+                <div class="card-body" id="preguntaContenido">
+                    <!-- Aquí se inserta dinámicamente la imagen (si existe) y el formulario de opciones -->
+                    <!-- Ejemplo de imagen:
+        <div class="text-center mb-4">
+            <img src="URL_DE_IMAGEN" class="img-fluid rounded-3 shadow-sm" alt="Imagen relacionada">
+        </div>
+        -->
+                    <!-- Aquí se cargan las opciones con JavaScript -->
+                </div>
+
+                <!-- Pie: botón continuar -->
+                <div class="card-footer bg-white border-top text-end py-4">
+                    <button id="btnSiguiente" class="btn btn-primary px-4 py-2 rounded-pill shadow" disabled>
+                        Responder y Continuar <i class="bi bi-arrow-right-circle ms-2"></i>
+                    </button>
+                </div>
+
             </div>
-            <div class="text-end mt-4">
-                <button id="btnSiguiente" class="btn btn-primary" disabled>Responder y Continuar <i
-                        class="bi bi-arrow-right-circle ms-2"></i></button>
-            </div>
+
         </div>
     </div>
+
+    <!-- Modal de confirmación de salida -->
 
     <div class="modal fade" id="modalSalir" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -138,13 +205,13 @@ $codigo = $estudiante['usuario'];
         window.onbeforeunload = () => "¿Seguro que quieres salir? El examen se cancelará.";
 
         // Detectar cambio de pestaña o minimización
-         document.addEventListener('visibilitychange', () => {
+        /*  document.addEventListener('visibilitychange', () => {
              if (document.visibilityState === 'hidden') {
                  // Cancelar el examen automáticamente al cambiar de pestaña
                  window.onbeforeunload = null;
                  window.location.href = 'aspirante.php?motivo=abandono';
              }
-         });
+         }); */
 
 
 
@@ -191,19 +258,27 @@ $codigo = $estudiante['usuario'];
                 method: 'POST',
                 body: datos
             })
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
                 .then(res => {
                     if (!res.status) {
-                        console.log(res.message)
+                        console.log(res.message);
                     } else {
-                        console.log(res.preguntas)
+                        console.log(res.preguntas);
                         listaPreguntas = res.preguntas;
                         totalPreguntas = listaPreguntas.length;
                         mostrarPregunta();
-
                     }
                 })
-                .catch(() => alert('Error inesperado.'));
+                .catch(err => {
+                    alert('Error inesperado: ' + err.message);
+                    console.error(err);
+                });
+
         }
 
         function mostrarPregunta() {
@@ -218,46 +293,45 @@ $codigo = $estudiante['usuario'];
             progresoBarra.style.width = `${progreso}%`;
             progresoBarra.innerText = `Pregunta ${preguntaActual + 1} de ${totalPreguntas}`;
 
-            // Mostrar imagen si existe
+            // Insertar título de la pregunta en el header
+            const tituloHTML = `
+        <h5 class="fw-semibold mb-0 text-primary d-flex align-items-start">
+            <i class="bi bi-question-circle me-2"></i> ${pregunta.texto}
+        </h5>`;
+            document.getElementById('preguntaTitulo').innerHTML = tituloHTML;
+
+            // Imagen (si hay)
             const imagenHTML = pregunta.imagen
-                ? `<div class="text-center mb-3">
-         <img src="${pregunta.imagen}" class="img-fluid rounded shadow" alt="Imagen pregunta">
-       </div>`
+                ? `<div class="text-center mb-4">
+            <img src="${pregunta.imagen}" class="img-fluid rounded-3 shadow-sm" alt="Imagen relacionada">
+        </div>`
                 : '';
 
-            // Opciones: tipo única, múltiple o vf
+            // Opciones HTML: checkbox o radio, con buena legibilidad
             let opcionesHTML = '';
+            const crearOpcion = (id, texto, tipo) => `
+        <div class="opcion p-3 border rounded-3 mb-3 bg-light shadow-sm d-flex justify-content-between align-items-center fs-5" style="cursor: pointer;">
+            <label class="mb-0 flex-grow-1" for="${id}">${texto}</label>
+            <input class="form-check-input fs-4 ms-3" type="${tipo}" name="opciones" value="${id}" id="${id}">
+        </div>`;
+
             if (pregunta.tipo === 'vf') {
-                opcionesHTML = `
-      <div class="form-check opcion mb-2 p-2 border rounded">
-        <input class="form-check-input" type="radio" name="opciones" value="1" id="vf_verdadero">
-        <label class="form-check-label" for="vf_verdadero">Verdadero</label>
-      </div>
-      <div class="form-check opcion p-2 border rounded">
-        <input class="form-check-input" type="radio" name="opciones" value="0" id="vf_falso">
-        <label class="form-check-label" for="vf_falso">Falso</label>
-      </div>
-    `;
+                opcionesHTML += crearOpcion("vf_verdadero", "Verdadero", "radio");
+                opcionesHTML += crearOpcion("vf_falso", "Falso", "radio");
             } else {
                 pregunta.opciones.forEach(op => {
-                    opcionesHTML += `
-        <div class="form-check opcion p-2 rounded border mb-2">
-          <input class="form-check-input" type="${pregunta.tipo === 'multiple' ? 'checkbox' : 'radio'}" 
-                 name="opciones" value="${op.id}" id="op${op.id}">
-          <label class="form-check-label" for="op${op.id}">${op.texto}</label>
-        </div>
-      `;
+                    const tipoInput = pregunta.tipo === 'multiple' ? 'checkbox' : 'radio';
+                    opcionesHTML += crearOpcion(`op${op.id}`, op.texto, tipoInput);
                 });
             }
 
-            // Cargar contenido de la pregunta
-            preguntaContenido.innerHTML = `
-    <h5 class="mb-3"><i class="bi bi-question-circle text-primary"></i> ${pregunta.texto}</h5>
-    ${imagenHTML}
-    <form id="formPregunta">${opcionesHTML}</form>
-  `;
+            // Renderizar contenido en el cuerpo del card
+            document.getElementById('preguntaContenido').innerHTML = `
+        ${imagenHTML}
+        <form id="formPregunta" class="mt-3">${opcionesHTML}</form>
+    `;
 
-            // Habilitar siguiente si selecciona
+            // Activar botón siguiente al seleccionar opción
             document.querySelectorAll('input[name="opciones"]').forEach(input => {
                 input.addEventListener('change', () => {
                     seleccionUsuario = true;
@@ -272,9 +346,11 @@ $codigo = $estudiante['usuario'];
 
             if (seleccionados.length === 0) return;
 
+
             const datos = new FormData();
             datos.append('examen_id', examenId);
-            datos.append('pregunta_id', listaPreguntas[preguntaActual].id);
+            datos.append('examen_pregunta_id', listaPreguntas[preguntaActual].examen_pregunta_id);
+
             seleccionados.forEach(id => datos.append('opciones[]', id));
 
             fetch('../api/guardar_respuesta.php', {
@@ -282,10 +358,20 @@ $codigo = $estudiante['usuario'];
                 body: datos
             })
                 .then(res => res.json())
-                .then(() => {
-                    preguntaActual++;
-                    mostrarPregunta();
+                .then(res => { // <-- Aquí capturas correctamente el objeto de respuesta JSON
+                    if (res.success) {
+                        preguntaActual++;
+                        console.log(res.data);
+                        // Puedes volver a habilitar esta línea si quieres continuar automáticamente
+                        // mostrarPregunta();
+                    } else {
+                        console.log(res.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al guardar la respuesta:', error);
                 });
+
         });
 
         function finalizarExamen() {

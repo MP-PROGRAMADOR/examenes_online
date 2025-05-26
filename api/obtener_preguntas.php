@@ -18,16 +18,26 @@ require_once '../includes/conexion.php';
 
 
 // Cabeceras
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
-$examen_id = isset($_POST['examen_id']) ? trim($_POST['examen_id']) : null;
-if (!$examen_id || !ctype_digit($examen_id)) {
-    echo json_encode(['status' => false, 'message' => 'Examen inválido']);
+
+
+if($_SERVER['REQUEST_METHOD'] !== 'POST'){
+    echo json_encode(['status' => false, 'message' => 'Metodo no permitiso']);
+    exit;
+
+}
+//$examen_id = (int) $_GET['examen_id'];
+
+if (!isset($_POST['examen_id']) || !ctype_digit($_POST['examen_id'])) {
+    echo json_encode(['status' => false, 'message' => 'ID Examen invalido', $_POST['examen_id']]);
     exit;
 }
+// Validación básica
+
+$examen_id = (int) $_POST['examen_id'];
 
 
-$estudiante_id =$estudiante['id'];
 
 try {
     $pdo->beginTransaction();
