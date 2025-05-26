@@ -122,8 +122,7 @@ CREATE TABLE `estudiante_categorias` (
   `estudiante_id` int(11) NOT NULL,
   `categoria_id` int(11) NOT NULL,
   `estado` enum('pendiente','aprobado','rechazado','en_proceso') DEFAULT 'pendiente',
-  `fecha_asignacion` datetime DEFAULT current_timestamp(),
-  `fecha_aprobacion` datetime DEFAULT NULL
+  `fecha_asignacion` datetime DEFAULT current_timestamp() 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -139,6 +138,7 @@ CREATE TABLE `examenes` (
   `asignado_por` int(11) DEFAULT NULL,
   `fecha_asignacion` datetime DEFAULT current_timestamp(),
   `total_preguntas` int(11) NOT NULL,
+  `duracion` tinyint(1) DEFAULT 0,
   `estado` enum('pendiente','en_progreso','finalizado') DEFAULT 'pendiente',
   `calificacion` decimal(5,2) DEFAULT NULL,
   `codigo_acceso` varchar(20) NOT NULL

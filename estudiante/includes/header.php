@@ -1,22 +1,6 @@
 <?php
 session_start();
 
-/* 
-CREATE TABLE `estudiantes` (
-  `id` int(11) NOT NULL,
-  `dni` varchar(20) NOT NULL,
-  `nombre` varchar(100) NOT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `usuario` varchar(100) UNIQUE NOT NULL,
-  `telefono` varchar(20) DEFAULT NULL,
-  `fecha_nacimiento` date DEFAULT NULL,
-  `escuela_id` int(11) DEFAULT NULL,
-  `estado` enum('activo','inactivo') DEFAULT 'activo',
-  `creado_en` datetime DEFAULT current_timestamp(),
-  `apellidos` varchar(250) DEFAULT NULL,
-  `direccion` varchar(250) DEFAULT NULL
-)
- */
 
 // Verificar si hay sesión activa
 if (!isset($_SESSION['estudiante'])) {
@@ -39,7 +23,8 @@ $codigo = $estudiante['usuario'];
 
     <!-- Bootstrap 5 + Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet"> 
+
 
     <style>
         body {

@@ -39,17 +39,23 @@ if ($existe > 0) {
 }
 
 // Insertar el nuevo examen
-$sql_insert = "INSERT INTO examenes (estudiante_id, categoria_id, total_preguntas, estado, codigo_acceso, asignado_por, fecha_asignacion)
-               VALUES (?, ?, ?, ?, ?, ?, NOW())";
+$tiempo_por_pregunta = 45; // segundos
+$duracion = ceil(($total_preguntas * $tiempo_por_pregunta) / 60); // duración en minutos
+
+$sql_insert = "INSERT INTO examenes (estudiante_id, categoria_id, total_preguntas, estado, duracion, codigo_acceso, asignado_por, fecha_asignacion) 
+               VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+
 $stmt_insert = $pdo->prepare($sql_insert);
 $ok = $stmt_insert->execute([
     $estudiante_id,
     $categoria_id,
     $total_preguntas,
     $estado,
+    $duracion,
     $codigo_acceso,
     $asignado_por
 ]);
+
 
 echo json_encode([
     'status' => $ok,
