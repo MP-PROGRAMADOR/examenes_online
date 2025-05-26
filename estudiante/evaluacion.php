@@ -350,8 +350,9 @@ $codigo = $estudiante['usuario'];
             const datos = new FormData();
             datos.append('examen_id', examenId);
             datos.append('examen_pregunta_id', listaPreguntas[preguntaActual].examen_pregunta_id);
-
             seleccionados.forEach(id => datos.append('opciones[]', id));
+           
+            console.log(listaPreguntas[preguntaActual].examen_pregunta_id);
 
             fetch('../api/guardar_respuesta.php', {
                 method: 'POST',
@@ -361,7 +362,8 @@ $codigo = $estudiante['usuario'];
                 .then(res => { // <-- Aquí capturas correctamente el objeto de respuesta JSON
                     if (res.success) {
                         preguntaActual++;
-                        console.log(res.data);
+                       console.log(res.data);
+                       console.log(res.message);
                         // Puedes volver a habilitar esta línea si quieres continuar automáticamente
                         // mostrarPregunta();
                     } else {
