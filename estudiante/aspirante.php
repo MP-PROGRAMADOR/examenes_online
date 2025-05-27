@@ -28,7 +28,7 @@ $estudiante_id = $estudiante['id'];
 
 
 
-$nota_aprobacion = 5.0;
+$nota_aprobacion = 80.0;
 
 // Consultas usando PDO ($pdo)
 $examenesAsignados = $pdo->prepare("SELECT COUNT(*) FROM examenes WHERE estudiante_id = ? AND estado = 'pendiente'");
@@ -308,7 +308,7 @@ $examenesPendiantes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <i class="bi bi-file-earmark-text me-2 text-primary"></i>
                                         <?= htmlspecialchars($examen['categoria_nombre']) ?> -
                                         <?= htmlspecialchars($examen['fecha_asignacion']) ?> |
-                                        Calificación: <strong class="text-success"><?= $examen['calificacion'] ?></strong>
+                                        Calificación: <span class="mx-2"></span> <strong class="text-success"> <?= $examen['calificacion'] ?></strong>
                                     </button>
                                 </h2>
                                 <div id="collapse<?= $index ?>" class="accordion-collapse collapse"

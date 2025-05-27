@@ -205,13 +205,13 @@ $codigo = $estudiante['usuario'];
         window.onbeforeunload = () => "¿Seguro que quieres salir? El examen se cancelará.";
 
         // Detectar cambio de pestaña o minimización
-        /*  document.addEventListener('visibilitychange', () => {
+         document.addEventListener('visibilitychange', () => {
              if (document.visibilityState === 'hidden') {
                  // Cancelar el examen automáticamente al cambiar de pestaña
                  window.onbeforeunload = null;
                  window.location.href = 'aspirante.php?motivo=abandono';
              }
-         }); */
+         });
 
 
 
@@ -245,7 +245,7 @@ $codigo = $estudiante['usuario'];
 
 
         function cargarPreguntas() {
-            console.log("examenId:", examenId);
+           // console.log("examenId:", examenId);
 
             if (!examenId || isNaN(examenId)) {
                 alert("Examen inválido (ID no definido en URL)");
@@ -268,7 +268,7 @@ $codigo = $estudiante['usuario'];
                     if (!res.status) {
                         console.log(res.message);
                     } else {
-                        console.log(res.preguntas);
+                        //console.log(res.preguntas);
                         listaPreguntas = res.preguntas;
                         totalPreguntas = listaPreguntas.length;
                         mostrarPregunta();
@@ -316,12 +316,12 @@ $codigo = $estudiante['usuario'];
         </div>`;
 
             if (pregunta.tipo === 'vf') {
-                opcionesHTML += crearOpcion("vf_verdadero", "Verdadero", "radio");
-                opcionesHTML += crearOpcion("vf_falso", "Falso", "radio");
+                opcionesHTML += crearOpcion("1", "Verdadero", "radio");
+                opcionesHTML += crearOpcion("0", "Falso", "radio");
             } else {
                 pregunta.opciones.forEach(op => {
                     const tipoInput = pregunta.tipo === 'multiple' ? 'checkbox' : 'radio';
-                    opcionesHTML += crearOpcion(`op${op.id}`, op.texto, tipoInput);
+                    opcionesHTML += crearOpcion(op.id, op.texto, tipoInput);
                 });
             }
 
@@ -341,6 +341,8 @@ $codigo = $estudiante['usuario'];
         }
 
         btnSiguiente.addEventListener('click', () => {
+
+       
             const seleccionados = Array.from(document.querySelectorAll('input[name="opciones"]:checked'))
                 .map(input => input.value);
 
@@ -350,9 +352,9 @@ $codigo = $estudiante['usuario'];
             const datos = new FormData();
             datos.append('examen_id', examenId);
             datos.append('pregunta_id', listaPreguntas[preguntaActual].pregunta_id);
+            datos.append('tipo_pregunta', listaPreguntas[preguntaActual].tipo);
             seleccionados.forEach(id => datos.append('opciones[]', id));
-            console.log(listaPreguntas[preguntaActual].examen_pregunta_id);
-
+            
             fetch('../api/guardar_respuesta.php', {
                 method: 'POST',
                 body: datos
@@ -363,7 +365,7 @@ $codigo = $estudiante['usuario'];
                         preguntaActual++;
                        console.log(res.data);
                         // Puedes volver a habilitar esta línea si quieres continuar automáticamente
-                        // mostrarPregunta();
+                         mostrarPregunta();
                     } else {
                         console.log(res.message);
                     }

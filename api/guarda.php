@@ -1,21 +1,4 @@
- // Validar si ya fue respondida
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM respuestas_estudiante WHERE examen_pregunta_id = ?");
-    $stmt->execute([$examen_pregunta_id]);
-    if ($stmt->fetchColumn() > 0) {
-        throw new Exception('La pregunta ya fue respondida');
-    }
-
-    // Insertar opciones seleccionadas
-    $stmtInsert = $pdo->prepare("INSERT INTO respuestas_estudiante (examen_pregunta_id, opcion_id) VALUES (?, ?)");
-    foreach ($opciones as $opcion_id) {
-        $stmtInsert->execute([$examen_pregunta_id, $opcion_id]);
-    }
-
-    // Marcar como respondida
-    $stmt = $pdo->prepare("UPDATE examen_preguntas SET respondida = 1 WHERE id = ?");
-    $stmt->execute([$examen_pregunta_id]);
-
-    // Verificar cuántas preguntas han sido respondidas
+ // Verificar cuántas preguntas han sido respondidas
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM examen_preguntas WHERE examen_id = ? AND respondida = 1");
     $stmt->execute([$examen_id]);
     $respondidas = $stmt->fetchColumn();

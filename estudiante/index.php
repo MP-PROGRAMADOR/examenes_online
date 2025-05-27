@@ -1,7 +1,9 @@
 <?php
 session_start();
-$error = isset($_SESSION['error']) ? $_SESSION['error'] : null;
-unset($_SESSION['error']);
+if (isset($_SESSION['estudiante'])) {
+    header("Location: aspirante.php");
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
