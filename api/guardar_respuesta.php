@@ -47,11 +47,11 @@ try {
         $stmtInsert->execute([$examen_pregunta_id, $pregunta_id]);
 
         // Comparar respuesta enviada con la existente
-        $stmtCompare = $pdo->prepare('SELECT id FROM opciones_pregunta WHERE id = ? AND es_correcta = ?');
+        $stmtCompare = $pdo->prepare('SELECT COUNT(*) FROM opciones_pregunta WHERE id = ? AND es_correcta = ?');
         $stmtCompare->execute([$pregunta_id, $respuesta]);
         $es_correcta_vf = (int) $stmtCompare->fetchColumn();
 
-        $puntaje = (float) $es_correcta_vf;
+        $puntaje = (int) $es_correcta_vf;
 
     } else {
         // Insertar opciones seleccionadas y verificar cuáles son correctas
@@ -143,7 +143,8 @@ try {
         'data' => [
             'puntaje' => $puntaje ?? 0,
             'resumen' => $_SESSION['resumen'] ?? 0,
-            'calificacion' => $calificacion ?? 0
+            'calificacion' => $calificacion ?? 0,
+            'vf'=> $es_correcta_vf ?? 0
         ]
     ]);
 

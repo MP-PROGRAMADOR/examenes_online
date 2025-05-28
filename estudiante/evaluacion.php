@@ -205,13 +205,13 @@ $codigo = $estudiante['usuario'];
         window.onbeforeunload = () => "¿Seguro que quieres salir? El examen se cancelará.";
 
         // Detectar cambio de pestaña o minimización
-         document.addEventListener('visibilitychange', () => {
-             if (document.visibilityState === 'hidden') {
-                 // Cancelar el examen automáticamente al cambiar de pestaña
-                 window.onbeforeunload = null;
-                 window.location.href = 'aspirante.php?motivo=abandono';
-             }
-         });
+        //  document.addEventListener('visibilitychange', () => {
+        //      if (document.visibilityState === 'hidden') {
+        //          // Cancelar el examen automáticamente al cambiar de pestaña
+        //          window.onbeforeunload = null;
+        //          window.location.href = 'aspirante.php?motivo=abandono';
+        //      }
+        //  });
 
 
 
@@ -301,12 +301,12 @@ $codigo = $estudiante['usuario'];
             document.getElementById('preguntaTitulo').innerHTML = tituloHTML;
 
             // Imagen (si hay)
-            const imagenHTML = pregunta.imagen
+            const imagenHTML = pregunta.imagenes[0]
                 ? `<div class="text-center mb-4">
-            <img src="${pregunta.imagen}" class="img-fluid rounded-3 shadow-sm" alt="Imagen relacionada">
+           <img src="../api/${regunta.imagenes[0].ruta_imagen}" class="img-fluid rounded-3 shadow-sm" alt="Imagen relacionada">
         </div>`
                 : '';
-
+              console.log(pregunta.imagenes[0].ruta_imagen)
             // Opciones HTML: checkbox o radio, con buena legibilidad
             let opcionesHTML = '';
             const crearOpcion = (id, texto, tipo) => `
@@ -365,7 +365,7 @@ $codigo = $estudiante['usuario'];
                         preguntaActual++;
                        console.log(res.data);
                         // Puedes volver a habilitar esta línea si quieres continuar automáticamente
-                         mostrarPregunta();
+                        //  mostrarPregunta();
                     } else {
                         console.log(res.message);
                     }

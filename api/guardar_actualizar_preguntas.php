@@ -86,7 +86,7 @@ try {
 
         if (move_uploaded_file($tmpPath, $rutaFinal)) {
           $pdo->prepare("INSERT INTO imagenes_pregunta (pregunta_id, ruta_imagen) VALUES (?, ?)")
-            ->execute([$id, $rutaFinal]);
+            ->execute([$id_registro, $rutaFinal]);
         }
       }
     }
