@@ -44,6 +44,8 @@
           style="transition: background-color 0.3s ease;">
           <i class="bi bi-box-arrow-right fs-5"></i> Cerrar
         </a>
+        <button id="reiniciar-examen" data-examen-id="123">Reiniciar examen</button>
+
       </div>
     </div>
 
@@ -59,10 +61,10 @@
   <a href="../admin/examenes.php" class="nav-link"><i class="bi bi-card-list"></i><span class="link-text">Exámenes</span></a>
   <a href="../admin/preguntas.php" class="nav-link"><i class="bi bi-collection"></i><span class="link-text">Preguntas</span></a>
   <a href="../admin/escuelas.php" class="nav-link"><i class="bi bi-bank"></i><span class="link-text">Escuelas</span></a>
+  <a href="../admin/correo.php" class="nav-link"><i class="bi bi-send"></i><span class="link-text">Correos Enviados</span></a>
 
   <!-- <a href="#" class="nav-link"><i class="bi bi-ui-checks"></i><span class="link-text">Asignar Preguntas</span></a>
   <a href="../admin/preguntas.php" class="nav-link"><i class="bi bi-check-circle"></i><span class="link-text">Respuestas</span></a>
-  <a href="#" class="nav-link"><i class="bi bi-send"></i><span class="link-text">Correos Enviados</span></a>
  
   <div class="section-title">Contenido</div>
   
