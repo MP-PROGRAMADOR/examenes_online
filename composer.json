@@ -1,0 +1,16 @@
+{
+    "name": "mp/examenes_online",
+    "description": "Plataforma de exámenes online para obtener el carné de conducir.",
+    "autoload": {
+        "psr-4": {
+            "Mp\\ExamenesOnline\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "SIR-TOPOLÁ",
+            "email": "sirtopola@gmail.com"
+        }
+    ],
+    "require": {}
+}
