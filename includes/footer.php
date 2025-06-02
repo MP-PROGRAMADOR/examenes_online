@@ -8,7 +8,7 @@
 <!-- MDB JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"></script>
 <script src="../js/alerta.js"></script>
-<script src="../reset.js"></script>
+ 
   <script>
     const sidebar = document.getElementById("sidebar");
     const hamburger = document.getElementById("hamburger");

@@ -49,7 +49,7 @@ function cerrarToast(toast) {
 
   setTimeout(() => {
     toast.remove();
-  }, 800); // duración animación
+  }, 200); // duración animación
 }
 
 

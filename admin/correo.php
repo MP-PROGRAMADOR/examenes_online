@@ -184,7 +184,8 @@ document.getElementById('formCorreo').addEventListener('submit', function(e) {
         if (data.success) {
             mostrarToast('success' ,data.message);
             form.reset(); // Limpiar formulario
-            const modal = bootstrap.Modal.getInstance(document.getElementById('modalCorreo'));
+          const modal = bootstrap.Modal.getInstance(document.getElementById('modalNuevoCorreo'));
+
             modal.hide(); // Cerrar modal
         } else {
             mostrarToast('warning ' , data.message);

@@ -44,7 +44,7 @@
           style="transition: background-color 0.3s ease;">
           <i class="bi bi-box-arrow-right fs-5"></i> Cerrar
         </a>
-        <button id="reiniciar-examen" data-examen-id="123">Reiniciar examen</button>
+        
 
       </div>
     </div>
