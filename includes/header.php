@@ -9,7 +9,7 @@ if (!isset($_SESSION['usuario'])) {
  
 $rol = $_SESSION['usuario']['rol'];
 $nombre = $_SESSION['usuario']['nombre'];
-$correo = $_SESSION['usuario']['email'];
+//$correo = $_SESSION['usuario']['correo'];
  
  
 ?>

@@ -54,7 +54,7 @@
 
 <!-- Sidebar -->
 <div id="sidebar" class="sidebar">
-  <a href="#" class="nav-link"><i class="bi bi-house-door"></i><span class="link-text">Inicio</span></a>
+  <a href="../admin/index.php" class="nav-link"><i class="bi bi-house-door"></i><span class="link-text">Inicio</span></a>
 
   <div class="section-title">Gestión Académica</div>
   <a href="../admin/estudiantes.php" class="nav-link"><i class="bi bi-people"></i><span class="link-text">Estudiantes</span></a>
