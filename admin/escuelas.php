@@ -1,6 +1,5 @@
 <?php
-include_once("../includes/header.php");
-include_once("../includes/sidebar.php");
+include_once("../includes/header.php"); 
 
 try {
     // Preparar y ejecutar la consulta para obtener las escuelas
@@ -19,6 +18,11 @@ try {
 
 
 ?>
+
+<div class="d-flex">
+  <?php include_once("../includes/sidebar.php"); ?>
+  
+ 
 
 <div class="main-content">
 

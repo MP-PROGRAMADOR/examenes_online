@@ -24,17 +24,16 @@ try {
 ?>
 
 
-
-
-<div class="main-content   mt-5">
+<div class="main-content mt-5">
   <div class="card shadow border-0 rounded-4">
-    <div
-      class="card-header bg-primary text-white d-flex flex-wrap justify-content-between align-items-center rounded-top-4 px-4 py-3">
+    <div class="card-header bg-primary text-white d-flex flex-wrap justify-content-between align-items-center rounded-top-4 px-4 py-3">
       <h5 class="mb-0"><i class="bi bi-people-fill me-2"></i>Listado de estudiantes</h5>
+
       <div class="search-box position-relative">
         <input type="text" class="form-control ps-5" id="customSearch" placeholder="Buscar estudiante...">
         <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
       </div>
+
       <div class="d-flex flex-wrap gap-5 align-items-center">
         <div class="d-flex align-items-center">
           <label for="container-length" class="me-2 text-white fw-medium mb-0">Mostrar:</label>
@@ -46,124 +45,112 @@ try {
             <option value="25">25 registros</option>
           </select>
         </div>
-        <button class="btn btn-primary" onclick="abrirModalRegistroEstudiante()">
-          <i class="bi bi-person-plus-fill me-2"></i>
-          Crear Nuevo
+        <button class="btn btn-light fw-semibold shadow-sm" onclick="abrirModalRegistroEstudiante()">
+          <i class="bi bi-person-plus-fill me-2"></i> Crear Nuevo
         </button>
-        <!-- <a href="registrar_estudiantes.php" class="btn btn-light fw-semibold shadow-sm">
-          <i class="bi bi-plus-circle me-2"></i>
-        </a> -->
       </div>
     </div>
 
     <div class="card-body">
       <div class="table-responsive">
-        <table id="container-table" class="table table-striped table-hover align-middle">
-          <thead class="table-light text-center">
-            <?php if (!empty($estudiantes)): ?>
-
-
+        <?php if (!empty($estudiantes)): ?>
+          <table id="container-table" class="table table-striped table-hover align-middle">
+            <thead class="table-light text-center">
               <tr>
                 <th><i class="bi bi-hash me-1"></i>ID</th>
                 <th><i class="bi bi-person-badge-fill me-1"></i>Nombre</th>
                 <th><i class="bi bi-credit-card-2-front-fill me-1"></i>Identificación</th>
                 <th><i class="bi bi-building me-1"></i>Escuela</th>
-                <th><i class="bi bi-building me-1"></i>email</th>
+                <th><i class="bi bi-envelope-at-fill me-1"></i>Email</th>
                 <th><i class="bi bi-calendar-heart-fill me-1"></i>Nacimiento</th>
                 <th><i class="bi bi-telephone-forward-fill me-1"></i>Teléfono</th>
                 <th><i class="bi bi-geo-alt-fill me-1"></i>Dirección</th>
                 <th><i class="bi bi-card-heading me-1"></i>Categoría Carné</th>
                 <th><i class="bi bi-upc-scan me-1"></i>Código Registro</th>
-                <th><i class="bi bi-person-badge me-1"></i>estado</th>
+                <th><i class="bi bi-person-badge me-1"></i>Estado</th>
                 <th><i class="bi bi-tools me-1"></i>Acciones</th>
               </tr>
             </thead>
             <tbody>
               <?php foreach ($estudiantes as $estudiante): ?>
                 <tr>
-                  <td class="text-center"><?= htmlspecialchars($estudiante['id'], ENT_QUOTES, 'UTF-8'); ?></td>
-                  <td><?= htmlspecialchars($estudiante['nombre'], ENT_QUOTES, 'UTF-8'); ?>
-                    <?= htmlspecialchars($estudiante['apellidos'], ENT_QUOTES, 'UTF-8'); ?>
-                  </td>
-                  <td><?= htmlspecialchars($estudiante['dni'], ENT_QUOTES, 'UTF-8'); ?></td>
-                  <td><?= htmlspecialchars($estudiante['escuela'], ENT_QUOTES, 'UTF-8'); ?> </td>
-                  <td>
-                    <?= !empty(htmlspecialchars($estudiante['email'], ENT_QUOTES, 'UTF-8')) ? htmlspecialchars($estudiante['email'], ENT_QUOTES, 'UTF-8') : 'Sin definir' ?>
-                  </td>
-                  <td><?= htmlspecialchars($estudiante['fecha_nacimiento'], ENT_QUOTES, 'UTF-8'); ?></td>
-                  <td><?= htmlspecialchars($estudiante['telefono'], ENT_QUOTES, 'UTF-8'); ?></td>
-                  <td><?= htmlspecialchars($estudiante['direccion'], ENT_QUOTES, 'UTF-8'); ?> </td>
-                  <td><?= htmlspecialchars($estudiante['categoria'], ENT_QUOTES, 'UTF-8'); ?></td>
-                  <td><?= htmlspecialchars($estudiante['usuario'], ENT_QUOTES, 'UTF-8'); ?></td>
+                  <td class="text-center"><?= htmlspecialchars($estudiante['id']) ?></td>
+                  <td><?= htmlspecialchars($estudiante['nombre']) ?> <?= htmlspecialchars($estudiante['apellidos']) ?></td>
+                  <td><?= htmlspecialchars($estudiante['dni']) ?></td>
+                  <td><?= htmlspecialchars($estudiante['escuela']) ?></td>
+                  <td><?= htmlspecialchars($estudiante['email']) ?: 'Sin definir' ?></td>
+                  <td><?= htmlspecialchars($estudiante['fecha_nacimiento']) ?></td>
+                  <td><?= htmlspecialchars($estudiante['telefono']) ?></td>
+                  <td><?= htmlspecialchars($estudiante['direccion']) ?></td>
+                  <td><?= htmlspecialchars($estudiante['categoria']) ?></td>
+                  <td><?= htmlspecialchars($estudiante['usuario']) ?></td>
+
                   <td class="text-center">
                     <?php if ($estudiante['estado'] === 'activo'): ?>
-                      <button
-                        class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                        title="Haz clic para desactivar"
-                        onclick="cambiarEstadoEstudiante(<?= $estudiante['id'] ?>, 'inactivo')">
-                        <i class="bi bi-toggle-on fs-5"></i>
-                        Activo
+                      <button class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
+                              title="Haz clic para desactivar"
+                              onclick="cambiarEstadoEstudiante(<?= (int)$estudiante['id'] ?>, 'inactivo')">
+                        <i class="bi bi-toggle-on fs-5"></i> Activo
                       </button>
                     <?php else: ?>
-                      <button
-                        class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                        title="Haz clic para activar" onclick="cambiarEstadoEstudiante(<?= $estudiante['id'] ?>, 'activo')">
-                        <i class="bi bi-toggle-off fs-5"></i>
-                        Inactivo
+                      <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
+                              title="Haz clic para activar"
+                              onclick="cambiarEstadoEstudiante(<?= (int)$estudiante['id'] ?>, 'activo')">
+                        <i class="bi bi-toggle-off fs-5"></i> Inactivo
                       </button>
                     <?php endif; ?>
                   </td>
 
                   <td class="text-center">
                     <div class="d-flex gap-2 justify-content-center flex-wrap">
-                      <button class="btn btn-sm btn-outline-warning" onclick="abrirModalEdicionEstudiante({
-                          id: <?= (int) $estudiante['id']; ?>,
-                          nombre: '<?= addslashes(htmlspecialchars($estudiante['nombre'], ENT_QUOTES, 'UTF-8')); ?>',
-                          apellidos: '<?= addslashes(htmlspecialchars($estudiante['apellidos'], ENT_QUOTES, 'UTF-8')); ?>',
-                          escuela: '<?= addslashes(htmlspecialchars($estudiante['escuela'], ENT_QUOTES, 'UTF-8')); ?>',
-                          fecha_nacimiento: '<?= addslashes(htmlspecialchars($estudiante['fecha_nacimiento'], ENT_QUOTES, 'UTF-8')); ?>',
-                          telefono: '<?= addslashes(htmlspecialchars($estudiante['telefono'], ENT_QUOTES, 'UTF-8')); ?>',
-                          direccion: '<?= addslashes(htmlspecialchars($estudiante['direccion'], ENT_QUOTES, 'UTF-8')); ?>',
-                          categoria: '<?= addslashes(htmlspecialchars($estudiante['categoria'], ENT_QUOTES, 'UTF-8')); ?>',
-                          usuario: '<?= addslashes(htmlspecialchars($estudiante['usuario'], ENT_QUOTES, 'UTF-8')); ?>',
-                          email: '<?= addslashes(htmlspecialchars($estudiante['email'], ENT_QUOTES, 'UTF-8')); ?>',
-                          dni: '<?= addslashes(htmlspecialchars($estudiante['dni'], ENT_QUOTES, 'UTF-8')); ?>'
-                        })">
+                      <button class="btn btn-sm btn-outline-warning"
+                              onclick="abrirModalEdicionEstudiante({
+                                id: <?= (int)$estudiante['id'] ?>,
+                                nombre: '<?= addslashes(htmlspecialchars($estudiante['nombre'])) ?>',
+                                apellidos: '<?= addslashes(htmlspecialchars($estudiante['apellidos'])) ?>',
+                                escuela: '<?= addslashes(htmlspecialchars($estudiante['escuela'])) ?>',
+                                fecha_nacimiento: '<?= addslashes(htmlspecialchars($estudiante['fecha_nacimiento'])) ?>',
+                                telefono: '<?= addslashes(htmlspecialchars($estudiante['telefono'])) ?>',
+                                direccion: '<?= addslashes(htmlspecialchars($estudiante['direccion'])) ?>',
+                                categoria: '<?= addslashes(htmlspecialchars($estudiante['categoria'])) ?>',
+                                usuario: '<?= addslashes(htmlspecialchars($estudiante['usuario'])) ?>',
+                                email: '<?= addslashes(htmlspecialchars($estudiante['email'])) ?>',
+                                dni: '<?= addslashes(htmlspecialchars($estudiante['dni'])) ?>'
+                              })">
                         <i class="bi bi-pencil-square me-1"></i> Editar
                       </button>
-                      <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2   shadow-sm"
-                        onclick="abrirModalCategorias(<?= $estudiante['id'] ?>, '<?= htmlspecialchars($estudiante['nombre'], ENT_QUOTES, 'UTF-8') ?>',  '<?= htmlspecialchars($estudiante['fecha_nacimiento'], ENT_QUOTES, 'UTF-8') ?>')"
-                        title="Ver detalles de categorias del estudiante">
-                        <i class="bi bi-eye "></i> Categorias
+
+                      <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2 shadow-sm"
+                              onclick="abrirModalCategorias(<?= (int)$estudiante['id'] ?>, '<?= htmlspecialchars($estudiante['nombre']) ?>', '<?= htmlspecialchars($estudiante['fecha_nacimiento']) ?>')"
+                              title="Ver detalles de categorías del estudiante">
+                        <i class="bi bi-eye"></i> Categorías
                       </button>
 
-
-                      <?php if (($rol === 'admin')): ?>
+                      <?php if ($rol === 'admin'): ?>
                         <button class="btn btn-sm btn-outline-danger eliminar-estudiante-btn"
-                          onclick="eliminarEstudiante(<?= htmlspecialchars($estudiante['id'], ENT_QUOTES, 'UTF-8') ?>, '<?= htmlspecialchars($estudiante['nombre'], ENT_QUOTES, 'UTF-8') ?>')"
-                          title="Eliminar estudiante">
-                          <i class="bi bi-trash me-1"></i>Eliminar
+                                onclick="eliminarEstudiante(<?= (int)$estudiante['id'] ?>, '<?= htmlspecialchars($estudiante['nombre']) ?>')"
+                                title="Eliminar estudiante">
+                          <i class="bi bi-trash me-1"></i> Eliminar
                         </button>
                       <?php endif; ?>
-
                     </div>
                   </td>
-
                 </tr>
               <?php endforeach; ?>
-            <?php else: ?>
-              <div class="alert alert-warning text-center m-3">
-                <i class="bi bi-exclamation-circle-fill me-2"></i>⚠️ No hay estudiantes registrados actualmente.
-              </div>
-            <?php endif; ?>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        <?php else: ?>
+          <div class="alert alert-warning text-center m-3">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            ⚠️ No hay estudiantes registrados actualmente.
+          </div>
+        <?php endif; ?>
       </div>
     </div>
   </div>
 </div>
 
-
+ 
 <!-- Modal Registro / Edición Estudiante -->
 <div class="modal fade" id="modalEstudiante" tabindex="-1" aria-labelledby="modalEstudianteLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">

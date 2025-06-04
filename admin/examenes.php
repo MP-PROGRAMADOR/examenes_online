@@ -18,95 +18,167 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
-<!-- Main -->
 <div class="main-content">
-  <div class="card shadow border-0 rounded-4">
-    <div
-      class="card-header bg-primary text-white d-flex flex-wrap justify-content-between align-items-center rounded-top-4 px-4 py-3">
-      <h5 class="mb-0"><i class="bi bi-file-earmark-text-fill me-2"></i>Gestión de Exámenes</h5>
-      <div class="search-box position-relative">
-        <input type="text" class="form-control ps-5" id="customSearch" placeholder="Buscar examen...">
-        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-      </div>
-      <div class="d-flex flex-wrap gap-5 align-items-center">
-        <div class="d-flex align-items-center">
-          <label for="container-length" class="me-2 text-white fw-medium mb-0">Mostrar:</label>
-          <select id="container-length" class="form-select w-auto shadow-sm">
-            <option value="5">5 registros</option>
-            <option value="10" selected>10 registros</option>
-            <option value="15">15 registros</option>
-            <option value="20">20 registros</option>
-            <option value="25">25 registros</option>
-          </select>
-        </div>
-        <button class="btn btn-success" onclick="abrirModalExamen()">
-          <i class="bi bi-file-earmark-plus-fill me-2"></i>Nuevo Examen
-        </button>
-      </div>
-    </div>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 rounded-top">
+            <h5 class="mb-0 d-flex align-items-center">
+                <i class="bi bi-file-earmark-text-fill me-2"></i>Gestión de Exámenes
+            </h5>
 
-    <div class="table-responsive">
-      <table id="examenes-table" class="table table-hover align-middle shadow-sm rounded-3 overflow-hidden">
-        <thead class="table-light text-center">
-          <?php if (!empty($examenes)): ?>
-            <tr>
-              <th><i class="bi bi-hash me-1"></i> ID</th>
-              <th><i class="bi bi-person-fill me-1"></i> Estudiante</th>
-              <th><i class="bi bi-tags-fill me-1"></i> Categoría</th>
-              <th><i class="bi bi-person-badge-fill me-1"></i> Asignado Por</th>
-              <th><i class="bi bi-calendar-event-fill me-1"></i> Fecha Asignación</th>
-              <th><i class="bi bi-list-ol me-1"></i> Total Preguntas</th>
-              <th><i class="bi bi-toggle-on me-1"></i> Estado</th>
-              <th><i class="bi bi-clipboard-check-fill me-1"></i> Calificación</th>
-              <th><i class="bi bi-key-fill me-1"></i> Código Acceso</th>
-              <th><i class="bi bi-gear-fill me-1"></i> Acciones</th>
-            </tr>
+            <div class="d-flex align-items-center gap-3 flex-grow-1 flex-wrap justify-content-end">
+                <div class="position-relative">
+                    <input type="text" class="form-control ps-5 form-control-sm shadow-sm" id="customSearch"
+                        placeholder="Buscar examen...">
+                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                </div>
 
-          </thead>
-          <tbody>
-            <?php foreach ($examenes as $examen): ?>
-              <tr>
-                <td class="text-center"><?= $examen['id'] ?></td>
-                <td><?= $examen['estudiante'] ?></td>
-                <td><?= $examen['categoria'] ?></td>
-                <td><?= $examen['usuario'] ?? '—' ?></td>
-                <td><?= $examen['fecha_asignacion'] ?></td>
-                <td><?= $examen['total_preguntas'] ?></td>
-                <td>
-                  <span
-                    class="badge bg-<?= $examen['estado'] === 'pendiente' ? 'warning' : ($examen['estado'] === 'en_progreso' ? 'primary' : 'success') ?>">
-                    <?= strtoupper($examen['estado']) ?>
-                  </span>
-                </td>
-                <td><?= $examen['calificacion'] !== null ? $examen['calificacion'] : '—' ?></td>
-                <td><code><?= $examen['codigo_acceso'] ?></code></td>
-                <td class="text-center">
-                  <div class="d-flex gap-2 justify-content-center flex-wrap">
-                    <button class="btn btn-sm btn-outline-primary" onclick="verExamen(<?= $examen['id'] ?>)">
-                      <i class="bi bi-eye-fill me-1"></i> Ver
-                    </button>
-                    <button class="btn btn-sm btn-outline-warning" onclick="editarExamen(<?= $examen['id'] ?>)">
-                      <i class="bi bi-pencil-fill me-1"></i> Editar
-                    </button>
+                <div class="d-flex align-items-center gap-2">
+                    <label for="container-length" class="mb-0 fw-semibold text-white">Mostrar:</label>
+                    <select id="container-length" class="form-select form-select-sm w-auto shadow-sm">
+                        <?php foreach ([5, 10, 15, 20, 25] as $op): ?>
+                            <option value="<?= $op ?>" <?= $limite == $op ? 'selected' : '' ?>><?= $op ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-                    <button class="btn btn-sm btn-outline-danger" onclick="eliminarExamen(<?= $examen['id'] ?>)">
-                      <i class="bi bi-trash-fill me-1"></i> Eliminar
-                    </button>
-                    
-                  </div>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          <?php else: ?>
-            <div class="alert alert-warning text-center m-3">
-              <i class="bi bi-exclamation-circle-fill me-2"></i>⚠️ No hay exámenes registrados actualmente.
+                <button class="btn btn-success btn-sm shadow-sm" onclick="abrirModalExamen()">
+                    <i class="bi bi-file-earmark-plus-fill me-2"></i>Nuevo Examen
+                </button>
             </div>
-          <?php endif; ?>
-        </tbody>
-      </table>
+        </div>
+
+        <!-- TABLA -->
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered align-middle mb-0">
+                    <thead class="table-primary text-center">
+                        <tr>
+                            <th><i class="bi bi-hash me-1"></i> ID</th>
+                            <th><i class="bi bi-person-fill me-1"></i> Estudiante</th>
+                            <th><i class="bi bi-tags-fill me-1"></i> Categoría</th>
+                            <th><i class="bi bi-person-badge-fill me-1"></i> Asignado Por</th>
+                            <th><i class="bi bi-calendar-event-fill me-1"></i> Fecha</th>
+                            <th><i class="bi bi-list-ol me-1"></i> Preguntas</th>
+                            <th><i class="bi bi-toggle-on me-1"></i> Estado</th>
+                            <th><i class="bi bi-clipboard-check-fill me-1"></i> Calificación</th>
+                            <th><i class="bi bi-key-fill me-1"></i> Código</th>
+                            <th><i class="bi bi-gear-fill me-1"></i> Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($examenes)): ?>
+                            <?php foreach ($examenes as $examen): ?>
+                                <tr>
+                                    <td class="text-center"><?= htmlspecialchars($examen['id']) ?></td>
+                                    <td><?= htmlspecialchars($examen['estudiante']) ?></td>
+                                    <td><?= htmlspecialchars($examen['categoria']) ?></td>
+                                    <td><?= htmlspecialchars($examen['usuario'] ?? '—') ?></td>
+                                    <td><?= htmlspecialchars($examen['fecha_asignacion']) ?></td>
+                                    <td class="text-center"><?= htmlspecialchars($examen['total_preguntas']) ?></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-<?= $examen['estado'] === 'pendiente' ? 'warning' : ($examen['estado'] === 'en_progreso' ? 'primary' : 'success') ?>">
+                                            <?= strtoupper($examen['estado']) ?>
+                                        </span>
+                                    </td>
+                                    <td class="text-center"><?= $examen['calificacion'] !== null ? $examen['calificacion'] : '—' ?></td>
+                                    <td class="text-center"><code><?= htmlspecialchars($examen['codigo_acceso']) ?></code></td>
+                                    <td class="text-center">
+                                        <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="verExamen(<?= $examen['id'] ?>)">
+                                                <i class="bi bi-eye-fill me-1"></i> Ver
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-warning" onclick="editarExamen(<?= $examen['id'] ?>)">
+                                                <i class="bi bi-pencil-fill me-1"></i> Editar
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="eliminarExamen(<?= $examen['id'] ?>)">
+                                                <i class="bi bi-trash-fill me-1"></i> Eliminar
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="10">
+                                    <div class="alert alert-warning text-center m-0 rounded-0">
+                                        <i class="bi bi-exclamation-circle-fill me-2"></i>No hay exámenes registrados actualmente.
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <?php if ($total_paginas > 1): ?>
+                <nav aria-label="Paginación de exámenes" class="my-3">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?pagina=<?= $pagina - 1 ?>&limite=<?= $limite ?>">Anterior</a>
+                        </li>
+                        <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+                            <li class="page-item <?= $pagina == $i ? 'active' : '' ?>">
+                                <a class="page-link" href="?pagina=<?= $i ?>&limite=<?= $limite ?>"><?= $i ?></a>
+                            </li>
+                        <?php endfor; ?>
+                        <li class="page-item <?= $pagina >= $total_paginas ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?pagina=<?= $pagina + 1 ?>&limite=<?= $limite ?>">Siguiente</a>
+                        </li>
+                    </ul>
+                </nav>
+            <?php endif; ?>
+        </div>
     </div>
-  </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            function filterTable() {
+                const search = $("#customSearch").val().toLowerCase();
+                let count = 0;
+
+                $("table tbody tr").each(function () {
+                    const rowText = $(this).text().toLowerCase();
+                    if (rowText.includes(search)) {
+                        $(this).show();
+                        count++;
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                if (count === 0) {
+                    if ($("#no-results").length === 0) {
+                        $("table tbody").append(`
+                            <tr id="no-results">
+                                <td colspan="10">
+                                    <div class="alert alert-info text-center m-0 rounded-0">
+                                        <i class="bi bi-info-circle-fill me-2"></i>No se encontraron resultados.
+                                    </div>
+                                </td>
+                            </tr>
+                        `);
+                    }
+                } else {
+                    $("#no-results").remove();
+                }
+            }
+
+            // Filtro en tiempo real
+            $("#customSearch").on("input", filterTable);
+
+            // Redirige al cambiar la cantidad
+            $('#container-length').on('change', function () {
+                const selectedLimit = $(this).val();
+                window.location.href = `?pagina=1&limite=${selectedLimit}`;
+            });
+
+            filterTable();
+        });
+    </script>
 </div>
+
 
 
 <!-- Modal -->
