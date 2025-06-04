@@ -1,21 +1,43 @@
 <?php
-
 include_once("../includes/header.php");
 include_once("../includes/sidebar.php");
+
+// Definir variables de paginación y límite por defecto para evitar errores
+$limite = isset($_GET['limite']) && in_array((int)$_GET['limite'], [5,10,15,20,25]) ? (int)$_GET['limite'] : 10;
+$pagina = isset($_GET['pagina']) && is_numeric($_GET['pagina']) && $_GET['pagina'] > 0 ? (int)$_GET['pagina'] : 1;
+
+// Contar total de exámenes para paginación
+$countSql = "SELECT COUNT(*) FROM examenes";
+$countStmt = $pdo->prepare($countSql);
+$countStmt->execute();
+$total_examenes = $countStmt->fetchColumn();
+$total_paginas = ceil($total_examenes / $limite);
+
+// Calcular offset para la consulta con límite y paginación
+$offset = ($pagina - 1) * $limite;
+
 $sql = "SELECT 
-              ex.id,  CONCAT(est.nombre, ' ', est.apellidos) AS estudiante, cat.nombre AS categoria,
-              us.nombre AS usuario, ex.fecha_asignacion, ex.total_preguntas,
-              ex.estado, ex.calificacion, ex.codigo_acceso
-              FROM examenes ex
-              JOIN estudiantes est ON ex.estudiante_id = est.id
-              JOIN categorias cat ON ex.categoria_id = cat.id
-              LEFT JOIN usuarios us ON ex.asignado_por = us.id
-              ORDER BY ex.fecha_asignacion DESC";
+            ex.id,  
+            CONCAT(est.nombre, ' ', est.apellidos) AS estudiante, 
+            cat.nombre AS categoria,
+            us.nombre AS usuario, 
+            ex.fecha_asignacion, 
+            ex.total_preguntas,
+            ex.estado, 
+            ex.calificacion, 
+            ex.codigo_acceso
+        FROM examenes ex
+        JOIN estudiantes est ON ex.estudiante_id = est.id
+        JOIN categorias cat ON ex.categoria_id = cat.id
+        LEFT JOIN usuarios us ON ex.asignado_por = us.id
+        ORDER BY ex.fecha_asignacion DESC
+        LIMIT :limite OFFSET :offset";
 
 $stmt = $pdo->prepare($sql);
+$stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
 
 <div class="main-content">
@@ -80,7 +102,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <?= strtoupper($examen['estado']) ?>
                                         </span>
                                     </td>
-                                    <td class="text-center"><?= $examen['calificacion'] !== null ? $examen['calificacion'] : '—' ?></td>
+                                    <td class="text-center"><?= $examen['calificacion'] !== null ? htmlspecialchars($examen['calificacion']) : '—' ?></td>
                                     <td class="text-center"><code><?= htmlspecialchars($examen['codigo_acceso']) ?></code></td>
                                     <td class="text-center">
                                         <div class="d-flex gap-2 justify-content-center flex-wrap">
@@ -139,6 +161,9 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 let count = 0;
 
                 $("table tbody tr").each(function () {
+                    // Ignorar fila de "No resultados" para no contarla ni mostrarla
+                    if ($(this).attr('id') === 'no-results') return;
+
                     const rowText = $(this).text().toLowerCase();
                     if (rowText.includes(search)) {
                         $(this).show();
@@ -171,6 +196,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             // Redirige al cambiar la cantidad
             $('#container-length').on('change', function () {
                 const selectedLimit = $(this).val();
+                // Cambia la URL para página 1 y límite seleccionado
                 window.location.href = `?pagina=1&limite=${selectedLimit}`;
             });
 
@@ -178,7 +204,6 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         });
     </script>
 </div>
-
 
 
 <!-- Modal -->
