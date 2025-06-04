@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 27-05-2025 a las 16:05:09
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Servidor: localhost:3306
+-- Tiempo de generación: 04-06-2025 a las 10:24:27
+-- Versión del servidor: 10.4.25-MariaDB
+-- Versión de PHP: 8.1.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -32,7 +32,7 @@ CREATE TABLE `categorias` (
   `nombre` varchar(50) NOT NULL,
   `descripcion` text DEFAULT NULL,
   `edad_minima` tinyint(3) UNSIGNED NOT NULL DEFAULT 15
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `categorias`
@@ -67,7 +67,7 @@ CREATE TABLE `correos_enviados` (
   `cuerpo` text DEFAULT NULL,
   `enviado_por` int(11) DEFAULT NULL,
   `enviado_en` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -80,7 +80,7 @@ CREATE TABLE `escuelas_conduccion` (
   `nombre` varchar(100) NOT NULL,
   `ciudad` varchar(100) NOT NULL,
   `pais` varchar(100) DEFAULT 'Guinea Ecuatorial'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `escuelas_conduccion`
@@ -109,7 +109,7 @@ CREATE TABLE `estudiantes` (
   `apellidos` varchar(250) DEFAULT NULL,
   `direccion` varchar(250) DEFAULT NULL,
   `usuario` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `estudiantes`
@@ -118,7 +118,8 @@ CREATE TABLE `estudiantes` (
 INSERT INTO `estudiantes` (`id`, `dni`, `nombre`, `email`, `telefono`, `fecha_nacimiento`, `escuela_id`, `estado`, `creado_en`, `apellidos`, `direccion`, `usuario`) VALUES
 (1, '0001234567', 'jesus Santos', 'pepe@gmail.com', '222547886', '0000-00-00', 1, 'activo', '2025-05-20 10:40:09', 'Pepe Payé', 'bisinga', 'pepe'),
 (3, '00012589741', 'Bubi', 'marie@gmail.com', '555214782', '2004-05-04', 1, 'activo', '2025-05-20 12:26:08', 'mabale', 'adfg', 'ENA25181'),
-(4, '000121415', 'jesus', 'jes@gmail.com', '222141516', '2000-01-26', 1, 'activo', '2025-05-26 10:33:06', 'topola', 'Bisinga', 'ENA2546A');
+(4, '000121415', 'jesus', 'jes@gmail.com', '222141516', '2000-01-26', 1, 'activo', '2025-05-26 10:33:06', 'topola', 'Bisinga', 'ENA2546A'),
+(5, '874653', 'salvador', 'salvadormete4@gmail.com', '33309876543', '2004-02-04', 1, 'activo', '2025-05-28 11:00:13', 'mete bijeri', 'buena esperanza 1', 'ENA25454');
 
 -- --------------------------------------------------------
 
@@ -133,7 +134,7 @@ CREATE TABLE `estudiante_categorias` (
   `estado` enum('pendiente','aprobado','rechazado','en_proceso') DEFAULT 'pendiente',
   `fecha_asignacion` datetime DEFAULT current_timestamp(),
   `fecha_aprobacion` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `estudiante_categorias`
@@ -143,7 +144,8 @@ INSERT INTO `estudiante_categorias` (`id`, `estudiante_id`, `categoria_id`, `est
 (1, 3, 1, 'pendiente', '2025-05-20 12:26:08', NULL),
 (2, 3, 4, 'pendiente', '2025-05-20 16:01:46', NULL),
 (3, 3, 6, 'pendiente', '2025-05-20 16:03:46', NULL),
-(4, 4, 4, 'pendiente', '2025-05-26 10:33:06', NULL);
+(4, 4, 4, 'pendiente', '2025-05-26 10:33:06', NULL),
+(5, 5, 4, 'pendiente', '2025-05-28 11:00:13', NULL);
 
 -- --------------------------------------------------------
 
@@ -162,15 +164,14 @@ CREATE TABLE `examenes` (
   `estado` enum('pendiente','en_progreso','finalizado') DEFAULT 'pendiente',
   `calificacion` decimal(5,2) DEFAULT NULL,
   `codigo_acceso` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `examenes`
 --
 
 INSERT INTO `examenes` (`id`, `estudiante_id`, `categoria_id`, `asignado_por`, `fecha_asignacion`, `duracion`, `total_preguntas`, `estado`, `calificacion`, `codigo_acceso`) VALUES
-(1, 3, 4, 1, '2025-05-21 11:44:24', 0, 1, 'pendiente', NULL, 'EXAM264107'),
-(2, 4, 4, 1, '2025-05-26 10:40:57', 3, 3, 'finalizado', 0.00, 'EXAM457235');
+(5, 5, 4, 1, '2025-05-28 12:16:31', 7, 9, 'pendiente', '38.89', 'EXAM991276');
 
 -- --------------------------------------------------------
 
@@ -183,16 +184,22 @@ CREATE TABLE `examen_preguntas` (
   `examen_id` int(11) NOT NULL,
   `pregunta_id` int(11) NOT NULL,
   `respondida` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `examen_preguntas`
 --
 
 INSERT INTO `examen_preguntas` (`id`, `examen_id`, `pregunta_id`, `respondida`) VALUES
-(1, 2, 1, 1),
-(2, 2, 2, 1),
-(3, 2, 3, 1);
+(55, 5, 14, 1),
+(56, 5, 1, 0),
+(57, 5, 6, 0),
+(58, 5, 2, 0),
+(59, 5, 9, 0),
+(60, 5, 3, 0),
+(61, 5, 7, 0),
+(62, 5, 5, 0),
+(63, 5, 8, 0);
 
 -- --------------------------------------------------------
 
@@ -205,7 +212,14 @@ CREATE TABLE `imagenes_pregunta` (
   `pregunta_id` int(11) NOT NULL,
   `ruta_imagen` varchar(255) NOT NULL,
   `descripcion` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `imagenes_pregunta`
+--
+
+INSERT INTO `imagenes_pregunta` (`id`, `pregunta_id`, `ruta_imagen`, `descripcion`) VALUES
+(5, 14, 'uploads/preguntas/6836ee991d6d2_Screenshot 2025-05-27 133121.png', NULL);
 
 -- --------------------------------------------------------
 
@@ -218,7 +232,7 @@ CREATE TABLE `opciones_pregunta` (
   `pregunta_id` int(11) NOT NULL,
   `texto` varchar(255) NOT NULL,
   `es_correcta` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `opciones_pregunta`
@@ -230,7 +244,25 @@ INSERT INTO `opciones_pregunta` (`id`, `pregunta_id`, `texto`, `es_correcta`) VA
 (3, 1, 'se usa para aumentar la fuerza', 1),
 (4, 1, 'para eliminar el sueño', 1),
 (5, 1, 'no es un buen nutriente', 0),
-(6, 1, 'es de color chocolate', 1);
+(6, 1, 'es de color chocolate', 1),
+(7, 5, '30 km/h', 0),
+(8, 5, '50 km/h', 1),
+(9, 5, '60 km/h', 0),
+(10, 5, '70 km/h', 0),
+(11, 6, 'Debe detenerse completamente al llegar a una señal de “Ceda el paso”.', 0),
+(12, 7, 'Cinturón de seguridad', 1),
+(13, 7, 'Radio del coche', 0),
+(14, 7, 'Luces durante la noche o en condiciones de baja visibilidad', 1),
+(15, 7, 'Espejos retrovisores en buen estado', 1),
+(16, 8, 'Puede avanzar con precaución', 0),
+(17, 8, 'Tiene prioridad sobre otros vehículos', 0),
+(18, 8, 'Debe detenerse completamente', 1),
+(19, 8, 'Puede continuar sin detenerse si no hay peatones', 0),
+(20, 9, 'Lluvia o pavimento mojado', 1),
+(21, 9, 'Neumáticos en mal estado', 1),
+(22, 9, 'Luz solar intensa', 0),
+(23, 9, 'Conducir a alta velocidad', 1),
+(28, 14, 'hola macho', 0);
 
 -- --------------------------------------------------------
 
@@ -245,7 +277,7 @@ CREATE TABLE `preguntas` (
   `tipo_contenido` enum('texto','ilustracion') NOT NULL,
   `activa` tinyint(1) DEFAULT 1,
   `creado_en` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `preguntas`
@@ -254,7 +286,13 @@ CREATE TABLE `preguntas` (
 INSERT INTO `preguntas` (`id`, `texto`, `tipo`, `tipo_contenido`, `activa`, `creado_en`) VALUES
 (1, '¿el café?', 'multiple', 'texto', 1, '2025-05-26 10:29:12'),
 (2, 'una copa se usa para almacenar agua', 'vf', 'texto', 1, '2025-05-26 10:23:18'),
-(3, 'la misca es una pesca', 'vf', 'texto', 1, '2025-05-21 08:59:27');
+(3, 'la misca es una pesca', 'vf', 'texto', 1, '2025-05-21 08:59:27'),
+(5, '¿Cuál es la velocidad máxima permitida en zona urbana, salvo que se indique lo contrario?', 'multiple', 'texto', 1, '2025-05-28 11:03:12'),
+(6, 'Debe detenerse completamente al llegar a una señal de “Ceda el paso”.', 'vf', 'texto', 1, '2025-05-28 11:03:46'),
+(7, '¿Qué elementos de seguridad deben usarse obligatoriamente mientras se conduce?', 'multiple', 'texto', 1, '2025-05-28 11:04:58'),
+(8, '¿Qué indica una luz roja intermitente en un semáforo?', 'multiple', 'texto', 1, '2025-05-28 11:45:53'),
+(9, '¿Qué situaciones pueden aumentar la distancia de frenado de un vehículo?', 'multiple', 'texto', 1, '2025-05-28 11:47:19'),
+(14, 'hola macho', 'vf', 'ilustracion', 1, '2025-05-28 12:08:09');
 
 -- --------------------------------------------------------
 
@@ -266,7 +304,7 @@ CREATE TABLE `pregunta_categoria` (
   `id` int(11) NOT NULL,
   `pregunta_id` int(11) NOT NULL,
   `categoria_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `pregunta_categoria`
@@ -275,7 +313,28 @@ CREATE TABLE `pregunta_categoria` (
 INSERT INTO `pregunta_categoria` (`id`, `pregunta_id`, `categoria_id`) VALUES
 (2, 3, 4),
 (3, 2, 4),
-(4, 1, 4);
+(4, 1, 4),
+(5, 7, 4),
+(6, 7, 6),
+(7, 5, 4),
+(8, 6, 4),
+(9, 8, 4),
+(10, 8, 5),
+(11, 8, 6),
+(12, 8, 7),
+(13, 8, 9),
+(14, 9, 1),
+(15, 9, 4),
+(16, 9, 6),
+(17, 1, 1),
+(18, 2, 1),
+(19, 3, 1),
+(20, 5, 1),
+(21, 6, 1),
+(22, 7, 1),
+(23, 8, 1),
+(26, 14, 1),
+(27, 14, 4);
 
 -- --------------------------------------------------------
 
@@ -288,16 +347,14 @@ CREATE TABLE `respuestas_estudiante` (
   `examen_pregunta_id` int(11) NOT NULL,
   `opcion_id` int(11) DEFAULT NULL,
   `fecha_respuesta` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `respuestas_estudiante`
 --
 
 INSERT INTO `respuestas_estudiante` (`id`, `examen_pregunta_id`, `opcion_id`, `fecha_respuesta`) VALUES
-(153, 1, 5, '2025-05-27 15:02:22'),
-(154, 2, 2, '2025-05-27 15:02:32'),
-(155, 3, 3, '2025-05-27 15:02:38');
+(269, 55, 14, '2025-05-28 12:32:01');
 
 -- --------------------------------------------------------
 
@@ -313,7 +370,7 @@ CREATE TABLE `usuarios` (
   `rol` enum('admin','examinador','operador') DEFAULT 'operador',
   `creado_en` datetime DEFAULT current_timestamp(),
   `activo` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `usuarios`
@@ -454,55 +511,55 @@ ALTER TABLE `escuelas_conduccion`
 -- AUTO_INCREMENT de la tabla `estudiantes`
 --
 ALTER TABLE `estudiantes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `estudiante_categorias`
 --
 ALTER TABLE `estudiante_categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `examenes`
 --
 ALTER TABLE `examenes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `examen_preguntas`
 --
 ALTER TABLE `examen_preguntas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT de la tabla `imagenes_pregunta`
 --
 ALTER TABLE `imagenes_pregunta`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `opciones_pregunta`
 --
 ALTER TABLE `opciones_pregunta`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT de la tabla `preguntas`
 --
 ALTER TABLE `preguntas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `pregunta_categoria`
 --
 ALTER TABLE `pregunta_categoria`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de la tabla `respuestas_estudiante`
 --
 ALTER TABLE `respuestas_estudiante`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=156;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=270;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`

@@ -1,8 +1,8 @@
 <?php
 session_start();
 if (isset($_SESSION['estudiante'])) {
-    header("Location: aspirante.php");
-    exit;
+  header("Location: aspirante.php");
+  exit;
 }
 ?>
 <!DOCTYPE html>
@@ -147,14 +147,67 @@ if (isset($_SESSION['estudiante'])) {
 
 
     /* Ajustar la altura del contenedor */
-    .login-left {
-      height: 80vh;
+   .login-left {
+  flex: 1;
+  height: 80vh;
+  background-image: url('../img/cemaforo.jpg'); /* Ruta de tu imagen */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+}
+
+
+
+    /* Imágenes de fondo para cada slide */
+    .bg-slide-1 {
+      background-image: url('https://via.placeholder.com/600x800?text=Conduce+Seguro');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .bg-slide-2 {
+      background-image: url('../img/cemaforo.jpg');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .bg-slide-3 {
+      background-image: url('../img/cemaforo.jpg');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    /* Oscurecer un poco el fondo para mejorar legibilidad del texto */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      z-index: 1;
+    }
+
+    /* Asegurar que los textos estén sobre la overlay */
+    .carousel-caption {
+      position: relative;
+      z-index: 1;
+      color: #fff;
     }
   </style>
 </head>
 
 <body>
- <div id="toast-container" class="position-fixed top-0 start-50 translate-middle-x p-3"
+  <div id="toast-container" class="position-fixed top-0 start-50 translate-middle-x p-3"
     style="z-index: 1060; max-width: 90%; width: 400px;"></div> <!-- alerta modal -->
   <div class="login-container">
 
@@ -165,19 +218,22 @@ if (isset($_SESSION['estudiante'])) {
       <div class="login-left">
         <div id="carouselExampleFade" class="carousel slide carousel-fade" data-bs-ride="carousel">
           <div class="carousel-inner">
-            <div class="carousel-item active">
+            <div class="carousel-item active bg-slide-1">
+              <div class="overlay"></div>
               <div class="carousel-caption">
                 <h3><i class="bi bi-shield-check"></i> Conduce Seguro</h3>
                 <p>Siempre usa el cinturón de seguridad. Salva vidas.</p>
               </div>
             </div>
-            <div class="carousel-item">
+            <div class="carousel-item bg-slide-2">
+              <div class="overlay"></div>
               <div class="carousel-caption">
                 <h3><i class="bi bi-speedometer2"></i> Respeta los límites</h3>
                 <p>Mantén una velocidad adecuada para prevenir accidentes.</p>
               </div>
             </div>
-            <div class="carousel-item">
+            <div class="carousel-item bg-slide-3">
+              <div class="overlay"></div>
               <div class="carousel-caption">
                 <h3><i class="bi bi-traffic-cone"></i> Atención en la vía</h3>
                 <p>Evita distracciones. Tu concentración es vital al volante.</p>
@@ -187,41 +243,50 @@ if (isset($_SESSION['estudiante'])) {
         </div>
       </div>
 
+
       <!-- Columna derecha: Login -->
-      <div class="login-right">
+     <div class="login-right p-4 bg-white shadow-lg rounded-4">
+  <div class="text-center mb-4">
+    <i class="bi bi-person-circle fs-1 text-primary"></i>
+    <h3 class="fw-bold text-dark mt-2">Iniciar Sesión</h3>
+    <p class="text-muted small">Introduce tu código personal para acceder</p>
+  </div>
 
-        <h2><i class="bi bi-person-circle"></i> Iniciar sesión</h2>
-        <form id="formLogin" method="POST" autocomplete="off">
-          <div class="mb-3">
-            <label for="codigo" class="form-label">
-              <i class="bi bi-key-fill"></i> Código de acceso
-            </label>
-            <input type="text" name="codigo" id="codigo" class="form-control" required maxlength="50"
-              placeholder="Tu código personal">
-          </div>
-          <button type="submit" class="btn btn-custom w-100">
-            <i class="bi bi-box-arrow-in-right"></i> Entrar
-          </button>
-          <div class="mt-2 text-center">
-            <a href="aspirante.php">¿No tienes cuenta? Regístrate aquí</a>
-          </div>
-        </form>
-
-
+  <form id="formLogin" method="POST" autocomplete="off" class="needs-validation" novalidate>
+    <div class="mb-4">
+      <label for="codigo" class="form-label fw-semibold text-secondary">
+        <i class="bi bi-key-fill me-1"></i> Código de acceso
+      </label>
+      <div class="input-group">
+        <span class="input-group-text bg-light"><i class="bi bi-person-badge"></i></span>
+        <input type="text" name="codigo" id="codigo" class="form-control" required maxlength="50"
+          placeholder="Tu código personal">
       </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100 fw-semibold shadow-sm">
+      <i class="bi bi-box-arrow-in-right me-2"></i> Entrar
+    </button>
+
+    <div class="text-center mt-3">
+      <a href="#" class="text-decoration-none text-muted small">¿Olvidaste tu código?</a>
+    </div>
+  </form>
+</div>
+
     </div>
 
   </div>
   </div>
- 
+
   <!-- Bootstrap JS -->
 
- <script src="../js/alerta.js"></script>
+  <script src="../js/alerta.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
       const form = document.getElementById('formLogin');
 
-      form.addEventListener('submit', function (e) {
+      form.addEventListener('submit', function(e) {
         e.preventDefault(); // Previene el envío tradicional
 
         const codigo = document.getElementById('codigo').value.trim();
@@ -237,24 +302,24 @@ if (isset($_SESSION['estudiante'])) {
 
 
         fetch('../api/login.php', {
-          method: 'POST',
-          body: formData
-        })
+            method: 'POST',
+            body: formData
+          })
           .then(response => response.json())
           .then(data => {
             console.log(data)
             if (data.status) {
-               mostrarToast('success', data.message || 'Inicio de sesión exitoso');
-               setTimeout(() => {
-                 window.location.href = data.redirect || 'aspirante.php';
-               }, 1200);
+              mostrarToast('success', data.message || 'Inicio de sesión exitoso');
+              setTimeout(() => {
+                window.location.href = data.redirect || 'aspirante.php';
+              }, 1200);
             } else {
-               mostrarToast('danger', data.message || 'Credenciales incorrectas');
+              mostrarToast('danger', data.message || 'Credenciales incorrectas');
             }
           })
           .catch(error => {
             console.error('Error en la solicitud:', error);
-             mostrarToast('danger', 'Ocurrió un error al procesar el login.');
+            mostrarToast('danger', 'Ocurrió un error al procesar el login.');
           });
       });
     });
