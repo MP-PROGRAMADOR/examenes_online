@@ -3,18 +3,18 @@ include_once("../includes/header.php");
 include_once("../includes/sidebar.php");
 
 try {
-    $limite = isset($_GET['limite']) ? (int)$_GET['limite'] : 10;
-    $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
-    $inicio = ($pagina - 1) * $limite;
+  $limite = isset($_GET['limite']) ? (int) $_GET['limite'] : 10;
+  $pagina = isset($_GET['pagina']) ? (int) $_GET['pagina'] : 1;
+  $inicio = ($pagina - 1) * $limite;
 
-    // Contar total de estudiantes
-    $total_sql = "SELECT COUNT(*) FROM estudiantes";
-    $total_stmt = $pdo->query($total_sql);
-    $total_registros = $total_stmt->fetchColumn();
-    $total_paginas = ceil($total_registros / $limite);
+  // Contar total de estudiantes
+  $total_sql = "SELECT COUNT(*) FROM estudiantes";
+  $total_stmt = $pdo->query($total_sql);
+  $total_registros = $total_stmt->fetchColumn();
+  $total_paginas = ceil($total_registros / $limite);
 
-    // Consulta paginada con joins
-    $sql = "
+  // Consulta paginada con joins
+  $sql = "
         SELECT 
             e.*, 
             esc.nombre AS escuela, 
@@ -26,87 +26,87 @@ try {
         ORDER BY e.id DESC
         LIMIT :inicio, :limite
     ";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':inicio', $inicio, PDO::PARAM_INT);
-    $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
-    $stmt->execute();
-    $estudiantes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $stmt = $pdo->prepare($sql);
+  $stmt->bindValue(':inicio', $inicio, PDO::PARAM_INT);
+  $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+  $stmt->execute();
+  $estudiantes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    error_log("Error al obtener estudiantes: " . $e->getMessage());
-    $estudiantes = [];
+  error_log("Error al obtener estudiantes: " . $e->getMessage());
+  $estudiantes = [];
 }
 ?>
 
 <div class="main-content">
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 rounded-top">
-            <h5 class="mb-0 d-flex align-items-center">
-                <i class="bi bi-people-fill me-2"></i>Listado de Estudiantes
-            </h5>
+  <div class="card shadow-sm mb-4">
+    <div
+      class="card-header bg-primary text-white d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 rounded-top">
+      <h5 class="mb-0 d-flex align-items-center">
+        <i class="bi bi-people-fill me-2"></i>Listado de Estudiantes
+      </h5>
 
-            <div class="d-flex align-items-center gap-3 flex-grow-1 flex-wrap justify-content-end">
-                <div class="position-relative">
-                    <input type="text" class="form-control ps-5 form-control-sm shadow-sm" id="customSearch"
-                        placeholder="Buscar estudiante...">
-                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                </div>
-
-                <div class="d-flex align-items-center gap-2">
-                    <label for="container-length" class="mb-0 fw-semibold text-white">Mostrar:</label>
-                    <select id="container-length" class="form-select form-select-sm w-auto shadow-sm">
-                        <?php foreach ([5, 10, 15, 20, 25] as $op): ?>
-                            <option value="<?= $op ?>" <?= $limite == $op ? 'selected' : '' ?>><?= $op ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <button class="btn btn-light fw-semibold shadow-sm" onclick="abrirModalRegistroEstudiante()">
-                    <i class="bi bi-person-plus-fill me-1"></i>Nuevo
-                </button>
-            </div>
+      <div class="d-flex align-items-center gap-3 flex-grow-1 flex-wrap justify-content-end">
+        <div class="position-relative">
+          <input type="text" class="form-control ps-5 form-control-sm shadow-sm" id="customSearch"
+            placeholder="Buscar estudiante...">
+          <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
         </div>
 
-        <!-- Tabla -->
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered align-middle mb-0">
-                    <thead class="table-primary text-center">
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>DNI</th>
-                            <th>Escuela</th>
-                            <th>Email</th>
-                            <th>Nacimiento</th>
-                            <th>Teléfono</th>
-                            <th>Dirección</th>
-                            <th>Categoría</th>
-                            <th>Código</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($estudiantes)): ?>
-                            <?php foreach ($estudiantes as $est): ?>
-                                <tr>
-                                    <td class="text-center"><?= htmlspecialchars($est['id']) ?></td>
-                                    <td><?= htmlspecialchars($est['apellidos'] . ' ' . $est['nombre']) ?></td>
-                                    <td><?= htmlspecialchars($est['dni']) ?></td>
-                                    <td><?= htmlspecialchars($est['escuela'] ?? '—') ?></td>
-                                    <td><?= htmlspecialchars($est['email']) ?></td>
-                                    <td><?= htmlspecialchars($est['fecha_nacimiento']) ?></td>
-                                    <td><?= htmlspecialchars($est['telefono']) ?></td>
-                                    <td><?= htmlspecialchars($est['direccion']) ?></td>
-                                    <td><?= htmlspecialchars($est['categoria'] ?? '—') ?></td>
-                                    <td><?= htmlspecialchars($est['usuario']) ?></td>
-                                   
-                                     <td class="text-center">
+        <div class="d-flex align-items-center gap-2">
+          <label for="container-length" class="mb-0 fw-semibold text-white">Mostrar:</label>
+          <select id="container-length" class="form-select form-select-sm w-auto shadow-sm">
+            <?php foreach ([5, 10, 15, 20, 25] as $op): ?>
+              <option value="<?= $op ?>" <?= $limite == $op ? 'selected' : '' ?>><?= $op ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <button class="btn btn-light fw-semibold shadow-sm" onclick="abrirModalRegistroEstudiante()">
+          <i class="bi bi-person-plus-fill me-1"></i>Nuevo
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle mb-0">
+          <thead class="table-primary text-center">
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>DNI</th>
+              <th>Escuela</th>
+              <th>Email</th>
+              <th>Nacimiento</th>
+              <th>Teléfono</th>
+              <th>Dirección</th>
+              <th>Categoría</th>
+              <th>Código</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php if (!empty($estudiantes)): ?>
+              <?php foreach ($estudiantes as $est): ?>
+                <tr>
+                  <td class="text-center"><?= htmlspecialchars($est['id']) ?></td>
+                  <td><?= htmlspecialchars($est['apellidos'] . ' ' . $est['nombre']) ?></td>
+                  <td><?= htmlspecialchars($est['dni']) ?></td>
+                  <td><?= htmlspecialchars($est['escuela'] ?? '—') ?></td>
+                  <td><?= htmlspecialchars($est['email']) ?></td>
+                  <td><?= htmlspecialchars($est['fecha_nacimiento']) ?></td>
+                  <td><?= htmlspecialchars($est['telefono']) ?></td>
+                  <td><?= htmlspecialchars($est['direccion']) ?></td>
+                  <td><?= htmlspecialchars($est['categoria'] ?? '—') ?></td>
+                  <td><?= htmlspecialchars($est['usuario']) ?></td>
+
+                  <td class="text-center">
                     <?php if ($est['estado'] === 'activo'): ?>
                       <button
                         class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                        title="Haz clic para desactivar"
-                        onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, 'inactivo')">
+                        title="Haz clic para desactivar" onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, 'inactivo')">
                         <i class="bi bi-toggle-on fs-5"></i>
                         Activo
                       </button>
@@ -119,77 +119,77 @@ try {
                       </button>
                     <?php endif; ?>
                   </td>
-                                    <td class="text-center">
-                                        <button class="btn btn-sm btn-outline-warning me-1" title="Editar"
-                                            onclick="editarEstudiante(<?= $est['id'] ?>)">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar"
-                                            onclick="eliminarEstudiante(<?= $est['id'] ?>)">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                         <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2   shadow-sm"
-                        onclick="abrirModalCategorias(<?= $est['id'] ?>, '<?= htmlspecialchars($est['nombre'], ENT_QUOTES, 'UTF-8') ?>',  '<?= htmlspecialchars($est['fecha_nacimiento'], ENT_QUOTES, 'UTF-8') ?>')"
-                        title="Ver detalles de categorias del estudiante">
-                        <i class="bi bi-eye "></i> Categorias
-                      </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="12">
-                                    <div class="alert alert-warning text-center m-0 rounded-0">
-                                        <i class="bi bi-exclamation-circle-fill me-2"></i>No hay estudiantes registrados.
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-
-            <?php if ($total_paginas > 1): ?>
-                <nav aria-label="Paginación de estudiantes" class="my-3">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
-                            <a class="page-link" href="?pagina=<?= $pagina - 1 ?>&limite=<?= $limite ?>">Anterior</a>
-                        </li>
-                        <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
-                            <li class="page-item <?= $pagina == $i ? 'active' : '' ?>">
-                                <a class="page-link" href="?pagina=<?= $i ?>&limite=<?= $limite ?>"><?= $i ?></a>
-                            </li>
-                        <?php endfor; ?>
-                        <li class="page-item <?= $pagina >= $total_paginas ? 'disabled' : '' ?>">
-                            <a class="page-link" href="?pagina=<?= $pagina + 1 ?>&limite=<?= $limite ?>">Siguiente</a>
-                        </li>
-                    </ul>
-                </nav>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-outline-warning me-1" title="Editar"
+                      onclick="editarEstudiante(<?= $est['id'] ?>)">
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" title="Eliminar"
+                      onclick="eliminarEstudiante(<?= $est['id'] ?>)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2   shadow-sm"
+                      onclick="abrirModalCategorias(<?= $est['id'] ?>, '<?= htmlspecialchars($est['nombre'], ENT_QUOTES, 'UTF-8') ?>',  '<?= htmlspecialchars($est['fecha_nacimiento'], ENT_QUOTES, 'UTF-8') ?>')"
+                      title="Ver detalles de categorias del estudiante">
+                      <i class="bi bi-eye "></i> Categorias
+                    </button>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <tr>
+                <td colspan="12">
+                  <div class="alert alert-warning text-center m-0 rounded-0">
+                    <i class="bi bi-exclamation-circle-fill me-2"></i>No hay estudiantes registrados.
+                  </div>
+                </td>
+              </tr>
             <?php endif; ?>
-        </div>
+          </tbody>
+        </table>
+      </div>
+
+      <?php if ($total_paginas > 1): ?>
+        <nav aria-label="Paginación de estudiantes" class="my-3">
+          <ul class="pagination justify-content-center">
+            <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
+              <a class="page-link" href="?pagina=<?= $pagina - 1 ?>&limite=<?= $limite ?>">Anterior</a>
+            </li>
+            <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+              <li class="page-item <?= $pagina == $i ? 'active' : '' ?>">
+                <a class="page-link" href="?pagina=<?= $i ?>&limite=<?= $limite ?>"><?= $i ?></a>
+              </li>
+            <?php endfor; ?>
+            <li class="page-item <?= $pagina >= $total_paginas ? 'disabled' : '' ?>">
+              <a class="page-link" href="?pagina=<?= $pagina + 1 ?>&limite=<?= $limite ?>">Siguiente</a>
+            </li>
+          </ul>
+        </nav>
+      <?php endif; ?>
     </div>
+  </div>
 
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            function filterTable() {
-                const search = $("#customSearch").val().toLowerCase();
-                let count = 0;
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      function filterTable() {
+        const search = $("#customSearch").val().toLowerCase();
+        let count = 0;
 
-                $("table tbody tr").each(function () {
-                    const rowText = $(this).text().toLowerCase();
-                    if (rowText.includes(search)) {
-                        $(this).show();
-                        count++;
-                    } else {
-                        $(this).hide();
-                    }
-                });
+        $("table tbody tr").each(function () {
+          const rowText = $(this).text().toLowerCase();
+          if (rowText.includes(search)) {
+            $(this).show();
+            count++;
+          } else {
+            $(this).hide();
+          }
+        });
 
-                if (count === 0) {
-                    if ($("#no-results").length === 0) {
-                        $("table tbody").append(`
+        if (count === 0) {
+          if ($("#no-results").length === 0) {
+            $("table tbody").append(`
                             <tr id="no-results">
                                 <td colspan="12">
                                     <div class="alert alert-info text-center m-0 rounded-0">
@@ -198,22 +198,22 @@ try {
                                 </td>
                             </tr>
                         `);
-                    }
-                } else {
-                    $("#no-results").remove();
-                }
-            }
+          }
+        } else {
+          $("#no-results").remove();
+        }
+      }
 
-            $("#customSearch").on("input", filterTable);
+      $("#customSearch").on("input", filterTable);
 
-            $('#container-length').on('change', function () {
-                const selectedLimit = $(this).val();
-                window.location.href = `?pagina=1&limite=${selectedLimit}`;
-            });
+      $('#container-length').on('change', function () {
+        const selectedLimit = $(this).val();
+        window.location.href = `?pagina=1&limite=${selectedLimit}`;
+      });
 
-            filterTable();
-        });
-    </script>
+      filterTable();
+    });
+  </script>
 </div>
 
 <!-- Modal Registro / Edición Estudiante -->
@@ -363,11 +363,11 @@ try {
       <div class="modal-header bg-primary text-white">
         <h5 class="modal-title">
           <i class="bi bi-card-checklist me-2 text-white"></i>
-           Categorías asignadas al estudiante: 
+          Categorías asignadas al estudiante:
           <span id="nombreEstudiante" class="fw-semibold"></span>
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div> 
+      </div>
 
       <!-- Cuerpo del modal -->
       <div class="modal-body">
@@ -375,7 +375,7 @@ try {
         <div id="seccionNuevaCategoria" class="mb-4 d-none">
           <form id="formNuevaCategoria">
             <p class="h3" id="edad"></p>
-            <input type="text" name="estudiante_id" id="nuevo_estudiante_id" value="" >
+            <input type="text" name="estudiante_id" id="nuevo_estudiante_id" value="">
             <div class="row g-2 align-items-center">
               <div class="col-md-8">
                 <label class="form-label">Selecciona nueva categoría:</label>
@@ -398,25 +398,25 @@ try {
             <i class="bi bi-plus-circle me-1"></i> Nueva Categoría
           </button>
         </div>
-         <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-          <thead class="table-light">
-            <tr>
-              <th><i class="bi bi-hash text-secondary me-1"></i>ID</th> 
-              <th><i class="bi bi-award-fill text-primary me-1"></i>Categoría</th>
-              <th><i class="bi bi-check2-circle text-success me-1"></i>Estado</th>
-              <th><i class="bi bi-calendar-event text-info me-1"></i>Fecha Asignación</th>
-              <th><i class="bi bi-tools text-dark me-1"></i>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="tablaCategoriasEstudiante">
-            <tr>
-              <td colspan="5" class="text-center text-muted">
-                <i class="bi bi-hourglass-split me-2"></i>Cargando...
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th><i class="bi bi-hash text-secondary me-1"></i>ID</th>
+                <th><i class="bi bi-award-fill text-primary me-1"></i>Categoría</th>
+                <th><i class="bi bi-check2-circle text-success me-1"></i>Estado</th>
+                <th><i class="bi bi-calendar-event text-info me-1"></i>Fecha Asignación</th>
+                <th><i class="bi bi-tools text-dark me-1"></i>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaCategoriasEstudiante">
+              <tr>
+                <td colspan="5" class="text-center text-muted">
+                  <i class="bi bi-hourglass-split me-2"></i>Cargando...
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -642,19 +642,19 @@ try {
 
   // Ejecutar al cargar la página
   document.addEventListener('DOMContentLoaded', cargarEscuelas);
-  
-let estudianteEdadGlobal = null;
+
+  let estudianteEdadGlobal = null;
 
   function abrirModalCategorias(estudianteId, nombreEstudiante, fecha_nacimiento) {
     // Mostrar modal
     const modal = new bootstrap.Modal(document.getElementById('modalAsignarCategoria'));
     modal.show();
-    estudianteEdadGlobal =calcularEdad(fecha_nacimiento);
+    estudianteEdadGlobal = calcularEdad(fecha_nacimiento);
     // Mostrar nombre 
     document.getElementById('nuevo_estudiante_id').value = estudianteId;
 
     document.getElementById('nombreEstudiante').textContent = nombreEstudiante;
-    document.getElementById('edad').textContent =` ${estudianteEdadGlobal } Años`;
+    document.getElementById('edad').textContent = ` ${estudianteEdadGlobal} Años`;
 
     // Cargar categorías asignadas
     fetch(`../api/obtener_categorias_estudiante.php?estudiante_id=${estudianteId}`)
@@ -709,101 +709,101 @@ let estudianteEdadGlobal = null;
       default: return 'secondary';
     }
   }
- 
 
-let estudianteIdGlobal = null;
 
-function asignarCategoriaEstudiante(estudiante_id, nombre_estudiante) {
-  mostrarConfirmacionToast(`¿Deseas asignar categoría a ${nombre_estudiante}?`, () => {
-    estudianteIdGlobal = estudiante_id;
-    document.getElementById('nombreEstudianteModal').textContent = nombre_estudiante;
-    document.getElementById('nuevo_estudiante_id').value = estudiante_id;
-    ocultarFormularioNuevaCategoria();
-    mostrarCategoriasEstudiante(estudiante_id);
-    const modal = new bootstrap.Modal(document.getElementById('modalCategoriasEstudiante'));
-    modal.show();
-  });
-}
- 
-function mostrarFormularioNuevaCategoria() {
-  const seccion = document.getElementById('seccionNuevaCategoria');
-  seccion.classList.remove('d-none');
-  cargarCategoriasDisponibles();
-}
+  let estudianteIdGlobal = null;
 
-function ocultarFormularioNuevaCategoria() {
-  document.getElementById('seccionNuevaCategoria').classList.add('d-none');
-}
- 
+  function asignarCategoriaEstudiante(estudiante_id, nombre_estudiante) {
+    mostrarConfirmacionToast(`¿Deseas asignar categoría a ${nombre_estudiante}?`, () => {
+      estudianteIdGlobal = estudiante_id;
+      document.getElementById('nombreEstudianteModal').textContent = nombre_estudiante;
+      document.getElementById('nuevo_estudiante_id').value = estudiante_id;
+      ocultarFormularioNuevaCategoria();
+      mostrarCategoriasEstudiante(estudiante_id);
+      const modal = new bootstrap.Modal(document.getElementById('modalCategoriasEstudiante'));
+      modal.show();
+    });
+  }
 
-function cargarCategoriasDisponibles() {
-  fetch('../api/obtener_categorias.php')
-    .then(res => res.json())
-    .then(data => {
-      const select = document.getElementById('selectNuevaCategoria');
-      select.innerHTML = '<option value="">-- Seleccionar --</option>';
+  function mostrarFormularioNuevaCategoria() {
+    const seccion = document.getElementById('seccionNuevaCategoria');
+    seccion.classList.remove('d-none');
+    cargarCategoriasDisponibles();
+  }
 
-      data.data.forEach(cat => {
-        // Suponiendo que cada categoría tenga campos: edad_minima y edad_maxima
-        if (estudianteEdadGlobal >= cat.edad_minima ) {
-          select.innerHTML += `<option value="${cat.id}">${cat.nombre}</option>`;
+  function ocultarFormularioNuevaCategoria() {
+    document.getElementById('seccionNuevaCategoria').classList.add('d-none');
+  }
+
+
+  function cargarCategoriasDisponibles() {
+    fetch('../api/obtener_categorias.php')
+      .then(res => res.json())
+      .then(data => {
+        const select = document.getElementById('selectNuevaCategoria');
+        select.innerHTML = '<option value="">-- Seleccionar --</option>';
+
+        data.data.forEach(cat => {
+          // Suponiendo que cada categoría tenga campos: edad_minima y edad_maxima
+          if (estudianteEdadGlobal >= cat.edad_minima) {
+            select.innerHTML += `<option value="${cat.id}">${cat.nombre}</option>`;
+          }
+        });
+
+        if (select.options.length === 1) {
+          select.innerHTML += '<option disabled>No hay categorías disponibles para esta edad</option>';
         }
       });
-
-      if (select.options.length === 1) {
-        select.innerHTML += '<option disabled>No hay categorías disponibles para esta edad</option>';
-      }
-    });
-}
+  }
 
 
 
- 
-
-document.getElementById('formNuevaCategoria').addEventListener('submit', function (e) {
-  e.preventDefault();
-
-  const form = e.target;
-  const formData = new FormData(form);
-  console.log(form);
-  fetch('../api/guardar_categoria_estudiante.php', {
-    method: 'POST',
-    body: formData
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.status) {
-      mostrarToast('success','Categoría asignada correctamente');
-      ocultarFormularioNuevaCategoria();
-     // mostrarCategoriasEstudiante('success', formData.get('estudiante_id')); // Refresca tabla
-       setTimeout(() => location.reload(), 1200);
-    } else {
-      mostrarToast('warning', data.message || 'Error al guardar la categoría');
-    }
-  })
-  .catch(error => {
-    console.error(error);
-    mostrarToast('Error de red o servidor al guardar', 'danger');
-  });
-});
 
 
-function eliminarCategoriaAsignada(asignacion_id) {
-  mostrarConfirmacionToast(`¿Estás seguro de eliminar esta asignación?`, () => {
-    fetch('api/eliminar_categoria_estudiante.php', {
+  document.getElementById('formNuevaCategoria').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+    console.log(form);
+    fetch('../api/guardar_categoria_estudiante.php', {
       method: 'POST',
-      body: new URLSearchParams({ asignacion_id })
+      body: formData
     })
       .then(res => res.json())
       .then(data => {
         if (data.status) {
-          mostrarCategoriasEstudiante(estudianteIdGlobal);
+          mostrarToast('success', 'Categoría asignada correctamente');
+          ocultarFormularioNuevaCategoria();
+          // mostrarCategoriasEstudiante('success', formData.get('estudiante_id')); // Refresca tabla
+          setTimeout(() => location.reload(), 1200);
         } else {
-          alert(data.message || 'Error al eliminar.');
+          mostrarToast('warning', data.message || 'Error al guardar la categoría');
         }
+      })
+      .catch(error => {
+        console.error(error);
+        mostrarToast('Error de red o servidor al guardar', 'danger');
       });
   });
-}
+
+
+  function eliminarCategoriaAsignada(asignacion_id) {
+    mostrarConfirmacionToast(`¿Estás seguro de eliminar esta asignación?`, () => {
+      fetch('api/eliminar_categoria_estudiante.php', {
+        method: 'POST',
+        body: new URLSearchParams({ asignacion_id })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status) {
+            mostrarCategoriasEstudiante(estudianteIdGlobal);
+          } else {
+            alert(data.message || 'Error al eliminar.');
+          }
+        });
+    });
+  }
 
 
 
