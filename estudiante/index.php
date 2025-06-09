@@ -300,6 +300,7 @@ if (isset($_SESSION['estudiante'])) {
         formData.append('tipoUsuario', 'estudiante'); // ← ¡debe ser "tipo"!
         formData.append('usuario', codigo);
 
+        
 
         fetch('../api/login.php', {
             method: 'POST',
