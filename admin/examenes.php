@@ -214,8 +214,10 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <h5 class="modal-title" id="tituloModalExamen"><i class="bi bi-journal-plus me-2"></i>Nuevo Examen</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
-        <form id="formExamen">
-          <div class="modal-body row g-3 px-4 py-3">
+
+
+
+        <div class="modal-body row g-3 px-4 py-3">
             <input type="hidden" name="examen_id" id="examen_id">
             <input type="hidden" name="usuario_id" id="usuario_id" value="<?= (int) $_SESSION['usuario']['id'] ?>">
 
@@ -249,6 +251,14 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
           </div>
 
 
+        <form id="formExamen">
+          
+<div class="mt-3">
+          <h5 class="text-primary"><i class="bi bi-list-ul me-1"></i>Lista de Estudiantes Añadidos</h5>
+          <ul class="list-group" id="lista_seleccionados" name="lista_seleccionados"></ul>
+        </div>
+
+
           <div class="col-md-6">
             <button type="button" id="btn_anadir_estudiante" class="btn btn-success">
               <i class="bi bi-plus-circle me-1"></i>Añadir a la lista
@@ -266,11 +276,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </form>
 
 
-        <div class="mt-3">
-          <h5 class="text-primary"><i class="bi bi-list-ul me-1"></i>Lista de Estudiantes Añadidos</h5>
-          <ul class="list-group" id="lista_seleccionados"></ul>
-        </div>
-
+        
 
       </div>
     </div>
@@ -466,8 +472,17 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 
+
+
+
+
+
+
+
+
         // Generar código único
         formData.append("codigo_acceso", generarCodigo());
+        formData.append("lista_seleccionados", )
 
         try {
           const res = await fetch("../api/guardar_examen.php", {
@@ -498,6 +513,69 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 
+
+
+
+
+
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('form_examen'); // Cambia esto al id real
+
+  if (!form) {
+    console.error('No se encontró el formulario');
+    return;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Suponiendo que listaTemporal está declarada y llena
+    const formData = new FormData(form);
+    formData.append('codigo_acceso', generarCodigo());
+    formData.append('lista_estudiantes', JSON.stringify(listaTemporal));
+
+    try {
+      const res = await fetch('../api/guardar_examen.php', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+
+
+
+      console.log(data);
+
+
+
+      if (data.status) {
+        mostrarToast('success', data.message || 'Examen guardado correctamente');
+        setTimeout(() => location.reload(), 1200);
+      } else {
+        mostrarToast('warning', 'Error: ' + (data.message || 'No se pudo guardar el examen.'));
+      }
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+      mostrarToast('error', 'Error en la conexión con el servidor.');
+    }
+  });
+
+  function generarCodigo() {
+    return 'EXAM' + Date.now().toString().slice(-6);
+  }
+});
+
+
+
+
+
+
+
+
+
+
+    
 
 
     
@@ -536,17 +614,17 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     btnAnadir.addEventListener('click', () => {
       const estudianteId = document.querySelector('input[name="estudiante_radio"]:checked')?.value;
 
-      console.log(estudianteId);
+    
 
       // Buscar el estudiante
       const estudiante = estudiantesData.find(e => e.id == estudianteId);
 
-      console.log(estudiantesData);
+     
 
       // Validar si existe el estudiante
       if (!estudiante) {
         mostrarToast('error', 'Debes buscar y seleccionar un estudiante válido.');
-        console.log(estudiante);
+       
         return;
       }
 
@@ -556,7 +634,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       const fechaExamen = document.getElementById('fecha_examen').value;
 
 
-      console.log(fechaExamen);
+      
 
       if (!categoriaId || !totalPreguntas) {
         mostrarToast('warning', 'Completa todos los campos antes de añadir.');

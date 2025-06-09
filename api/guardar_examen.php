@@ -7,57 +7,91 @@ function limpiarTexto($texto) {
     return trim(htmlspecialchars($texto));
 }
 
-// Validar y sanitizar entradas
-$estudiante_id    = isset($_POST['estudiante_id']) ? (int) $_POST['estudiante_id'] : null;
-$categoria_id     = isset($_POST['categoria_id']) ? (int) $_POST['categoria_id'] : null;
-$total_preguntas  = isset($_POST['total_preguntas']) ? (int) $_POST['total_preguntas'] : 0;
-$estado           = isset($_POST['estado']) ? limpiarTexto($_POST['estado']) : 'pendiente';
-$codigo_acceso    = isset($_POST['codigo_acceso']) ? limpiarTexto($_POST['codigo_acceso']) : '';
-$asignado_por     = isset($_POST['usuario_id']) ? (int) $_POST['usuario_id'] : null;
+// Recibimos JSON desde el frontend
+$input = file_get_contents('php://input');
+$data = json_decode($input, true);
 
-// Validación básica de campos obligatorios
-if (!$estudiante_id || !$categoria_id || !$codigo_acceso || !$asignado_por) {
+if (!$data || !isset($data['examenes']) || !is_array($data['examenes'])) {
     echo json_encode([
         'status' => false,
-        'message' => 'Todos los campos requeridos deben estar completos.'
+        'message' => 'Datos inválidos o no recibidos.'
     ]);
     exit;
 }
 
-// Verificar si ya existe un examen para ese estudiante y categoría
-$sql_check = "SELECT COUNT(*) FROM examenes WHERE estudiante_id = ? AND categoria_id = ?";
-$stmt_check = $pdo->prepare($sql_check);
-$stmt_check->execute([$estudiante_id, $categoria_id]);
-$existe = $stmt_check->fetchColumn();
-
-if ($existe > 0) {
-    echo json_encode([
-        'status' => false,
-        'message' => 'Este estudiante ya tiene asignado un examen para esta categoría.'
-    ]);
-    exit;
-}
-
-// Insertar el nuevo examen
+$examenes = $data['examenes'];
+$codigo_acceso = isset($data['codigo_acceso']) ? limpiarTexto($data['codigo_acceso']) : '';
+$asignado_por = isset($data['usuario_id']) ? (int) $data['usuario_id'] : null;
 $tiempo_por_pregunta = 45; // segundos
-$duracion = ceil(($total_preguntas * $tiempo_por_pregunta) / 60); // duración en minutos
 
-$sql_insert = "INSERT INTO examenes (estudiante_id, categoria_id, total_preguntas, estado, duracion, codigo_acceso, asignado_por, fecha_asignacion) 
-               VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+if (!$codigo_acceso || !$asignado_por) {
+    echo json_encode([
+        'status' => false,
+        'message' => 'Faltan datos obligatorios: código de acceso o usuario.'
+    ]);
+    exit;
+}
 
-$stmt_insert = $pdo->prepare($sql_insert);
-$ok = $stmt_insert->execute([
-    $estudiante_id,
-    $categoria_id,
-    $total_preguntas,
-    $estado,
-    $duracion,
-    $codigo_acceso,
-    $asignado_por
-]);
+$exitos = 0;
+$errores = [];
 
+foreach ($examenes as $index => $item) {
+    $estudiante_id = isset($item['estudiante_id']) ? (int) $item['estudiante_id'] : null;
+    $categoria_id = isset($item['categoria_id']) ? (int) $item['categoria_id'] : null;
+    $total_preguntas = isset($item['total_preguntas']) ? (int) $item['total_preguntas'] : 0;
+    $fecha_examen = isset($item['fecha_examen']) ? limpiarTexto($item['fecha_examen']) : null;
+    $estado = 'INICIO';
+
+    // Validar cada registro
+    if (!$estudiante_id || !$categoria_id || $total_preguntas <= 0 || !$fecha_examen) {
+        $errores[] = "Registro #$index inválido o incompleto.";
+        continue;
+    }
+
+    // Validar formato de fecha YYYY-MM-DD
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha_examen)) {
+        $errores[] = "Fecha inválida en registro #$index.";
+        continue;
+    }
+
+    // Verificar si ya existe examen para ese estudiante y categoría
+    $sql_check = "SELECT COUNT(*) FROM examenes WHERE estudiante_id = ? AND categoria_id = ?";
+    $stmt_check = $pdo->prepare($sql_check);
+    $stmt_check->execute([$estudiante_id, $categoria_id]);
+    $existe = $stmt_check->fetchColumn();
+
+    if ($existe > 0) {
+        $errores[] = "El estudiante ID $estudiante_id ya tiene examen para la categoría ID $categoria_id.";
+        continue;
+    }
+
+    $duracion = ceil(($total_preguntas * $tiempo_por_pregunta) / 60);
+
+    $sql_insert = "INSERT INTO examenes (estudiante_id, categoria_id, total_preguntas, estado, duracion, codigo_acceso, asignado_por, fecha_asignacion) 
+                   VALUES (?, ?, ?, ?, ?, ?, ?,?)";
+
+    $stmt_insert = $pdo->prepare($sql_insert);
+    $ok = $stmt_insert->execute([
+        $estudiante_id,
+        $categoria_id,
+        $total_preguntas,
+        $estado,
+        $duracion,
+        $codigo_acceso,
+        $asignado_por,
+        $fecha_examen
+    ]);
+
+    if ($ok) {
+        $exitos++;
+    } else {
+        $errores[] = "Error al guardar examen para estudiante ID $estudiante_id y categoría ID $categoria_id.";
+    }
+}
 
 echo json_encode([
-    'status' => $ok,
-    'message' => $ok ? 'Examen guardado exitosamente.' : 'Error al guardar el examen.'
+    'status' => $exitos > 0,
+    'message' => $exitos > 0 ? "Se guardaron $exitos examen(es)." : "No se guardó ningún examen.",
+    'errores' => $errores
 ]);
+?>
