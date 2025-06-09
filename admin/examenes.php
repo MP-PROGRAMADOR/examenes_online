@@ -220,30 +220,31 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <input type="hidden" name="usuario_id" id="usuario_id" value="<?= (int) $_SESSION['usuario']['id'] ?>">
 
 
-          <div class="col-md-6">
-            <label for="estudiante_id" class="form-label">Estudiante</label>
-            <select class="form-select" id="estudiante_id" name="estudiante_id" required></select>
-          </div>
+        <div class="mb-2">
+  <label for="buscador_estudiantes" class="form-label">Buscar Estudiante</label>
+  <input type="text" class="form-control" id="buscador_estudiantes" placeholder="Escribe nombre o apellido...">
+</div>
+<div id="lista_estudiantes" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;"></div>
+<input type="hidden" name="estudiante_id" id="estudiante_id" required>
+
 
           <div class="col-md-6">
             <label for="categoria_id" class="form-label">Categoría</label>
             <select class="form-select" id="categoria_id" name="categoria_id" required></select>
           </div>
 
-          <div class="col-md-6">
+          <div class="col-md-12">
             <label for="total_preguntas" class="form-label">Total de Preguntas</label>
-            <input type="number" class="form-control" id="total_preguntas" name="total_preguntas" min="1" required>
+            <input type="number" class="form-control" id="total_preguntas" value="30" name="total_preguntas" min="30" required>
             <span id="preguntas_disponibles" class="text-fs-2"></span>
           </div>
 
-          <div class="col-md-6">
-            <label for="estado" class="form-label">Estado</label>
-            <select class="form-select" id="estado" name="estado">
-              <option value="pendiente">Pendiente</option>
-              <option value="en_progreso">En Progreso</option>
-              <option value="finalizado">Finalizado</option>
-            </select>
-          </div>
+         
+      <div class="col-12">
+  <button type="button" id="btn_anadir_estudiante" class="btn btn-success">
+    <i class="bi bi-plus-circle me-1"></i>Añadir a la lista
+  </button>
+</div>
 
 
 
@@ -254,9 +255,30 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
           </div>
       </form>
+
+
+      <div class="mt-3">
+  <h5 class="text-primary"><i class="bi bi-list-ul me-1"></i>Lista de Estudiantes Añadidos</h5>
+  <ul class="list-group" id="lista_seleccionados"></ul>
+</div>
+
+
     </div>
   </div>
 </div>
+
+
+
+
+
+
+<script>
+  let estudiantesData = []; // <- Aquí guardaremos los estudiantes
+</script>
+
+
+
+
 
 
 
@@ -276,8 +298,31 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       document.getElementById('codigo_acceso').value = examen.codigo_acceso;
     }
 
+
+
+
+
+if (examen) {
+  // Esperar a que se carguen los estudiantes antes de marcar el seleccionado
+  setTimeout(() => {
+    const radio = document.querySelector(`input[name="estudiante_radio"][value="${examen.estudiante_id}"]`);
+    if (radio) {
+      radio.checked = true;
+      document.getElementById("estudiante_id").value = examen.estudiante_id;
+    }
+  }, 300); // Ajusta si tu AJAX es más lento
+}
+
+
+
+
+
     modal.show();
   }
+
+
+
+  
   document.addEventListener("DOMContentLoaded", () => {
 
 
@@ -286,15 +331,78 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     const categoriaSelect = document.getElementById("categoria_id");
     const totalPreguntasInput = document.getElementById("total_preguntas");
 
+
+    
+configurarBuscadorEstudiantes();
+
     // Cargar estudiantes al cargar la página
-    fetch("../api/obtener_estudiantes.php")
-      .then(res => res.json())
-      .then(data => {
-        estudianteSelect.innerHTML = `<option value="">Seleccione</option>`;
-        data.data.forEach(e => {
-          estudianteSelect.innerHTML += `<option value="${e.id}">${e.nombre} ${e.apellidos}</option>`;
-        });
-      });
+   
+
+
+function renderEstudiantes(filtro = '') {
+  const contenedor = document.getElementById("lista_estudiantes");
+  contenedor.innerHTML = '';
+
+  if (filtro.trim() === '') return;
+
+  const filtroLower = filtro.toLowerCase();
+  const coincidencias = estudiantesData.filter(est =>
+    (`${est.nombre} ${est.apellidos}`).toLowerCase().includes(filtroLower)
+  ).slice(0, 3); // Máximo 3
+
+  if (coincidencias.length === 0) {
+    contenedor.innerHTML = '<p class="text-muted">No se encontraron coincidencias.</p>';
+    return;
+  }
+
+  coincidencias.forEach(est => {
+    const item = `
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="estudiante_radio" value="${est.id}" id="est_${est.id}">
+        <label class="form-check-label" for="est_${est.id}">
+          ${est.nombre} ${est.apellidos}
+        </label>
+      </div>
+    `;
+    contenedor.innerHTML += item;
+  });
+
+
+
+
+
+
+
+
+  // Cuando se selecciona un estudiante
+  contenedor.querySelectorAll('input[name="estudiante_radio"]').forEach(radio => {
+    radio.addEventListener('change', function () {
+      document.getElementById('estudiante_id').value = this.value;
+      cargarCategorias(this.value); // Cargar categorías para el estudiante seleccionado
+    });
+  });
+}
+
+function configurarBuscadorEstudiantes() {
+  fetch("../api/obtener_estudiantes.php")
+  .then(res => res.json())
+  .then(data => {
+    estudiantesData = data.data;
+  });
+
+  document.getElementById("buscador_estudiantes").addEventListener("input", function () {
+    renderEstudiantes(this.value);
+  });
+}
+
+
+
+
+
+
+
+
+
 
     // Cargar categorías según el estudiante seleccionado
     estudianteSelect.addEventListener("change", () => {
@@ -372,7 +480,120 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       return "EXAM" + Date.now().toString().slice(-6);
     }
   });
+
+
+
+function cargarCategorias(estudianteId) {
+  const categoriaSelect = document.getElementById("categoria_id");
+  categoriaSelect.innerHTML = `<option value="">Seleccione</option>`;
+
+  if (!estudianteId) return;
+
+  fetch(`../api/obtener_categorias_estudiante.php?estudiante_id=${estudianteId}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.status) {
+        mostrarToast('success', data.message);
+        data.data.forEach(c => {
+          categoriaSelect.innerHTML += `<option value="${c.categoria_id}">${c.categoria}</option>`;
+        });
+      } else {
+        mostrarToast('warning', data.message);
+      }
+    });
+}
+
+
+
 </script>
+
+
+
+
+
+
+<script>
+
+
+const btnAnadir = document.getElementById('btn_anadir_estudiante');
+const listaSeleccionados = document.getElementById('lista_seleccionados');
+
+const listaTemporal = []; // Lista que simula los datos a guardar
+
+btnAnadir.addEventListener('click', () => {
+  const estudianteId = document.querySelector('input[name="estudiante_radio"]:checked')?.value;
+
+  console.log(estudianteId);
+
+  // Buscar el estudiante
+  const estudiante = estudiantesData.find(e => e.id == estudianteId);
+
+   console.log(estudiantesData);
+
+  // Validar si existe el estudiante
+  if (!estudiante) {
+    mostrarToast('error', 'Debes buscar y seleccionar un estudiante válido.');
+    console.log(estudiante);
+    return;
+  }
+
+  const categoriaId = document.getElementById('categoria_id').value;
+  const categoriaNombre = document.getElementById('categoria_id').options[document.getElementById('categoria_id').selectedIndex]?.text;
+  const totalPreguntas = document.getElementById('total_preguntas').value;
+
+  if (!categoriaId || !totalPreguntas) {
+    mostrarToast('warning', 'Completa todos los campos antes de añadir.');
+    return;
+  }
+
+  // Evitar duplicados
+  const yaExiste = listaTemporal.some(e => e.estudiante_id == estudianteId && e.categoria_id == categoriaId);
+  if (yaExiste) {
+    mostrarToast('info', 'Este estudiante ya fue añadido con esta categoría.');
+    return;
+  }
+
+  // Crear objeto con los datos
+  const datos = {
+    estudiante_id: estudianteId,
+    nombre: estudiante.nombre + ' ' + estudiante.apellidos,
+    categoria_id: categoriaId,
+    categoria: categoriaNombre,
+    total_preguntas: totalPreguntas
+  };
+
+  listaTemporal.push(datos);
+  actualizarListaVisual();
+});
+
+
+function actualizarListaVisual() {
+  listaSeleccionados.innerHTML = '';
+  listaTemporal.forEach((item, index) => {
+    const li = document.createElement('li');
+    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+    li.innerHTML = `
+      <div>
+        <strong>${item.nombre}</strong> - ${item.categoria} (${item.total_preguntas} preguntas)
+      </div>
+      <button type="button" class="btn btn-sm btn-danger" onclick="eliminarSeleccionado(${index})">
+        <i class="bi bi-trash"></i>
+      </button>
+    `;
+    listaSeleccionados.appendChild(li);
+  });
+}
+
+window.eliminarSeleccionado = function (index) {
+  listaTemporal.splice(index, 1);
+  actualizarListaVisual();
+};
+
+
+
+</script>
+
+
 
 
 <?php include_once('../includes/footer.php'); ?>
