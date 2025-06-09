@@ -14,47 +14,30 @@ try {
   $total_paginas = ceil($total_registros / $limite);
 
   // Consulta paginada con joins
-  // Consulta con categorías agrupadas
   $sql = "
-  SELECT 
-    e.*, 
-    esc.nombre AS escuela, 
-    c.nombre AS categoria, 
-    ec.categoria_id
-  FROM estudiantes e
-  LEFT JOIN escuelas_conduccion esc ON e.escuela_id = esc.id
-  LEFT JOIN estudiante_categorias ec ON ec.estudiante_id = e.id
-  LEFT JOIN categorias c ON ec.categoria_id = c.id
-  ORDER BY e.id DESC
-  LIMIT :inicio, :limite
-";
+        SELECT 
+            e.*, 
+            esc.nombre AS escuela, 
+            c.nombre AS categoria 
+        FROM estudiantes e
+        LEFT JOIN escuelas_conduccion esc ON e.escuela_id = esc.id
+        LEFT JOIN estudiante_categorias ec ON ec.estudiante_id = e.id
+        LEFT JOIN categorias c ON ec.categoria_id = c.id
+        ORDER BY e.id DESC
+        LIMIT :inicio, :limite
+    ";
   $stmt = $pdo->prepare($sql);
   $stmt->bindValue(':inicio', $inicio, PDO::PARAM_INT);
   $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
   $stmt->execute();
-  $raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-  // Agrupar categorías por estudiante ID
-  $estudiantes = [];
-  foreach ($raw as $row) {
-    $id = $row['id'];
-    if (!isset($estudiantes[$id])) {
-      $estudiantes[$id] = $row;
-      $estudiantes[$id]['categorias'] = [];
-    }
-    if ($row['categoria']) {
-      $estudiantes[$id]['categorias'][] = $row['categoria'];
-    }
-  }
-
-
+  $estudiantes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
   error_log("Error al obtener estudiantes: " . $e->getMessage());
   $estudiantes = [];
 }
 ?>
 
-<main class="main-content" id="content">
+<div class="main-content">
   <div class="card shadow-sm mb-4">
     <div
       class="card-header bg-primary text-white d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 rounded-top">
@@ -109,50 +92,36 @@ try {
               <?php foreach ($estudiantes as $est): ?>
                 <tr>
                   <td class="text-center"><?= htmlspecialchars($est['id']) ?></td>
-                  <td><?= htmlspecialchars($est['nombre'] . ' ' . $est['apellidos']) ?></td>
+                  <td><?= htmlspecialchars($est['apellidos'] . ' ' . $est['nombre']) ?></td>
                   <td><?= htmlspecialchars($est['dni']) ?></td>
                   <td><?= htmlspecialchars($est['escuela'] ?? '—') ?></td>
-                  <td><?= htmlspecialchars($est['email'] ?? '-') ?></td>
+                  <td><?= htmlspecialchars($est['email']) ?></td>
                   <td><?= htmlspecialchars($est['fecha_nacimiento']) ?></td>
                   <td><?= htmlspecialchars($est['telefono']) ?></td>
                   <td><?= htmlspecialchars($est['direccion']) ?></td>
-                  <td>
-                    <?php if (!empty($est['categorias'])): ?>
-                      <ul class="list-unstyled mb-0">
-                        <?php foreach ($est['categorias'] as $cat): ?>
-                          <li><i class="bi bi-bookmark-check-fill text-success me-1"></i> <?= htmlspecialchars($cat) ?></li>
-                        <?php endforeach; ?>
-                      </ul>
-                    <?php else: ?>
-                      <span class="text-muted">—</span>
-                    <?php endif; ?>
-                  </td>
-
+                  <td><?= htmlspecialchars($est['categoria'] ?? '—') ?></td>
                   <td><?= htmlspecialchars($est['usuario']) ?></td>
 
                   <td class="text-center">
                     <?php if ($est['estado'] === 'activo'): ?>
                       <button
                         class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                        title="Haz clic para desactivar"
-                        onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, '<?= $est['nombre'] ?>', 'inactivo')">
+                        title="Haz clic para desactivar" onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, 'inactivo')">
                         <i class="bi bi-toggle-on fs-5"></i>
                         Activo
                       </button>
                     <?php else: ?>
                       <button
                         class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                        title="Haz clic para activar"
-                        onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, '<?= $est['nombre'] ?>', 'activo')">
+                        title="Haz clic para activar" onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, 'activo')">
                         <i class="bi bi-toggle-off fs-5"></i>
                         Inactivo
                       </button>
                     <?php endif; ?>
                   </td>
-
                   <td class="text-center">
                     <button class="btn btn-sm btn-outline-warning me-1" title="Editar"
-                     onclick='abrirModalEdicionEstudiante(<?= json_encode($est, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'">
+                      onclick="editarEstudiante(<?= $est['id'] ?>)">
                       <i class="bi bi-pencil-square"></i>
                     </button>
                     <button class="btn btn-sm btn-outline-danger" title="Eliminar"
@@ -200,7 +169,52 @@ try {
     </div>
   </div>
 
-</main>
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      function filterTable() {
+        const search = $("#customSearch").val().toLowerCase();
+        let count = 0;
+
+        $("table tbody tr").each(function () {
+          const rowText = $(this).text().toLowerCase();
+          if (rowText.includes(search)) {
+            $(this).show();
+            count++;
+          } else {
+            $(this).hide();
+          }
+        });
+
+        if (count === 0) {
+          if ($("#no-results").length === 0) {
+            $("table tbody").append(`
+                            <tr id="no-results">
+                                <td colspan="12">
+                                    <div class="alert alert-info text-center m-0 rounded-0">
+                                        <i class="bi bi-info-circle-fill me-2"></i>No se encontraron resultados.
+                                    </div>
+                                </td>
+                            </tr>
+                        `);
+          }
+        } else {
+          $("#no-results").remove();
+        }
+      }
+
+      $("#customSearch").on("input", filterTable);
+
+      $('#container-length').on('change', function () {
+        const selectedLimit = $(this).val();
+        window.location.href = `?pagina=1&limite=${selectedLimit}`;
+      });
+
+      filterTable();
+    });
+  </script>
+</div>
 
 <!-- Modal Registro / Edición Estudiante -->
 <div class="modal fade" id="modalEstudiante" tabindex="-1" aria-labelledby="modalEstudianteLabel" aria-hidden="true">
@@ -212,7 +226,7 @@ try {
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
-      <form id="formularioEstudiante" method="POST" class="needs-validation" novalidate>
+     <form id="formularioEstudiante" method="POST" class="needs-validation" novalidate>
         <div class="row modal-body p-4 ">
           <input type="hidden" name="estudiante_id" id="estudiante_id">
 
@@ -271,8 +285,7 @@ try {
             <label for="direccion_estudiante" class="form-label fw-semibold">
               <i class="bi bi-geo-alt-fill me-2 text-primary"></i>Dirección
             </label>
-            <textarea class="form-control shadow-sm" id="direccion_estudiante" name="direccion" rows="2"
-              required></textarea>
+            <textarea class="form-control shadow-sm" id="direccion_estudiante" name="direccion" rows="2" required></textarea>
           </div>
 
           <!-- Escuela de conducción -->
@@ -304,10 +317,9 @@ try {
 
           <div class="mb-3 col-12 col-md-6">
             <label for="categorias_id" class="form-label fw-semibold">
-              <i class="bi bi-file-earmark-text me-2 text-primary"></i>Número de Documento <span
-                class="text-danger">*</span>
+             <i class="bi bi-file-earmark-text me-2 text-primary"></i>Número de Documento <span class="text-danger">*</span>
             </label>
-            <input type="text" class="form-control shadow-sm" id="num" name="num">
+             <input type="text" class="form-control shadow-sm" id="num" name="num">
           </div>
 
 
@@ -363,7 +375,7 @@ try {
         <div id="seccionNuevaCategoria" class="mb-4 d-none">
           <form id="formNuevaCategoria">
             <p class="h3" id="edad"></p>
-            <input type="hidden" name="estudiante_id" id="nuevo_estudiante_id" value="">
+            <input type="text" name="estudiante_id" id="nuevo_estudiante_id" value="">
             <div class="row g-2 align-items-center">
               <div class="col-md-8">
                 <label class="form-label">Selecciona nueva categoría:</label>
@@ -412,51 +424,9 @@ try {
 </div>
 
 
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+
 <script>
-  $(document).ready(function () {
-    function filterTable() {
-      const search = $("#customSearch").val().toLowerCase();
-      let count = 0;
-
-      $("table tbody tr").each(function () {
-        const rowText = $(this).text().toLowerCase();
-        if (rowText.includes(search)) {
-          $(this).show();
-          count++;
-        } else {
-          $(this).hide();
-        }
-      });
-
-      if (count === 0) {
-        if ($("#no-results").length === 0) {
-          $("table tbody").append(`
-                            <tr id="no-results">
-                                <td colspan="12">
-                                    <div class="alert alert-info text-center m-0 rounded-0">
-                                        <i class="bi bi-info-circle-fill me-2"></i>No se encontraron resultados.
-                                    </div>
-                                </td>
-                            </tr>
-                        `);
-        }
-      } else {
-        $("#no-results").remove();
-      }
-    }
-
-    $("#customSearch").on("input", filterTable);
-
-    $('#container-length').on('change', function () {
-      const selectedLimit = $(this).val();
-      window.location.href = `?pagina=1&limite=${selectedLimit}`;
-    });
-
-    filterTable();
-  });
-
 
   // Función para calcular edad a partir de fecha de nacimiento
   function calcularEdad(fechaNacimiento) {
@@ -534,12 +504,11 @@ try {
     configurarSubmitEstudiante();
   }
 
-
   // Abrir modal de edición
   function abrirModalEdicionEstudiante(estudiante) {
     document.getElementById('modalEstudianteTitulo').textContent = 'Editar Estudiante';
     document.getElementById('modalEstudianteBotonTexto').textContent = 'Actualizar';
- 
+
     document.getElementById('estudiante_id').value = estudiante.id || '';
     document.getElementById('dni_estudiante').value = estudiante.dni || '';
     document.getElementById('nombre_estudiante').value = estudiante.nombre || '';
@@ -548,8 +517,9 @@ try {
     document.getElementById('telefono_estudiante').value = estudiante.telefono || '';
     document.getElementById('fecha_nacimiento').value = estudiante.fecha_nacimiento || '';
     document.getElementById('direccion_estudiante').value = estudiante.direccion || '';
-    
-    
+    document.getElementById('usuario_estudiante').value = estudiante.usuario || '';
+    document.getElementById('contrasena_estudiante').value = '';
+
     // Seleccionar escuela si está presente
     if (estudiante.escuela_id) {
       document.getElementById('escuela_id').value = estudiante.escuela_id;
@@ -569,9 +539,9 @@ try {
 
     if (estudiante.escuela_id) {
       document.getElementById('escuela_id').value = estudiante.escuela_id;
-    } 
+    }
 
-   const modal = new bootstrap.Modal(document.getElementById('modalEstudiante'));
+    const modal = new bootstrap.Modal(document.getElementById('modalEstudiante'));
     modal.show();
 
     configurarSubmitEstudiante();
@@ -680,11 +650,11 @@ try {
     const modal = new bootstrap.Modal(document.getElementById('modalAsignarCategoria'));
     modal.show();
     estudianteEdadGlobal = calcularEdad(fecha_nacimiento);
-    // Mostrar nombre  
+    // Mostrar nombre 
+    document.getElementById('nuevo_estudiante_id').value = estudianteId;
 
     document.getElementById('nombreEstudiante').textContent = nombreEstudiante;
     document.getElementById('edad').textContent = ` ${estudianteEdadGlobal} Años`;
-      document.getElementById('nuevo_estudiante_id').value = estudianteId;
 
     // Cargar categorías asignadas
     fetch(`../api/obtener_categorias_estudiante.php?estudiante_id=${estudianteId}`)
@@ -703,8 +673,14 @@ try {
                               <td>${cat.fecha_asignacion}</td> 
                               
                               <td class="text-center">
-                                
-                                
+                                <button class="btn btn-sm btn-outline-primary me-1" title="Asignar nueva categoría"
+                                  onclick="asignarNuevaCategoria(${cat.estudiante_id})">
+                                  <i class="bi bi-plus-circle"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning me-1" title="Editar asignación"
+                                  onclick="editarCategoriaAsignada(${cat.id})">
+                                  <i class="bi bi-pencil-square"></i>
+                                </button>
                                 <button class="btn btn-sm btn-outline-danger" title="Eliminar asignación"
                                   onclick="eliminarCategoriaAsignada(${cat.id})">
                                   <i class="bi bi-trash"></i>
@@ -728,7 +704,6 @@ try {
   function estadoColor(estado) {
     switch (estado) {
       case 'aprobado': return 'success';
-      case 'pendiente': return 'primary';
       case 'rechazado': return 'danger';
       case 'en_proceso': return 'warning';
       default: return 'secondary';
@@ -815,54 +790,22 @@ try {
 
   function eliminarCategoriaAsignada(asignacion_id) {
     mostrarConfirmacionToast(`¿Estás seguro de eliminar esta asignación?`, () => {
-      fetch('../api/eliminar_categoria_estudiante.php', {
+      fetch('api/eliminar_categoria_estudiante.php', {
         method: 'POST',
         body: new URLSearchParams({ asignacion_id })
       })
         .then(res => res.json())
         .then(data => {
           if (data.status) {
-            abrirModalCategorias(estudianteIdGlobal);
-           
-           mostrarToast('success', data.message);
+            mostrarCategoriasEstudiante(estudianteIdGlobal);
           } else {
-            mostrarToast('warning', data.message || 'Error al eliminar.');
+            alert(data.message || 'Error al eliminar.');
           }
         });
     });
   }
 
 
-
-  function cambiarEstadoEstudiante(id, nombre, nuevoEstado) {
-    mostrarConfirmacionToast(
-      `¿Estás seguro de que deseas ${nuevoEstado == "activo" ? "activar" : "desactivar"} al estudiante: ${nombre} ?`,
-      () => {
-
-        const formData = new FormData();
-        formData.append('id', id);
-        formData.append('estado', nuevoEstado);
-
-        fetch('../api/cambiar_estado_estudiante.php', {
-          method: 'POST',
-          body: formData
-        })
-          .then(res => res.json())
-          .then(data => {
-            if (data.status) {
-              // Recargar la página o actualizar solo el botón
-              mostrarToast('success', data.message)
-             setTimeout((e)=>{ location.reload();},500)
-            } else {
-              mostrarToast('warning','Error: ' + (data.message || 'No se pudo cambiar el estado.'));
-            }
-          })
-          .catch(error => {
-            console.error('Error AJAX:', error);
-            mostrarToast('danger','Ocurrió un error al cambiar el estado.');
-          });
-      })
-  }
 
 </script>
 
