@@ -10,7 +10,7 @@ $preguntas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!-- Main Content -->
-<div class="main-content">
+<main class="main-content" id="content">
   <div class="card shadow border-0 rounded-4">
     <!-- Header -->
     <div class="card-header bg-primary text-white d-flex flex-wrap justify-content-between align-items-center rounded-top-4 px-4 py-3">

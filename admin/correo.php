@@ -21,7 +21,7 @@ include_once("../includes/header.php");
 include_once("../includes/sidebar.php");
 ?>
 
-<div class="main-content">
+<main class="main-content" id="content">
     <div class="card shadow border-0 rounded-4">
         <div
             class="card-header bg-primary text-white d-flex flex-wrap justify-content-between align-items-center rounded-top-4 px-4 py-3">

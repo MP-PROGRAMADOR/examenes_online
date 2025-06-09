@@ -24,7 +24,7 @@ try {
   
  
 
-<div class="main-content">
+<div id="content" class="main-content">
 
     <div class="container-fluid mt-5">
         <div class="card shadow border-0 rounded-4">
