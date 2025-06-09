@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? null);
     $usuario = trim($_POST['usuario'] ?? '');
     $telefono = trim($_POST['telefono'] ?? null);
+    $num = trim($_POST['num'] ?? null);
     $fecha_nacimiento = trim($_POST['fecha_nacimiento'] ?? null);
     $direccion = trim($_POST['direccion'] ?? null);
     $escuela_id = !empty($_POST['escuela_id']) ? (int) $_POST['escuela_id'] : null;
@@ -38,8 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$estudiante_id) {
             // Registro nuevo
-            $sql = "INSERT INTO estudiantes (dni, nombre, apellidos, email,  telefono, fecha_nacimiento, direccion, escuela_id, estado)
-                    VALUES (?, ?, ?, ?, ?, ?, ?,  ?, ?)";
+            $sql = "INSERT INTO estudiantes (dni, nombre, apellidos, email,  telefono, fecha_nacimiento, direccion, escuela_id, estado, Doc)
+                    VALUES (?, ?, ?, ?, ?, ?, ?,  ?, ?,?)";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 $dni,
@@ -50,7 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $fecha_nacimiento,
                 $direccion,
                 $escuela_id,
-                'activo'
+                'activo',
+                $num
             ]);
 
             $estudiante_id = $pdo->lastInsertId();

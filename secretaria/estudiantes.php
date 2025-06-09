@@ -82,6 +82,7 @@ try {
                             <th>Dirección</th>
                             <th>Categoría</th>
                             <th>Código</th>
+                            <th>Documento</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -100,6 +101,7 @@ try {
                                     <td><?= htmlspecialchars($est['direccion']) ?></td>
                                     <td><?= htmlspecialchars($est['categoria'] ?? '—') ?></td>
                                     <td><?= htmlspecialchars($est['usuario']) ?></td>
+                                    <td><?= htmlspecialchars($est['Doc']) ?></td>
                                    
                                      <td class="text-center">
                     <?php if ($est['estado'] === 'activo'): ?>
@@ -253,7 +255,7 @@ try {
             <label for="apellidos_estudiante" class="form-label fw-semibold">
               <i class="bi bi-person-vcard me-2 text-primary"></i>Apellidos
             </label>
-            <input type="text" class="form-control shadow-sm" id="apellidos_estudiante" name="apellidos">
+            <input type="text" class="form-control shadow-sm" id="apellidos_estudiante" name="apellidos" required>
           </div>
 
           <!-- Email -->
@@ -261,7 +263,7 @@ try {
             <label for="email_estudiante" class="form-label fw-semibold">
               <i class="bi bi-envelope-fill me-2 text-primary"></i>Email (Opcional)
             </label>
-            <input type="email" class="form-control shadow-sm" id="email_estudiante" name="email">
+            <input type="email" class="form-control shadow-sm" id="email_estudiante" name="email" required>
           </div>
 
           <!-- Teléfono -->
@@ -269,7 +271,7 @@ try {
             <label for="telefono_estudiante" class="form-label fw-semibold">
               <i class="bi bi-telephone-fill me-2 text-primary"></i>Teléfono
             </label>
-            <input type="text" class="form-control shadow-sm" id="telefono_estudiante" name="telefono">
+            <input type="text" class="form-control shadow-sm" id="telefono_estudiante" name="telefono" required>
           </div>
 
           <!-- Fecha de nacimiento -->
@@ -277,7 +279,7 @@ try {
             <label for="fecha_nacimiento" class="form-label fw-semibold">
               <i class="bi bi-calendar-date-fill me-2 text-primary"></i>Fecha de Nacimiento
             </label>
-            <input type="date" class="form-control shadow-sm" id="fecha_nacimiento" name="fecha_nacimiento">
+            <input type="date" class="form-control shadow-sm" id="fecha_nacimiento" name="fecha_nacimiento" required>
           </div>
 
           <!-- Dirección -->
@@ -285,7 +287,7 @@ try {
             <label for="direccion_estudiante" class="form-label fw-semibold">
               <i class="bi bi-geo-alt-fill me-2 text-primary"></i>Dirección
             </label>
-            <textarea class="form-control shadow-sm" id="direccion_estudiante" name="direccion" rows="2"></textarea>
+            <textarea class="form-control shadow-sm" id="direccion_estudiante" name="direccion" rows="2" required></textarea>
           </div>
 
           <!-- Escuela de conducción -->
@@ -293,7 +295,7 @@ try {
             <label for="escuela_id" class="form-label fw-semibold">
               <i class="bi bi-building me-2 text-primary"></i>Escuela de Conducción
             </label>
-            <select class="form-select shadow-sm" id="escuela_id" name="escuela_id">
+            <select class="form-select shadow-sm" id="escuela_id" name="escuela_id" required>
               <option value="">Selecciona una escuela</option>
               <!-- Opciones se llenan dinámicamente desde backend -->
             </select>
@@ -312,6 +314,17 @@ try {
               Por favor selecciona una categoría de carné.
             </div>
           </div>
+
+
+
+          <div class="mb-3 col-12 col-md-6">
+            <label for="categorias_id" class="form-label fw-semibold">
+             <i class="bi bi-file-earmark-text me-2 text-primary"></i>Número de Documento <span class="text-danger">*</span>
+            </label>
+             <input type="text" class="form-control shadow-sm" id="num" name="num">
+          </div>
+
+
 
           <!-- Usuario -->
           <!--  <div class="mb-3 col-12 col-md-6">
