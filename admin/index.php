@@ -10,6 +10,13 @@ if (!isset($_SESSION['usuario'])) {
   exit;
 }
 $balanceCategorias = [];
+$estadoExamenes = [
+  'pendientes' => 0,
+  'en_progreso' => 0,
+  'finalizados' => 0,
+  'promedio_finalizados' => 0
+];
+
 try {
   // Preparar totales
   $totales = [
@@ -42,21 +49,9 @@ try {
   $stmt = $pdo->prepare($sql);
   $stmt->execute();
   $balanceCategorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-  error_log("Error al cargar resumen del dashboard: " . $e->getMessage());
-  // Asignar valores por defecto seguros
-  $totalEstudiantes = $totalCategorias = $totalEscuelas = $totalExamenes = 0;
-  $totalPreguntas = $totalCorreos = $totalUsuarios = 0;
-}
-$estadoExamenes = [
-  'pendientes' => 0,
-  'en_progreso' => 0,
-  'finalizados' => 0,
-  'promedio_finalizados' => 0
-];
 
-try {
-  $sql = "
+
+   $sql = "
     SELECT 
       estado,
       COUNT(*) AS total,
@@ -74,10 +69,14 @@ try {
       $estadoExamenes['promedio_finalizados'] = round($r['promedio'] ?? 0, 2);
     }
   }
+  
 } catch (PDOException $e) {
-  error_log("Error al consultar estados de exámenes: " . $e->getMessage());
+  error_log("Error al cargar resumen del dashboard: " . $e->getMessage());
+  // Asignar valores por defecto seguros
+  $totalEstudiantes = $totalCategorias = $totalEscuelas = $totalExamenes = 0;
+  $totalPreguntas = $totalCorreos = $totalUsuarios = 0;
 }
-
+ 
 
 ?>
 
