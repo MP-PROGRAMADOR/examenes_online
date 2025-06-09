@@ -62,16 +62,133 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
       flex: 1;
       overflow: hidden;
       padding-top: 50px;
-      background-color:  #0D47A1;
+      background-color:rgba(236, 227, 227, 0.65);
     }
 
-    .main-content {
-       
+    /* .main-content { 
       flex: 1;
       overflow-y: auto;
       padding: 1rem;
       background-color: var(--main-bg);
-    }
+    } */
+
+   /*  .wrapper {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        } */
+
+        /* ---------------- SIDEBAR ---------------- */
+        .sidebar {
+            width: 250px;
+            background-color:var(--sidebar-bg);
+            color: #fff;
+            box-shadow: 2px 0 5px var(--sidebar-bg);
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1050;
+            position: relative;
+            padding: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--sidebar-bg);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: var(--sidebar-bg);
+            border-radius: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background:var(--sidebar-bg);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+            background-color: var(--sidebar-bg);
+        }
+
+        .sidebar.collapsed .link-text {
+            display: none; /* ocultar las letras en menu colapsado  */
+        }
+
+        .sidebar .nav-link {
+            color: #fff;
+            transition: all 0.2s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: rgb(7, 88, 169);
+            color: rgb(160, 160, 160);
+        }
+
+        .sidebar .nav-link i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar.collapsed .nav-link span,
+        .sidebar.collapsed h5 {
+            display: none;
+        }
+
+        @media (max-width: 767.98px) {
+            .sidebar {
+                position: fixed;
+                height: calc(100vh - 80px);
+                margin-top: 60px;
+                left: -250px;
+                box-shadow: 2px 0 10px var(--sidebar-bg);
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+        }
+
+
+        /* ---------------- CONTENIDO PRINCIPAL ---------------- */
+        #content {
+            flex-grow: 1;
+            overflow-y: auto;
+            height: calc(100vh - 80px);
+            margin-top: 60px;
+            /*  height: 100vh; */
+            margin-left: 250px;
+            padding: 1rem;
+            transition: margin-left 0.3s ease;
+            /*   border: solid 2px #52a552; */
+        }
+
+        #content.collapsed {
+            margin-left: 80px;
+        }
+
+
+        @media (max-width: 767.98px) {
+            #content {
+                margin-left: 0 !important;
+
+            }
+
+            #navContent {
+                margin-left: 0 !important;
+
+            }
+
+        }
+
+        body.sidebar-collapsed #navContent {
+            left: 0px !important;
+        }
+
 
     .navbar {
       height: 56px;
@@ -152,16 +269,16 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
       display: none;
     }
 
-    @media (min-width: 992px) {
+ /*    @media (min-width: 992px) {
       .main-content {
-        margin-left: 120px;
+        margin-left: var(--sidebar-collapsed-width);
         transition: margin-left 0.3s ease;
       }
 
-      .sidebar.collapsed + .main-content {
+      .main-content {
         margin-left: var(--sidebar-collapsed-width);
       }
-    }
+    } */
 
      
     @media (max-width: 768px) {
@@ -175,9 +292,7 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
         z-index: 1040;
       }
 
-      .main-content {
-        margin-left: 0 !important;
-      }
+       
 
       .overlay {
         position: fixed;
@@ -190,9 +305,7 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
       }
     }
 
-    .main-content.collapsed {
-      margin-left: 0px;
-    }
+    
 
     .sidebar-toggle {
       cursor: pointer;
@@ -260,3 +373,4 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
   </style>
 </head>
 <body>
+ 

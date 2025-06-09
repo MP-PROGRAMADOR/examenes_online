@@ -40,7 +40,7 @@ $stmt->execute();
 $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<div class="main-content">
+<main class="main-content" id="content">
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 rounded-top">
             <h5 class="mb-0 d-flex align-items-center">

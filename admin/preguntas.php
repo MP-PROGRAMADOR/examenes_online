@@ -2,30 +2,27 @@
 include_once("../includes/header.php");
 include_once("../includes/sidebar.php");
 
-
-// Preparar la consulta para obtener los datos
+// Consulta para obtener las preguntas
 $sql = "SELECT * FROM preguntas";
 $stmt = $pdo->prepare($sql);
-
-if ($stmt->execute()) {
-  // Obtener los resultados como un array asociativo
-  $preguntas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-
+$stmt->execute();
+$preguntas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-
-<!-- Main -->
-<div class="main-content">
+<!-- Main Content -->
+<main class="main-content" id="content">
   <div class="card shadow border-0 rounded-4">
-    <div
-      class="card-header bg-primary text-white d-flex flex-wrap justify-content-between align-items-center rounded-top-4 px-4 py-3">
+    <!-- Header -->
+    <div class="card-header bg-primary text-white d-flex flex-wrap justify-content-between align-items-center rounded-top-4 px-4 py-3">
       <h5 class="mb-0"><i class="bi bi-question-circle-fill me-2"></i>Gestión de Preguntas</h5>
+      
+      <!-- Buscador -->
       <div class="search-box position-relative">
         <input type="text" class="form-control ps-5" id="buscarPregunta" placeholder="Buscar pregunta...">
         <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
       </div>
+
+      <!-- Filtros y botón -->
       <div class="d-flex flex-wrap gap-5 align-items-center">
         <div class="d-flex align-items-center">
           <label for="preguntas-length" class="me-2 text-white fw-medium mb-0">Mostrar:</label>
@@ -37,80 +34,73 @@ if ($stmt->execute()) {
             <option value="25">25 registros</option>
           </select>
         </div>
-        <button class="btn btn-primary" onclick="abrirModalRegistro()">
+        <button class="btn btn-light text-primary fw-semibold shadow-sm" onclick="abrirModalRegistro()">
           <i class="bi bi-plus-circle-fill me-2"></i>Nueva Pregunta
         </button>
       </div>
     </div>
 
+    <!-- Tabla -->
     <div class="table-responsive">
-      <table id="preguntas-table" class="table table-hover align-middle shadow-sm rounded-3 overflow-hidden">
-        <thead class="table-light text-center">
-          <?php if (!empty($preguntas)): ?>
+      <?php if (!empty($preguntas)): ?>
+        <table id="preguntas-table" class="table table-hover align-middle mb-0 text-center">
+          <thead class="table-light">
             <tr>
               <th><i class="bi bi-hash me-1"></i>ID</th>
               <th><i class="bi bi-chat-left-dots-fill me-1"></i>Texto</th>
               <th><i class="bi bi-ui-checks-grid me-1"></i>Tipo</th>
               <th><i class="bi bi-image-fill me-1"></i>Contenido</th>
-              <th><i class="bi bi-toggle-on me-1"></i>Activa</th>
+              <th><i class="bi bi-toggle-on me-1"></i>Estado</th>
               <th><i class="bi bi-calendar-event-fill me-1"></i>Creada</th>
               <th><i class="bi bi-gear-fill me-1"></i>Acciones</th>
             </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($preguntas as $pregunta): ?>
-            <tr>
-              <td class="text-center"><?= htmlspecialchars($pregunta['id']); ?></td>
-              <td><?= htmlspecialchars($pregunta['texto']); ?></td>
-              <td class="text-center">
-                <span class="badge bg-info text-uppercase">
-                  <?= strtoupper($pregunta['tipo']); ?>
-                </span>
-              </td>
-              <td class="text-center">
-                <span class="badge bg-secondary text-capitalize">
-                  <?= htmlspecialchars($pregunta['tipo_contenido']); ?>
-                </span>
-              </td>
-              <td class="text-center">
-                <?php if ($pregunta['activa']): ?>
-                  <button class="btn btn-outline-success btn-sm rounded-pill shadow-sm px-3 py-1"
-                    onclick="cambiarEstadoPregunta(<?= $pregunta['id'] ?>, false)" title="Desactivar">
-                    <i class="bi bi-toggle-on fs-5"></i> Activa
-                  </button>
-                <?php else: ?>
-                  <button class="btn btn-outline-danger btn-sm rounded-pill shadow-sm px-3 py-1"
-                    onclick="cambiarEstadoPregunta(<?= $pregunta['id'] ?>, true)" title="Activar">
-                    <i class="bi bi-toggle-off fs-5"></i> Inactiva
-                  </button>
-                <?php endif; ?>
-              </td>
-              <td><?= htmlspecialchars($pregunta['creado_en']); ?></td>
-              <td class="text-center">
-                <div class="d-flex gap-2 justify-content-center flex-wrap">
-                  <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2   shadow-sm"
-                    onclick="abrirModalCategorias(<?= (int) $pregunta['id'] ?>)"
-                    title="Ver detalles de categorias del estudiante">
-                    <i class="bi bi-eye "></i> categorias
-                  </button>
-
-                  <?php if (($rol === 'admin')): ?>
-                    <button class="btn btn-sm btn-outline-danger" onclick="eliminarPregunta(<?= $pregunta['id'] ?>)"
-                      title="Eliminar pregunta">
-                      <i class="bi bi-trash me-1"></i> Eliminar
+          </thead>
+          <tbody>
+            <?php foreach ($preguntas as $pregunta): ?>
+              <tr>
+                <td><?= htmlspecialchars($pregunta['id']); ?></td>
+                <td class="text-start"><?= htmlspecialchars($pregunta['texto']); ?></td>
+                <td>
+                  <span class="badge bg-info text-uppercase"><?= strtoupper($pregunta['tipo']); ?></span>
+                </td>
+                <td>
+                  <span class="badge bg-secondary"><?= htmlspecialchars($pregunta['tipo_contenido']); ?></span>
+                </td>
+                <td>
+                  <?php if ($pregunta['activa']): ?>
+                    <button class="btn btn-outline-success btn-sm rounded-pill shadow-sm px-3 py-1"
+                      onclick="cambiarEstadoPregunta(<?= $pregunta['id'] ?>, false)" title="Desactivar">
+                      <i class="bi bi-toggle-on fs-5"></i> Activa
+                    </button>
+                  <?php else: ?>
+                    <button class="btn btn-outline-danger btn-sm rounded-pill shadow-sm px-3 py-1"
+                      onclick="cambiarEstadoPregunta(<?= $pregunta['id'] ?>, true)" title="Activar">
+                      <i class="bi bi-toggle-off fs-5"></i> Inactiva
                     </button>
                   <?php endif; ?>
-                </div>
-              </td>
-            </tr>
-          <?php endforeach; ?>
-        <?php else: ?>
-          <div class="alert alert-warning text-center m-3">
-            <i class="bi bi-exclamation-circle-fill me-2"></i>⚠️ No hay preguntas registradas actualmente.
-          </div>
-        <?php endif; ?>
-        </tbody>
-      </table>
+                </td>
+                <td><?= htmlspecialchars($pregunta['creado_en']); ?></td>
+                <td>
+                  <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <button class="btn btn-sm btn-outline-primary" onclick="abrirModalCategorias(<?= (int) $pregunta['id'] ?>)" title="Ver categorías">
+                      <i class="bi bi-eye"></i> Categorías
+                    </button>
+                    <?php if ($rol === 'admin'): ?>
+                      <button class="btn btn-sm btn-outline-danger" onclick="eliminarPregunta(<?= $pregunta['id'] ?>)" title="Eliminar pregunta">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    <?php endif; ?>
+                  </div>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      <?php else: ?>
+        <div class="alert alert-warning text-center m-3">
+          <i class="bi bi-exclamation-circle-fill me-2"></i>No hay preguntas registradas actualmente.
+        </div>
+      <?php endif; ?>
     </div>
   </div>
 </div>
