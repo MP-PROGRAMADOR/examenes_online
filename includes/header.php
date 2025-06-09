@@ -35,6 +35,10 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
   <!-- MDBootstrap -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" rel="stylesheet" />
 
+
+
+
+
   <!-- Estilos personalizados -->
   <style>
     :root {

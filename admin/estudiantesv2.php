@@ -2,6 +2,7 @@
 include_once("../includes/header.php");
 include_once("../includes/sidebar.php");
 
+
 try {
   $limite = isset($_GET['limite']) ? (int) $_GET['limite'] : 10;
   $pagina = isset($_GET['pagina']) ? (int) $_GET['pagina'] : 1;
@@ -399,7 +400,7 @@ try {
           </button>
         </div>
         <div class="table-responsive">
-          <table class="table table-bordered table-hover align-middle">
+          <table class="table table-bordered table-hover align-middle" id="tablaEstudiantes">
             <thead class="table-light">
               <tr>
                 <th><i class="bi bi-hash text-secondary me-1"></i>ID</th>
