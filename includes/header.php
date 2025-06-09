@@ -292,9 +292,7 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
         z-index: 1040;
       }
 
-      .main-content {
-        margin-left: 0 !important;
-      }
+       
 
       .overlay {
         position: fixed;
@@ -307,9 +305,7 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
       }
     }
 
-    .main-content.collapsed {
-      margin-left: 0px !important;
-    }
+    
 
     .sidebar-toggle {
       cursor: pointer;
