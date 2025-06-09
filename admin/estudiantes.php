@@ -152,8 +152,8 @@ try {
 
                   <td class="text-center">
                     <button class="btn btn-sm btn-outline-warning me-1" title="Editar"
-                     onclick='abrirModalEdicionEstudiante(<?= json_encode($est, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'">
-                      <i class="bi bi-pencil-square"></i>
+                      onclick='abrirModalEdicionEstudiante(<?= json_encode($est, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'">
+                                  <i class=" bi bi-pencil-square"></i>
                     </button>
                     <button class="btn btn-sm btn-outline-danger" title="Eliminar"
                       onclick="eliminarEstudiante(<?= $est['id'] ?>)">
@@ -539,7 +539,7 @@ try {
   function abrirModalEdicionEstudiante(estudiante) {
     document.getElementById('modalEstudianteTitulo').textContent = 'Editar Estudiante';
     document.getElementById('modalEstudianteBotonTexto').textContent = 'Actualizar';
- 
+
     document.getElementById('estudiante_id').value = estudiante.id || '';
     document.getElementById('dni_estudiante').value = estudiante.dni || '';
     document.getElementById('nombre_estudiante').value = estudiante.nombre || '';
@@ -548,8 +548,8 @@ try {
     document.getElementById('telefono_estudiante').value = estudiante.telefono || '';
     document.getElementById('fecha_nacimiento').value = estudiante.fecha_nacimiento || '';
     document.getElementById('direccion_estudiante').value = estudiante.direccion || '';
-    
-    
+
+
     // Seleccionar escuela si está presente
     if (estudiante.escuela_id) {
       document.getElementById('escuela_id').value = estudiante.escuela_id;
@@ -569,9 +569,9 @@ try {
 
     if (estudiante.escuela_id) {
       document.getElementById('escuela_id').value = estudiante.escuela_id;
-    } 
+    }
 
-   const modal = new bootstrap.Modal(document.getElementById('modalEstudiante'));
+    const modal = new bootstrap.Modal(document.getElementById('modalEstudiante'));
     modal.show();
 
     configurarSubmitEstudiante();
@@ -671,7 +671,7 @@ try {
 
 
   // Ejecutar al cargar la página
-  document.addEventListener('DOMContentLoaded', cargarEscuelas);
+  document.addEventListener('DOMContentLoaded', cargarEscuelas, cargarCategoriasEstudiante);
 
   let estudianteEdadGlobal = null;
 
@@ -684,9 +684,14 @@ try {
 
     document.getElementById('nombreEstudiante').textContent = nombreEstudiante;
     document.getElementById('edad').textContent = ` ${estudianteEdadGlobal} Años`;
-      document.getElementById('nuevo_estudiante_id').value = estudianteId;
+    document.getElementById('nuevo_estudiante_id').value = estudianteId;
+    cargarCategoriasEstudiante(estudianteId)
 
-    // Cargar categorías asignadas
+
+  }
+
+  // Cargar categorías asignadas
+  function cargarCategoriasEstudiante(estudianteId) {
     fetch(`../api/obtener_categorias_estudiante.php?estudiante_id=${estudianteId}`)
       .then(res => res.json())
       .then(data => {
@@ -706,7 +711,7 @@ try {
                                 
                                 
                                 <button class="btn btn-sm btn-outline-danger" title="Eliminar asignación"
-                                  onclick="eliminarCategoriaAsignada(${cat.id})">
+                                  onclick="eliminarCategoriaAsignada(${cat.id}, ${cat.estudiante_id})">
                                   <i class="bi bi-trash"></i>
                                 </button>
                               </td>
@@ -813,7 +818,7 @@ try {
   });
 
 
-  function eliminarCategoriaAsignada(asignacion_id) {
+  function eliminarCategoriaAsignada(asignacion_id, estudiante_id) {
     mostrarConfirmacionToast(`¿Estás seguro de eliminar esta asignación?`, () => {
       fetch('../api/eliminar_categoria_estudiante.php', {
         method: 'POST',
@@ -822,9 +827,9 @@ try {
         .then(res => res.json())
         .then(data => {
           if (data.status) {
-            abrirModalCategorias(estudianteIdGlobal);
-           
-           mostrarToast('success', data.message);
+            // abrirModalCategorias(estudianteIdGlobal);
+            cargarCategoriasEstudiante(estudiante_id)
+            mostrarToast('success', data.message);
           } else {
             mostrarToast('warning', data.message || 'Error al eliminar.');
           }
@@ -852,14 +857,14 @@ try {
             if (data.status) {
               // Recargar la página o actualizar solo el botón
               mostrarToast('success', data.message)
-             setTimeout((e)=>{ location.reload();},500)
+              setTimeout((e) => { location.reload(); }, 500)
             } else {
-              mostrarToast('warning','Error: ' + (data.message || 'No se pudo cambiar el estado.'));
+              mostrarToast('warning', 'Error: ' + (data.message || 'No se pudo cambiar el estado.'));
             }
           })
           .catch(error => {
             console.error('Error AJAX:', error);
-            mostrarToast('danger','Ocurrió un error al cambiar el estado.');
+            mostrarToast('danger', 'Ocurrió un error al cambiar el estado.');
           });
       })
   }
