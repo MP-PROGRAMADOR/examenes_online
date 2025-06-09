@@ -189,7 +189,7 @@ include_once("../includes/sidebar.php");
               <option value="">Seleccionar Rol</option>
               <option value="admin">Administrador</option>
               <option value="examinador">Examinador</option>
-              <option value="operador">Operador</option>
+              <option value="secretaria">Secretaria</option>
             </select>
             <div class="invalid-feedback">Selecciona un rol para el usuario.</div>
           </div>

@@ -21,9 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Validación de rol
-        $roles_validos = ['admin', 'examinador', 'operador'];
+        $roles_validos = ['admin', 'examinador', 'secretaria'];
         if (!in_array($rol, $roles_validos)) {
-            throw new Exception("Rol inválido. Debe ser admin, examinador u operador.");
+            throw new Exception("Rol inválido. Debe ser admin, examinador u secretaria.");
         }
 
         // Actualización de usuario existente

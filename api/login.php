@@ -42,16 +42,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'email' => $user['email']
                 ];
 
+                // Redirección según el rol
+                $redirect = 'admin/index.php'; // valor por defecto
+
+                if ($user['rol'] === 'secretaria') {
+                    $redirect = 'secretaria/index.php';
+                } elseif ($user['rol'] === 'administrador') {
+                    $redirect = 'admin/index.php';
+                } // puedes añadir más roles aquí si lo necesitas
+                elseif ($user['rol'] === 'examinador') {
+                    $redirect = 'examinador/index.php';
+                }
+
                 $response = [
                     'status' => true,
                     'message' => 'Bienvenido, ' . htmlspecialchars($user['nombre']),
-                    'redirect' => 'admin/index.php'
+                    'redirect' => $redirect
                 ];
             } else {
                 throw new Exception('Credenciales incorrectas.');
             }
-
-
         } elseif ($tipo === 'estudiante') {
             $codigo = trim($_POST['usuario'] ?? '');
 
@@ -72,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($estudiante) {
                 $_SESSION['estudiante_id'] = $estudiante['id'];
-                $_SESSION['estudiante_nombre'] = $estudiante['nombre'];                 
+                $_SESSION['estudiante_nombre'] = $estudiante['nombre'];
                 $_SESSION['estudiante'] = $estudiante; // puedes usarlo para detalles
 
                 $response = [
@@ -83,7 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 throw new Exception('Código inválido.');
             }
-
         } else {
             throw new Exception('Tipo de usuario inválido.');
         }
