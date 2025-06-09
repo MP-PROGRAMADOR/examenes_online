@@ -18,6 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception('Usuario y contraseña requeridos.');
             }
 
+
+            
             $stmt = $pdo->prepare("SELECT id, nombre, rol, contrasena_hash, email, activo FROM usuarios WHERE email = :usuario LIMIT 1");
             $stmt->execute(['usuario' => $usuario]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
