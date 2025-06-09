@@ -210,87 +210,6 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </div>
 
 
-  <!-- Modal -->
-  <!--  <div class="modal fade" id="modalExamen" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content rounded-4 shadow">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title" id="tituloModalExamen"><i class="bi bi-journal-plus me-2"></i>Nuevo Examen</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-
-
-
-
-        <form id="formExamen">
-
-        
-        <div class="modal-body row g-3 px-4 py-3">
-          <input type="hidden" name="examen_id" id="examen_id">
-          <input type="hidden" name="usuario_id" id="usuario_id" value="<?= (int) $_SESSION['usuario']['id'] ?>">
-
-
-          <div class="mb-2">
-            <label for="buscador_estudiantes" class="form-label">Buscar Estudiante</label>
-            <input type="text" class="form-control" id="buscador_estudiantes"
-              placeholder="Escribe nombre o apellido...">
-          </div>
-          <div id="lista_estudiantes" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;"></div>
-          <input type="hidden" name="estudiante_id" id="estudiante_id" required>
-
-
-          <div class="col-md-6">
-            <label for="categoria_id" class="form-label">Categoría</label>
-            <select class="form-select" id="categoria_id" name="categoria_id" required></select>
-          </div>
-
-          <div class="col-md-6">
-            <label for="total_preguntas" class="form-label">Total de Preguntas</label>
-            <input type="number" class="form-control" id="total_preguntas" value="5" name="total_preguntas" min="5"
-              required>
-            <span id="preguntas_disponibles" class="text-fs-2"></span>
-          </div>
-
-          <div class="col-md-6">
-            <label for="fecha_examen" class="form-label">
-              <i class="bi bi-calendar-event me-1"></i>Fecha a examinar
-            </label>
-            <input type="date" id="fecha_examen" name="fecha_examen" class="form-control" required>
-          </div>
-
-        </div>
-
-          <div class="mt-3">
-            <h5 class="text-primary"><i class="bi bi-list-ul me-1"></i>Lista de Estudiantes Añadidos</h5>
-            <ul class="list-group" id="lista_seleccionados" name="lista_seleccionados"></ul>
-          </div>
-
-
-          <div class="col-md-6">
-            <button type="button" id="btn_anadir_estudiante" class="btn btn-success">
-              <i class="bi bi-plus-circle me-1"></i>Añadir a la lista
-            </button>
-          </div>
-
-
-
-          <div class="modal-footer px-4 py-3">
-            <button type="submit" class="btn btn-primary">
-              <i class="bi bi-save me-1"></i>Guardar Examen
-            </button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          </div>
-        </form>
-
-
-
-
-      </div>
-    </div>
-  </div>
- -->
-
-
 
   <!-- Modal -->
   <div class="modal fade" id="modalExamen" tabindex="-1" aria-hidden="true">
@@ -355,6 +274,150 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </div>
     </div>
   </div>
+
+  <!-- Modal Examen -->
+<div class="modal fade" id="modalExamenVer" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalExamenTitulo">Ver Examen</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" id="modalExamenContenido">
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+ 
+ 
+function editarExamen(id) {
+  const modal = new bootstrap.Modal(document.getElementById('modalExamenVer'));
+  const contenido = document.getElementById('modalExamenContenido');
+  const titulo = document.getElementById('modalExamenTitulo');
+
+  // Mostrar modal y loader
+  titulo.textContent = 'Editar Examen';
+  contenido.innerHTML = `
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+    </div>
+  `;
+  modal.show();
+
+  fetch(`../api/obtener_examen.php?id=${id}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const examen = data.examen;
+
+        // Aquí puedes renderizar el formulario editable dentro del modal
+        contenido.innerHTML = `
+          <form id="formEditarExamen">
+            <input type="hidden" name="id" value="${examen.id}">
+            
+            <div class="mb-3">
+              <label class="form-label">Estudiante:</label>
+              <input type="text" class="form-control" value="${examen.estudiante}" disabled>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Categoría:</label>
+              <input type="text" class="form-control" value="${examen.categoria}" disabled>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Fecha de Asignación:</label>
+              <input type="date" name="fecha_asignacion" class="form-control" value="${examen.fecha_asignacion}">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Estado:</label>
+              <select name="estado" class="form-select">
+                <option value="pendiente" ${examen.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                <option value="en_progreso" ${examen.estado === 'en_progreso' ? 'selected' : ''}>En Progreso</option>
+                <option value="finalizado" ${examen.estado === 'finalizado' ? 'selected' : ''}>Finalizado</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Calificación:</label>
+              <input type="number" step="0.01" name="calificacion" class="form-control" value="${examen.calificacion ?? ''}">
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-success">Guardar Cambios</button>
+            </div>
+          </form>
+        `;
+      } else {
+        contenido.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+      }
+    })
+    .catch(err => {
+      contenido.innerHTML = `<div class="alert alert-danger">Error al cargar examen</div>`;
+      console.error(err);
+    });
+}
+
+    
+  function verExamen(id) {
+    const formData = new FormData()
+    formData.append('id', id)
+    
+    const modalExamen = new bootstrap.Modal(document.getElementById('modalExamenVer'))
+    document.getElementById('modalExamenTitulo').innerText = 'Detalles del Examen'
+    document.getElementById('modalExamenContenido').innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>'
+    modalExamen.show()
+
+    fetch('../api/ver_examen.php', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('modalExamenContenido').innerHTML = html
+    })
+    .catch(() => {
+      document.getElementById('modalExamenContenido').innerHTML = '<div class="alert alert-danger">Error al cargar los datos.</div>'
+    })
+  }
+ 
+
+
+  function eliminarExamen(id) {
+    if (!mostrarConfirmacionToast('¿Estás seguro de eliminar este examen? Esta acción no se puede deshacer.')) return
+
+    const formData = new FormData()
+    formData.append('id', id)
+
+    fetch('../api/eliminar_examen.php', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        mostrarToast('success', 'Examen eliminado correctamente')
+        location.reload()
+      } else {
+        mostrarToast('info','Error: ' + data.message)
+      }
+    })
+    .catch(() => {
+      mostrarToast( 'danger','Error al eliminar examen')
+    })
+  }
+
+</script>
+
+
 
 
   <script>
