@@ -3,8 +3,8 @@ include_once("../includes/header.php");
 include_once("../includes/sidebar.php");
 
 // Definir variables de paginación y límite por defecto para evitar errores
-$limite = isset($_GET['limite']) && in_array((int)$_GET['limite'], [5, 10, 15, 20, 25]) ? (int)$_GET['limite'] : 10;
-$pagina = isset($_GET['pagina']) && is_numeric($_GET['pagina']) && $_GET['pagina'] > 0 ? (int)$_GET['pagina'] : 1;
+$limite = isset($_GET['limite']) && in_array((int) $_GET['limite'], [5, 10, 15, 20, 25]) ? (int) $_GET['limite'] : 10;
+$pagina = isset($_GET['pagina']) && is_numeric($_GET['pagina']) && $_GET['pagina'] > 0 ? (int) $_GET['pagina'] : 1;
 
 // Contar total de exámenes para paginación
 $countSql = "SELECT COUNT(*) FROM examenes";
@@ -42,7 +42,8 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <main class="main-content" id="content">
   <div class="card shadow-sm mb-4">
-    <div class="card-header bg-primary text-white d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 rounded-top">
+    <div
+      class="card-header bg-primary text-white d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 rounded-top">
       <h5 class="mb-0 d-flex align-items-center">
         <i class="bi bi-file-earmark-text-fill me-2"></i>Gestión de Exámenes
       </h5>
@@ -98,11 +99,14 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                   <td><?= htmlspecialchars($examen['fecha_asignacion']) ?></td>
                   <td class="text-center"><?= htmlspecialchars($examen['total_preguntas']) ?></td>
                   <td class="text-center">
-                    <span class="badge bg-<?= $examen['estado'] === 'pendiente' ? 'warning' : ($examen['estado'] === 'en_progreso' ? 'primary' : 'success') ?>">
+                    <span
+                      class="badge bg-<?= $examen['estado'] === 'pendiente' ? 'warning' : ($examen['estado'] === 'en_progreso' ? 'primary' : 'success') ?>">
                       <?= strtoupper($examen['estado']) ?>
                     </span>
                   </td>
-                  <td class="text-center"><?= $examen['calificacion'] !== null ? htmlspecialchars($examen['calificacion']) : '—' ?></td>
+                  <td class="text-center">
+                    <?= $examen['calificacion'] !== null ? htmlspecialchars($examen['calificacion']) : '—' ?>
+                  </td>
                   <td class="text-center"><code><?= htmlspecialchars($examen['codigo_acceso']) ?></code></td>
                   <td class="text-center">
                     <div class="d-flex gap-2 justify-content-center flex-wrap">
@@ -155,12 +159,12 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <!-- Scripts -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
       function filterTable() {
         const search = $("#customSearch").val().toLowerCase();
         let count = 0;
 
-        $("table tbody tr").each(function() {
+        $("table tbody tr").each(function () {
           // Ignorar fila de "No resultados" para no contarla ni mostrarla
           if ($(this).attr('id') === 'no-results') return;
 
@@ -194,7 +198,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       $("#customSearch").on("input", filterTable);
 
       // Redirige al cambiar la cantidad
-      $('#container-length').on('change', function() {
+      $('#container-length').on('change', function () {
         const selectedLimit = $(this).val();
         // Cambia la URL para página 1 y límite seleccionado
         window.location.href = `?pagina=1&limite=${selectedLimit}`;
@@ -207,7 +211,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
   <!-- Modal -->
-  <div class="modal fade" id="modalExamen" tabindex="-1" aria-hidden="true">
+  <!--  <div class="modal fade" id="modalExamen" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content rounded-4 shadow">
         <div class="modal-header bg-primary text-white">
@@ -217,46 +221,49 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 
-        <div class="modal-body row g-3 px-4 py-3">
-            <input type="hidden" name="examen_id" id="examen_id">
-            <input type="hidden" name="usuario_id" id="usuario_id" value="<?= (int) $_SESSION['usuario']['id'] ?>">
-
-
-            <div class="mb-2">
-              <label for="buscador_estudiantes" class="form-label">Buscar Estudiante</label>
-              <input type="text" class="form-control" id="buscador_estudiantes" placeholder="Escribe nombre o apellido...">
-            </div>
-            <div id="lista_estudiantes" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;"></div>
-            <input type="hidden" name="estudiante_id" id="estudiante_id" required>
-
-
-            <div class="col-md-6">
-              <label for="categoria_id" class="form-label">Categoría</label>
-              <select class="form-select" id="categoria_id" name="categoria_id" required></select>
-            </div>
-
-            <div class="col-md-6">
-              <label for="total_preguntas" class="form-label">Total de Preguntas</label>
-              <input type="number" class="form-control" id="total_preguntas" value="5" name="total_preguntas" min="5" required>
-              <span id="preguntas_disponibles" class="text-fs-2"></span>
-            </div>
-
-            <div class="col-md-6">
-              <label for="fecha_examen" class="form-label">
-                <i class="bi bi-calendar-event me-1"></i>Fecha a examinar
-              </label>
-              <input type="date" id="fecha_examen" name="fecha_examen" class="form-control" required>
-            </div>
-
-          </div>
-
 
         <form id="formExamen">
-          
-<div class="mt-3">
-          <h5 class="text-primary"><i class="bi bi-list-ul me-1"></i>Lista de Estudiantes Añadidos</h5>
-          <ul class="list-group" id="lista_seleccionados" name="lista_seleccionados"></ul>
+
+        
+        <div class="modal-body row g-3 px-4 py-3">
+          <input type="hidden" name="examen_id" id="examen_id">
+          <input type="hidden" name="usuario_id" id="usuario_id" value="<?= (int) $_SESSION['usuario']['id'] ?>">
+
+
+          <div class="mb-2">
+            <label for="buscador_estudiantes" class="form-label">Buscar Estudiante</label>
+            <input type="text" class="form-control" id="buscador_estudiantes"
+              placeholder="Escribe nombre o apellido...">
+          </div>
+          <div id="lista_estudiantes" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;"></div>
+          <input type="hidden" name="estudiante_id" id="estudiante_id" required>
+
+
+          <div class="col-md-6">
+            <label for="categoria_id" class="form-label">Categoría</label>
+            <select class="form-select" id="categoria_id" name="categoria_id" required></select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="total_preguntas" class="form-label">Total de Preguntas</label>
+            <input type="number" class="form-control" id="total_preguntas" value="5" name="total_preguntas" min="5"
+              required>
+            <span id="preguntas_disponibles" class="text-fs-2"></span>
+          </div>
+
+          <div class="col-md-6">
+            <label for="fecha_examen" class="form-label">
+              <i class="bi bi-calendar-event me-1"></i>Fecha a examinar
+            </label>
+            <input type="date" id="fecha_examen" name="fecha_examen" class="form-control" required>
+          </div>
+
         </div>
+
+          <div class="mt-3">
+            <h5 class="text-primary"><i class="bi bi-list-ul me-1"></i>Lista de Estudiantes Añadidos</h5>
+            <ul class="list-group" id="lista_seleccionados" name="lista_seleccionados"></ul>
+          </div>
 
 
           <div class="col-md-6">
@@ -276,15 +283,78 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </form>
 
 
-        
+
 
       </div>
     </div>
   </div>
+ -->
 
 
 
+  <!-- Modal -->
+  <div class="modal fade" id="modalExamen" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content rounded-4 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="tituloModalExamen"><i class="bi bi-journal-plus me-2"></i>Nuevo Examen</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
 
+        <!-- FORMULARIO COMPLETO -->
+        <form id="formExamen">
+          <div class="modal-body row g-3 px-4 py-3">
+            <input type="hidden" name="examen_id" id="examen_id">
+            <input type="hidden" name="usuario_id" id="usuario_id" value="<?= (int) $_SESSION['usuario']['id'] ?>">
+            <input type="hidden" name="estudiante_id" id="estudiante_id" required>
+
+            <div class="mb-2">
+              <label for="buscador_estudiantes" class="form-label">Buscar Estudiante</label>
+              <input type="text" class="form-control" id="buscador_estudiantes"
+                placeholder="Escribe nombre o apellido...">
+            </div>
+            <div id="lista_estudiantes" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;"></div>
+
+            <div class="col-md-6">
+              <label for="categoria_id" class="form-label">Categoría</label>
+              <select class="form-select" id="categoria_id" name="categoria_id" required></select>
+            </div>
+
+            <div class="col-md-6">
+              <label for="total_preguntas" class="form-label">Total de Preguntas</label>
+              <input type="number" class="form-control" id="total_preguntas" value="5" name="total_preguntas" min="5"
+                required>
+              <span id="preguntas_disponibles" class="text-fs-2"></span>
+            </div>
+
+            <div class="col-md-6">
+              <label for="fecha_examen" class="form-label"><i class="bi bi-calendar-event me-1"></i>Fecha a
+                examinar</label>
+              <input type="date" id="fecha_examen" name="fecha_examen" class="form-control" required>
+            </div>
+
+            <div class="mt-3">
+              <h5 class="text-primary"><i class="bi bi-list-ul me-1"></i>Lista de Estudiantes Añadidos</h5>
+              <ul class="list-group" id="lista_seleccionados" name="lista_seleccionados"></ul>
+            </div>
+
+            <div class="col-md-6">
+              <button type="button" id="btn_anadir_estudiante" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i>Añadir a la lista
+              </button>
+            </div>
+          </div>
+
+          <div class="modal-footer px-4 py-3">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save me-1"></i>Guardar Examen
+            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
 
   <script>
@@ -392,7 +462,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Cuando se selecciona un estudiante
         contenedor.querySelectorAll('input[name="estudiante_radio"]').forEach(radio => {
-          radio.addEventListener('change', function() {
+          radio.addEventListener('change', function () {
             document.getElementById('estudiante_id').value = this.value;
             cargarCategorias(this.value); // Cargar categorías para el estudiante seleccionado
           });
@@ -406,7 +476,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             estudiantesData = data.data;
           });
 
-        document.getElementById("buscador_estudiantes").addEventListener("input", function() {
+        document.getElementById("buscador_estudiantes").addEventListener("input", function () {
           renderEstudiantes(this.value);
         });
       }
@@ -460,55 +530,51 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       });
 
       // Generar código de acceso automáticamente y eliminar campo manual
-      const form = document.getElementById("formExamen");
 
-      form.addEventListener("submit", async (e) => {
+
+      const form = document.getElementById('formExamen'); // Cambia esto al id real
+
+      if (!form) {
+        console.error('No se encontró el formulario');
+        return;
+      }
+
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
-
+        console.log(JSON.stringify(listaTemporal));
+        // Suponiendo que listaTemporal está declarada y llena
         const formData = new FormData(form);
+        formData.append('codigo_acceso', generarCodigo());
+     formData.append('lista_estudiantes', JSON.stringify(listaTemporal));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // Generar código único
-        formData.append("codigo_acceso", generarCodigo());
-        formData.append("lista_seleccionados", )
 
         try {
-          const res = await fetch("../api/guardar_examen.php", {
-            method: "POST",
+          const res = await fetch('../api/guardar_examen.php', {
+            method: 'POST',
             body: formData
           });
-
-          const data = await res.json(); // Asegúrate de usar "data", no "result"
-
+          const data = await res.json();
+          console.log(data);
           if (data.status) {
-            mostrarToast('success', data.message || "Examen guardado correctamente");
+            mostrarToast('success', data.message || 'Examen guardado correctamente');
             setTimeout(() => location.reload(), 1200);
           } else {
-            mostrarToast('warning', "Error: " + (data.message || "No se pudo guardar el examen."));
+            mostrarToast('warning', 'Error: ' + (data.message || 'No se pudo guardar el examen.'));
           }
-
         } catch (error) {
-          console.error("Error en la solicitud:", error);
-          mostrarToast('error', "Error en la conexión con el servidor.");
+          console.error('Error en la solicitud:', error);
+          mostrarToast('error', 'Error en la conexión con el servidor.');
         }
       });
 
-
       function generarCodigo() {
-        return "EXAM" + Date.now().toString().slice(-6);
+        return 'EXAM' + Date.now().toString().slice(-6);
       }
+
+
+
+
+
     });
 
 
@@ -517,54 +583,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 
-
-
-
-    document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('form_examen'); // Cambia esto al id real
-
-  if (!form) {
-    console.error('No se encontró el formulario');
-    return;
-  }
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // Suponiendo que listaTemporal está declarada y llena
-    const formData = new FormData(form);
-    formData.append('codigo_acceso', generarCodigo());
-    formData.append('lista_estudiantes', JSON.stringify(listaTemporal));
-
-    try {
-      const res = await fetch('../api/guardar_examen.php', {
-        method: 'POST',
-        body: formData
-      });
-      const data = await res.json();
-
-
-
-      console.log(data);
-
-
-
-      if (data.status) {
-        mostrarToast('success', data.message || 'Examen guardado correctamente');
-        setTimeout(() => location.reload(), 1200);
-      } else {
-        mostrarToast('warning', 'Error: ' + (data.message || 'No se pudo guardar el examen.'));
-      }
-    } catch (error) {
-      console.error('Error en la solicitud:', error);
-      mostrarToast('error', 'Error en la conexión con el servidor.');
-    }
-  });
-
-  function generarCodigo() {
-    return 'EXAM' + Date.now().toString().slice(-6);
-  }
-});
+    /* -------------- */
 
 
 
@@ -575,10 +594,8 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 
-    
 
 
-    
     function cargarCategorias(estudianteId) {
       const categoriaSelect = document.getElementById("categoria_id");
       categoriaSelect.innerHTML = `<option value="">Seleccione</option>`;
@@ -614,17 +631,17 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     btnAnadir.addEventListener('click', () => {
       const estudianteId = document.querySelector('input[name="estudiante_radio"]:checked')?.value;
 
-    
+
 
       // Buscar el estudiante
       const estudiante = estudiantesData.find(e => e.id == estudianteId);
 
-     
+
 
       // Validar si existe el estudiante
       if (!estudiante) {
-        mostrarToast('error', 'Debes buscar y seleccionar un estudiante válido.');
-       
+        mostrarToast('warning', 'Debes buscar y seleccionar un estudiante válido.');
+
         return;
       }
 
@@ -634,7 +651,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       const fechaExamen = document.getElementById('fecha_examen').value;
 
 
-      
+
 
       if (!categoriaId || !totalPreguntas) {
         mostrarToast('warning', 'Completa todos los campos antes de añadir.');
@@ -679,14 +696,14 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     `;
 
 
-    
+
 
 
         listaSeleccionados.appendChild(li);
       });
     }
 
-    window.eliminarSeleccionado = function(index) {
+    window.eliminarSeleccionado = function (index) {
       listaTemporal.splice(index, 1);
       actualizarListaVisual();
     };
