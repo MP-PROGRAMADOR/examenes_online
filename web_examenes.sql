@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost:3306
--- Tiempo de generación: 04-06-2025 a las 10:24:27
+-- Tiempo de generación: 09-06-2025 a las 14:30:55
 -- Versión del servidor: 10.4.25-MariaDB
 -- Versión de PHP: 8.1.10
 
@@ -108,18 +108,19 @@ CREATE TABLE `estudiantes` (
   `creado_en` datetime DEFAULT current_timestamp(),
   `apellidos` varchar(250) DEFAULT NULL,
   `direccion` varchar(250) DEFAULT NULL,
-  `usuario` varchar(100) NOT NULL
+  `usuario` varchar(100) NOT NULL,
+  `Doc` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `estudiantes`
 --
 
-INSERT INTO `estudiantes` (`id`, `dni`, `nombre`, `email`, `telefono`, `fecha_nacimiento`, `escuela_id`, `estado`, `creado_en`, `apellidos`, `direccion`, `usuario`) VALUES
-(1, '0001234567', 'jesus Santos', 'pepe@gmail.com', '222547886', '0000-00-00', 1, 'activo', '2025-05-20 10:40:09', 'Pepe Payé', 'bisinga', 'pepe'),
-(3, '00012589741', 'Bubi', 'marie@gmail.com', '555214782', '2004-05-04', 1, 'activo', '2025-05-20 12:26:08', 'mabale', 'adfg', 'ENA25181'),
-(4, '000121415', 'jesus', 'jes@gmail.com', '222141516', '2000-01-26', 1, 'activo', '2025-05-26 10:33:06', 'topola', 'Bisinga', 'ENA2546A'),
-(5, '874653', 'salvador', 'salvadormete4@gmail.com', '33309876543', '2004-02-04', 1, 'activo', '2025-05-28 11:00:13', 'mete bijeri', 'buena esperanza 1', 'ENA25454');
+INSERT INTO `estudiantes` (`id`, `dni`, `nombre`, `email`, `telefono`, `fecha_nacimiento`, `escuela_id`, `estado`, `creado_en`, `apellidos`, `direccion`, `usuario`, `Doc`) VALUES
+(3, '00012589741', 'Bubi', 'marie@gmail.com', '555214782', '2004-05-04', 1, 'activo', '2025-05-20 12:26:08', 'mabale', 'adfg', 'ENA25181', ''),
+(4, '000121415', 'jesus', 'jes@gmail.com', '222141516', '2000-01-26', 1, 'activo', '2025-05-26 10:33:06', 'topola', 'Bisinga', 'ENA2546A', ''),
+(5, '874653', 'salvador', 'salvadormete4@gmail.com', '33309876543', '2004-02-04', 1, 'activo', '2025-05-28 11:00:13', 'mete bijeri', 'buena esperanza 1', 'ENA25454', ''),
+(6, '00948371', 'panchos', 'spaocholojilo@gmail.com', '333098765', '2000-05-09', 1, 'activo', '2025-06-09 09:07:05', 'asitos', 'campo yaunde', 'ENA25104', '0406');
 
 -- --------------------------------------------------------
 
@@ -145,7 +146,8 @@ INSERT INTO `estudiante_categorias` (`id`, `estudiante_id`, `categoria_id`, `est
 (2, 3, 4, 'pendiente', '2025-05-20 16:01:46', NULL),
 (3, 3, 6, 'pendiente', '2025-05-20 16:03:46', NULL),
 (4, 4, 4, 'pendiente', '2025-05-26 10:33:06', NULL),
-(5, 5, 4, 'pendiente', '2025-05-28 11:00:13', NULL);
+(5, 5, 4, 'pendiente', '2025-05-28 11:00:13', NULL),
+(6, 6, 1, 'pendiente', '2025-06-09 09:07:05', NULL);
 
 -- --------------------------------------------------------
 
@@ -367,7 +369,7 @@ CREATE TABLE `usuarios` (
   `nombre` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `contrasena_hash` varchar(255) NOT NULL,
-  `rol` enum('admin','examinador','operador') DEFAULT 'operador',
+  `rol` enum('admin','examinador','secretaria') NOT NULL,
   `creado_en` datetime DEFAULT current_timestamp(),
   `activo` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -379,7 +381,7 @@ CREATE TABLE `usuarios` (
 INSERT INTO `usuarios` (`id`, `nombre`, `email`, `contrasena_hash`, `rol`, `creado_en`, `activo`) VALUES
 (1, 'sir', 'sir@gmail.com', '$2y$10$if.sTKBTytAIvwUjR4B8ouL5Ugr3GMrm4k63R2K10db489fJ5nAsO', 'admin', '2025-05-19 09:07:55', 1),
 (2, 'Mete', 'mh@gmail.com', '$2y$10$EJrZhIlE9vLlPETf9ZX.s.0GOdJwVNuJOgpKpy7EYNw3vPylgSWZO', 'examinador', '2025-05-19 13:09:50', 1),
-(3, 'Maximiliano', 'max@gmail.com', '$2y$10$wWF/OlFv5Eq460kUoyW/nOMXIf36iIw8qwPdGFIGEMew3vnqHd0da', 'operador', '2025-05-19 13:54:01', 1);
+(5, 'maximiliano compe puye', 'maxicom@gmail.com', '$2y$10$Ul6pXCK/6CkeqZI2uxkcre1RAe2802pYkrhmRPfg6PLBFoBFmOMYO', 'secretaria', '2025-06-09 08:49:20', 1);
 
 --
 -- Índices para tablas volcadas
@@ -511,13 +513,13 @@ ALTER TABLE `escuelas_conduccion`
 -- AUTO_INCREMENT de la tabla `estudiantes`
 --
 ALTER TABLE `estudiantes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `estudiante_categorias`
 --
 ALTER TABLE `estudiante_categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `examenes`
@@ -565,7 +567,7 @@ ALTER TABLE `respuestas_estudiante`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Restricciones para tablas volcadas
