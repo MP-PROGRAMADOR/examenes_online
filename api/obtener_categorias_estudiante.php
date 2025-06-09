@@ -16,6 +16,7 @@ $sql = "SELECT
     CONCAT(e.nombre, ' ', e.apellidos) AS estudiante,
     e.fecha_nacimiento AS edad,
     ec.estado, 
+    e.id AS estudiante_id,
     ec.fecha_asignacion,
     (SELECT COUNT(*) FROM estudiante_categorias WHERE estudiante_id = ec.estudiante_id) AS total
 FROM estudiante_categorias ec
