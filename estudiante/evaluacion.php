@@ -141,13 +141,7 @@ $codigo = $estudiante['usuario'];
 
                 <!-- Cuerpo: imagen + opciones -->
                 <div class="card-body" id="preguntaContenido">
-                    <!-- Aquí se inserta dinámicamente la imagen (si existe) y el formulario de opciones -->
-                    <!-- Ejemplo de imagen:
-        <div class="text-center mb-4">
-            <img src="URL_DE_IMAGEN" class="img-fluid rounded-3 shadow-sm" alt="Imagen relacionada">
-        </div>
-        -->
-                    <!-- Aquí se cargan las opciones con JavaScript -->
+
                 </div>
 
                 <!-- Pie: botón continuar -->
@@ -245,7 +239,7 @@ $codigo = $estudiante['usuario'];
 
 
         function cargarPreguntas() {
-           // console.log("examenId:", examenId);
+            // console.log("examenId:", examenId);
 
             if (!examenId || isNaN(examenId)) {
                 alert("Examen inválido (ID no definido en URL)");
@@ -295,25 +289,28 @@ $codigo = $estudiante['usuario'];
 
             // Insertar título de la pregunta en el header
             const tituloHTML = `
-        <h5 class="fw-semibold mb-0 text-primary d-flex align-items-start">
-            <i class="bi bi-question-circle me-2"></i> ${pregunta.texto}
-        </h5>`;
+                <h5 class="fw-semibold mb-0 text-primary d-flex align-items-start">
+                    <i class="bi bi-question-circle me-2"></i> ${pregunta.texto}
+                </h5>`;
             document.getElementById('preguntaTitulo').innerHTML = tituloHTML;
 
+            /* ----------------- seccion de rendirizado de la imagen -----------------------*/
             // Imagen (si hay)
             const imagenHTML = pregunta.imagenes[0]
                 ? `<div class="text-center mb-4">
-           <img src="../api/${regunta.imagenes[0].ruta_imagen}" class="img-fluid rounded-3 shadow-sm" alt="Imagen relacionada">
-        </div>`
+                    <img src="../api/${regunta.imagenes[0].ruta_imagen}" class="img-fluid rounded-3 shadow-sm" alt="Imagen relacionada">
+                    </div>`
                 : '';
-              console.log(pregunta.imagenes[0].ruta_imagen)
+            //console.log(pregunta)
+            /* --------- fin de la seccion de renderizado de la imagen ------ */
+
             // Opciones HTML: checkbox o radio, con buena legibilidad
             let opcionesHTML = '';
             const crearOpcion = (id, texto, tipo) => `
-        <div class="opcion p-3 border rounded-3 mb-3 bg-light shadow-sm d-flex justify-content-between align-items-center fs-5" style="cursor: pointer;">
-            <label class="mb-0 flex-grow-1" for="${id}">${texto}</label>
-            <input class="form-check-input fs-4 ms-3" type="${tipo}" name="opciones" value="${id}" id="${id}">
-        </div>`;
+                <div class="opcion p-3 border rounded-3 mb-3 bg-light shadow-sm d-flex justify-content-between align-items-center fs-5" style="cursor: pointer;">
+                    <label class="mb-0 flex-grow-1" for="${id}">${texto}</label>
+                    <input class="form-check-input fs-4 ms-3" type="${tipo}" name="opciones" value="${id}" id="${id}">
+                </div>`;
 
             if (pregunta.tipo === 'vf') {
                 opcionesHTML += crearOpcion("1", "Verdadero", "radio");
@@ -340,9 +337,14 @@ $codigo = $estudiante['usuario'];
             });
         }
 
+
+
+
+
+
         btnSiguiente.addEventListener('click', () => {
 
-       
+
             const seleccionados = Array.from(document.querySelectorAll('input[name="opciones"]:checked'))
                 .map(input => input.value);
 
@@ -354,7 +356,7 @@ $codigo = $estudiante['usuario'];
             datos.append('pregunta_id', listaPreguntas[preguntaActual].pregunta_id);
             datos.append('tipo_pregunta', listaPreguntas[preguntaActual].tipo);
             seleccionados.forEach(id => datos.append('opciones[]', id));
-            
+
             fetch('../api/guardar_respuesta.php', {
                 method: 'POST',
                 body: datos
@@ -363,9 +365,9 @@ $codigo = $estudiante['usuario'];
                 .then(res => { // <-- Aquí capturas correctamente el objeto de respuesta JSON
                     if (res.success) {
                         preguntaActual++;
-                       console.log(res.data);
+                        console.log(res.data);
                         // Puedes volver a habilitar esta línea si quieres continuar automáticamente
-                        //  mostrarPregunta();
+                          mostrarPregunta();
                     } else {
                         console.log(res.message);
                     }
