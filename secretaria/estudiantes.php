@@ -126,10 +126,7 @@ try {
                                             onclick="editarEstudiante(<?= $est['id'] ?>)">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar"
-                                            onclick="eliminarEstudiante(<?= $est['id'] ?>)">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                     
                                          <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2   shadow-sm"
                         onclick="abrirModalCategorias(<?= $est['id'] ?>, '<?= htmlspecialchars($est['nombre'], ENT_QUOTES, 'UTF-8') ?>',  '<?= htmlspecialchars($est['fecha_nacimiento'], ENT_QUOTES, 'UTF-8') ?>')"
                         title="Ver detalles de categorias del estudiante">

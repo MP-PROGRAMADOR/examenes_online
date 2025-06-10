@@ -53,7 +53,7 @@
         class="link-text">Inicio</span></a>
 
     <div class="section-title">Gestión Académica</div>
-    <a href="../secretaria/estudiantes.php" class="nav-link"><i class="bi bi-people"></i><span
+    <a href="../examinador/examenes.php" class="nav-link"><i class="bi bi-people"></i><span
         class="link-text">Estudiantes</span></a>
     <a href="../secretaria/resultados.php" class="nav-link"><i class="bi bi-card-list"></i><span
         class="link-text">Examenes</span></a>

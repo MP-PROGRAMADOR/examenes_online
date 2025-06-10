@@ -2,7 +2,7 @@
   <?php
   
   include_once("../includes/header.php");
-include_once("../includes/sidebar_secretaria.php");
+include_once("../includes/sidebar_examinador.php");
 ?>
 <?php
  
