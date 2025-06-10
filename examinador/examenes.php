@@ -63,7 +63,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
           </select>
         </div>
 
-      
+
       </div>
     </div>
 
@@ -79,9 +79,9 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
               <th><i class="bi bi-person-badge-fill me-1"></i> Asignado Por</th>
               <th><i class="bi bi-calendar-event-fill me-1"></i> Fecha</th>
               <th><i class="bi bi-list-ol me-1"></i> Preguntas</th>
-              <th><i class="bi bi-toggle-on me-1"></i> Estado</th>
               <th><i class="bi bi-clipboard-check-fill me-1"></i> Calificación</th>
               <th><i class="bi bi-key-fill me-1"></i> Código</th>
+              <th><i class="bi bi-toggle-on me-1"></i> Estado</th>
               <th><i class="bi bi-gear-fill me-1"></i> Acciones</th>
             </tr>
           </thead>
@@ -95,25 +95,40 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                   <td><?= htmlspecialchars($examen['usuario'] ?? '—') ?></td>
                   <td><?= htmlspecialchars($examen['fecha_asignacion']) ?></td>
                   <td class="text-center"><?= htmlspecialchars($examen['total_preguntas']) ?></td>
-                  <td class="text-center">
-                    <span class="badge bg-<?= $examen['estado'] === 'pendiente' ? 'warning' : ($examen['estado'] === 'en_progreso' ? 'primary' : 'success') ?>">
-                      <?= strtoupper($examen['estado']) ?>
-                    </span>
-                  </td>
                   <td class="text-center"><?= $examen['calificacion'] !== null ? htmlspecialchars($examen['calificacion']) : '—' ?></td>
                   <td class="text-center"><code><?= htmlspecialchars($examen['codigo_acceso']) ?></code></td>
+
                   <td class="text-center">
-                    <div class="d-flex gap-2 justify-content-center flex-wrap">
-                      <button class="btn btn-sm btn-outline-primary" onclick="verExamen(<?= $examen['id'] ?>)">
-                        <i class="bi bi-eye-fill me-1"></i> Ver
+                    <?php if ($examen['estado'] === 'pendiente'): ?>
+                      <button
+                        class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
+                        title="Haz clic para desactivar"
+                        onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, 'inactivo')">
+                        <i class="bi bi-toggle-on fs-5"></i>
+                        Activo
                       </button>
-                      <button class="btn btn-sm btn-outline-warning" onclick="editarExamen(<?= $examen['id'] ?>)">
-                        <i class="bi bi-pencil-fill me-1"></i> Editar
+                    <?php else: ?>
+                      <button
+                        class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
+                        title="Haz clic para activar" onclick="cambiarEstadoEstudiante(<?= $examen['id'] ?>, 'activo')">
+                        <i class="bi bi-toggle-off fs-5"></i>
+                        Inactivo
                       </button>
-                      <button class="btn btn-sm btn-outline-danger" onclick="eliminarExamen(<?= $examen['id'] ?>)">
-                        <i class="bi bi-trash-fill me-1"></i> Eliminar
+                    <?php endif; ?>
+                  </td>
+
+
+
+                  <td class="text-center">
+                    <a href="../libreria/imprimir_codigo.php?id=<?= $examen['id'] ?>" class="btn btn-sm btn-outline-secondary">
+                      <i class="bi bi-printer-fill me-1"></i> Imprimir
+                    </a>
+
+                    <?php if ($examen['calificacion'] > 0): ?>
+                      <button class="btn btn-sm btn-outline-warning" onclick="imprimirExamen(<?= $examen['id'] ?>)">
+                        <i class="bi bi-printer-fill me-1"></i> Imprimir Examen
                       </button>
-                    </div>
+                    <?php endif; ?>
                   </td>
                 </tr>
               <?php endforeach; ?>
@@ -216,45 +231,45 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
         <div class="modal-body row g-3 px-4 py-3">
-            <input type="hidden" name="examen_id" id="examen_id">
-            <input type="hidden" name="usuario_id" id="usuario_id" value="<?= (int) $_SESSION['usuario']['id'] ?>">
+          <input type="hidden" name="examen_id" id="examen_id">
+          <input type="hidden" name="usuario_id" id="usuario_id" value="<?= (int) $_SESSION['usuario']['id'] ?>">
 
 
-            <div class="mb-2">
-              <label for="buscador_estudiantes" class="form-label">Buscar Estudiante</label>
-              <input type="text" class="form-control" id="buscador_estudiantes" placeholder="Escribe nombre o apellido...">
-            </div>
-            <div id="lista_estudiantes" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;"></div>
-            <input type="hidden" name="estudiante_id" id="estudiante_id" required>
-
-
-            <div class="col-md-6">
-              <label for="categoria_id" class="form-label">Categoría</label>
-              <select class="form-select" id="categoria_id" name="categoria_id" required></select>
-            </div>
-
-            <div class="col-md-6">
-              <label for="total_preguntas" class="form-label">Total de Preguntas</label>
-              <input type="number" class="form-control" id="total_preguntas" value="5" name="total_preguntas" min="5" required>
-              <span id="preguntas_disponibles" class="text-fs-2"></span>
-            </div>
-
-            <div class="col-md-6">
-              <label for="fecha_examen" class="form-label">
-                <i class="bi bi-calendar-event me-1"></i>Fecha a examinar
-              </label>
-              <input type="date" id="fecha_examen" name="fecha_examen" class="form-control" required>
-            </div>
-
+          <div class="mb-2">
+            <label for="buscador_estudiantes" class="form-label">Buscar Estudiante</label>
+            <input type="text" class="form-control" id="buscador_estudiantes" placeholder="Escribe nombre o apellido...">
           </div>
+          <div id="lista_estudiantes" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;"></div>
+          <input type="hidden" name="estudiante_id" id="estudiante_id" required>
+
+
+          <div class="col-md-6">
+            <label for="categoria_id" class="form-label">Categoría</label>
+            <select class="form-select" id="categoria_id" name="categoria_id" required></select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="total_preguntas" class="form-label">Total de Preguntas</label>
+            <input type="number" class="form-control" id="total_preguntas" value="5" name="total_preguntas" min="5" required>
+            <span id="preguntas_disponibles" class="text-fs-2"></span>
+          </div>
+
+          <div class="col-md-6">
+            <label for="fecha_examen" class="form-label">
+              <i class="bi bi-calendar-event me-1"></i>Fecha a examinar
+            </label>
+            <input type="date" id="fecha_examen" name="fecha_examen" class="form-control" required>
+          </div>
+
+        </div>
 
 
         <form id="formExamen">
-          
-<div class="mt-3">
-          <h5 class="text-primary"><i class="bi bi-list-ul me-1"></i>Lista de Estudiantes Añadidos</h5>
-          <ul class="list-group" id="lista_seleccionados" name="lista_seleccionados"></ul>
-        </div>
+
+          <div class="mt-3">
+            <h5 class="text-primary"><i class="bi bi-list-ul me-1"></i>Lista de Estudiantes Añadidos</h5>
+            <ul class="list-group" id="lista_seleccionados" name="lista_seleccionados"></ul>
+          </div>
 
 
           <div class="col-md-6">
@@ -274,7 +289,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </form>
 
 
-        
+
 
       </div>
     </div>
@@ -519,64 +534,64 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
     document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('form_examen'); // Cambia esto al id real
+      const form = document.getElementById('form_examen'); // Cambia esto al id real
 
-  if (!form) {
-    console.error('No se encontró el formulario');
-    return;
-  }
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // Suponiendo que listaTemporal está declarada y llena
-    const formData = new FormData(form);
-    formData.append('codigo_acceso', generarCodigo());
-    formData.append('lista_estudiantes', JSON.stringify(listaTemporal));
-
-    try {
-      const res = await fetch('../api/guardar_examen.php', {
-        method: 'POST',
-        body: formData
-      });
-      const data = await res.json();
-
-
-
-      console.log(data);
-
-
-
-      if (data.status) {
-        mostrarToast('success', data.message || 'Examen guardado correctamente');
-        setTimeout(() => location.reload(), 1200);
-      } else {
-        mostrarToast('warning', 'Error: ' + (data.message || 'No se pudo guardar el examen.'));
+      if (!form) {
+        console.error('No se encontró el formulario');
+        return;
       }
-    } catch (error) {
-      console.error('Error en la solicitud:', error);
-      mostrarToast('error', 'Error en la conexión con el servidor.');
-    }
-  });
 
-  function generarCodigo() {
-    return 'EXAM' + Date.now().toString().slice(-6);
-  }
-});
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
+        // Suponiendo que listaTemporal está declarada y llena
+        const formData = new FormData(form);
+        formData.append('codigo_acceso', generarCodigo());
+        formData.append('lista_estudiantes', JSON.stringify(listaTemporal));
 
-
-
-
-
-
+        try {
+          const res = await fetch('../api/guardar_examen.php', {
+            method: 'POST',
+            body: formData
+          });
+          const data = await res.json();
 
 
 
-    
+          console.log(data);
 
 
-    
+
+          if (data.status) {
+            mostrarToast('success', data.message || 'Examen guardado correctamente');
+            setTimeout(() => location.reload(), 1200);
+          } else {
+            mostrarToast('warning', 'Error: ' + (data.message || 'No se pudo guardar el examen.'));
+          }
+        } catch (error) {
+          console.error('Error en la solicitud:', error);
+          mostrarToast('error', 'Error en la conexión con el servidor.');
+        }
+      });
+
+      function generarCodigo() {
+        return 'EXAM' + Date.now().toString().slice(-6);
+      }
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     function cargarCategorias(estudianteId) {
       const categoriaSelect = document.getElementById("categoria_id");
       categoriaSelect.innerHTML = `<option value="">Seleccione</option>`;
@@ -612,17 +627,17 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     btnAnadir.addEventListener('click', () => {
       const estudianteId = document.querySelector('input[name="estudiante_radio"]:checked')?.value;
 
-    
+
 
       // Buscar el estudiante
       const estudiante = estudiantesData.find(e => e.id == estudianteId);
 
-     
+
 
       // Validar si existe el estudiante
       if (!estudiante) {
         mostrarToast('error', 'Debes buscar y seleccionar un estudiante válido.');
-       
+
         return;
       }
 
@@ -632,7 +647,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       const fechaExamen = document.getElementById('fecha_examen').value;
 
 
-      
+
 
       if (!categoriaId || !totalPreguntas) {
         mostrarToast('warning', 'Completa todos los campos antes de añadir.');
@@ -677,7 +692,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     `;
 
 
-    
+
 
 
         listaSeleccionados.appendChild(li);

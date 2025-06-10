@@ -34,34 +34,61 @@ try {
         throw new Exception("No se encontró el examen con ID $examen_id.");
     }
 
-    // Crear el PDF
-    class PDF extends FPDF {
-        function Header() {
-            $this->SetFont('Arial','B',14);
-            $this->Cell(0,10,'Ticket de Examen',0,1,'C');
-            $this->Ln(5);
-        }
-        function Footer() {
-            $this->SetY(-15);
-            $this->SetFont('Arial','I',8);
-            $this->Cell(0,10,'Pagina '.$this->PageNo().'/{nb}',0,0,'C');
-        }
+// Crear el PDF
+class PDF extends FPDF {
+    function Header() {
+        // Logo (opcional)
+        // $this->Image('logo.png', 5, 5, 15); 
+
+        $this->SetFont('Arial', 'B', 14);
+        $this->SetTextColor(33, 37, 41); // Gris oscuro
+        $this->Cell(0, 10, 'TICKET DE EXAMEN', 0, 1, 'C');
+        $this->SetDrawColor(100, 100, 100);
+        $this->Line(5, 20, 75, 20);
+        $this->Ln(5);
     }
 
-    $pdf = new PDF('P', 'mm', array(80,150));
-    $pdf->AliasNbPages();
-    $pdf->AddPage();
-    $pdf->SetFont('Arial','',12);
+    function Footer() {
+        $this->SetY(-15);
+        $this->SetFont('Arial', 'I', 8);
+        $this->SetTextColor(150, 150, 150);
+        $this->Cell(0, 10, 'Página '.$this->PageNo().'/{nb}', 0, 0, 'C');
+    }
+}
 
-    $pdf->Cell(0,10,"Nombre: " . $resultado['nombre'] . " " . $resultado['apellidos'], 0, 1);
-    $pdf->Cell(0,10,"Email: " . $resultado['email'], 0, 1);
-    $pdf->Cell(0,10,"Usuario: " . $resultado['usuario'], 0, 1);
-    $pdf->Cell(0,10,"Categoria: " . $resultado['categoria'], 0, 1);
-    $pdf->Cell(0,10,"Total Preguntas: " . $resultado['total_preguntas'], 0, 1);
-    $pdf->Cell(0,10,"Fecha: " . $resultado['fecha_asignacion'], 0, 1);
+$pdf = new PDF('P', 'mm', array(80, 150));
+$pdf->AliasNbPages();
+$pdf->AddPage();
+$pdf->SetMargins(5, 5);
+$pdf->SetFont('Arial', '', 11);
+$pdf->SetTextColor(0, 0, 0);
 
-    $pdf->Output('I', 'ticket_examen.pdf');
-    exit;
+// Contenido del ticket
+$campos = [
+    'Nombre completo'     => $resultado['nombre'] . ' ' . $resultado['apellidos'],
+    'Email'               => $resultado['email'],
+    'Usuario'             => $resultado['usuario'],
+    'Categoría'           => $resultado['categoria'],
+    'T.Preguntas'  => $resultado['total_preguntas'],
+    'F.Examen'    => $resultado['fecha_asignacion'],
+];
+
+foreach ($campos as $label => $valor) {
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(30, 6, utf8_decode($label) . ':', 0, 0);
+    $pdf->SetFont('Arial', '', 10);
+    $pdf->MultiCell(0, 6, utf8_decode($valor), 0, 1);
+    $pdf->Ln(1);
+}
+
+// Separador final
+$pdf->Ln(5);
+$pdf->SetDrawColor(180, 180, 180);
+$pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
+
+$pdf->Output('I', 'ticket_examen.pdf');
+exit;
+
 
 } catch (Exception $e) {
     $_SESSION['error'] = "Error al generar PDF: " . $e->getMessage();
