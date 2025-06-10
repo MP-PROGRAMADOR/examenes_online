@@ -1,7 +1,7 @@
 <?php
 // Iniciar sesión si no está iniciada
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+  session_start();
 }
 
 // Incluir archivo de conexión
@@ -9,8 +9,8 @@ require '../includes/conexion.php';
 
 // Verificar si el usuario ha iniciado sesión
 if (!isset($_SESSION['usuario'])) {
-    header('location: ../index.php');
-    exit();
+  header('location: ../index.php');
+  exit();
 }
 
 // Extraer datos del usuario
@@ -21,8 +21,9 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8" /> 
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard | Entidad de Tráfico</title>
 
@@ -55,7 +56,7 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
     }
 
     body {
-     /*  display: flex;
+      /*  display: flex;
       flex-direction: column; */
       height: 100vh;
       overflow: hidden;
@@ -64,11 +65,11 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
     .wrapper {
       display: flex;
       flex: 1;
-      overflow: hidden; 
-      background-color:rgba(236, 227, 227, 0.65);
-   /*     border: solid 2px rgb(0, 0, 0); */
-       width: 100%;
-      
+      overflow: hidden;
+      background-color: rgba(236, 227, 227, 0.65);
+      /*     border: solid 2px rgb(0, 0, 0); */
+      width: 100%;
+
     }
 
     /* .main-content { 
@@ -78,123 +79,124 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
       background-color: var(--main-bg);
     } */
 
-   /*  .wrapper {
+    /*  .wrapper {
             display: flex;
             height: 100vh;
             overflow: hidden;
         } */
 
-        /* ---------------- SIDEBAR ---------------- */
-        .sidebar {
-            width: 250px;
-            background-color:var(--sidebar-bg);
-            color: #fff;
-            box-shadow: 2px 0 5px var(--sidebar-bg);
-            overflow-y: auto;
-            transition: all 0.3s ease;
-            z-index: 1050;
-            position: relative;
-            padding: 10px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--sidebar-bg);
-        }
+    /* ---------------- SIDEBAR ---------------- */
+    .sidebar {
+      width: 250px;
+      background-color: var(--sidebar-bg);
+      color: #fff;
+      box-shadow: 2px 0 5px var(--sidebar-bg);
+      overflow-y: auto;
+      transition: all 0.3s ease;
+      z-index: 1050;
+      position: relative;
+      padding: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--sidebar-bg);
+    }
 
-        .sidebar::-webkit-scrollbar {
-            width: 10px;
-        }
+    .sidebar::-webkit-scrollbar {
+      width: 10px;
+    }
 
-        .sidebar::-webkit-scrollbar-track {
-            background: var(--sidebar-bg);
-            border-radius: 10px;
-        }
+    .sidebar::-webkit-scrollbar-track {
+      background: var(--sidebar-bg);
+      border-radius: 10px;
+    }
 
-        .sidebar::-webkit-scrollbar-thumb {
-            background:var(--sidebar-bg);
-        }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: var(--sidebar-bg);
+    }
 
-        .sidebar::-webkit-scrollbar-thumb:hover {
-            background: #334155;
-        }
+    .sidebar::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
 
-        .sidebar.collapsed {
-            width: 80px;
-            background-color: var(--sidebar-bg);
-        }
+    .sidebar.collapsed {
+      width: 80px;
+      background-color: var(--sidebar-bg);
+    }
 
-        .sidebar.collapsed .link-text {
-            display: none; /* ocultar las letras en menu colapsado  */
-        }
+    .sidebar.collapsed .link-text {
+      display: none;
+      /* ocultar las letras en menu colapsado  */
+    }
 
-        .sidebar .nav-link {
-            color: #fff;
-            transition: all 0.2s;
-        }
+    .sidebar .nav-link {
+      color: #fff;
+      transition: all 0.2s;
+    }
 
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            background-color: rgb(7, 88, 169);
-            color: rgb(160, 160, 160);
-        }
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+      background-color: rgb(7, 88, 169);
+      color: rgb(160, 160, 160);
+    }
 
-        .sidebar .nav-link i {
-            font-size: 1.2rem;
-        }
+    .sidebar .nav-link i {
+      font-size: 1.2rem;
+    }
 
-        .sidebar.collapsed .nav-link span,
-        .sidebar.collapsed h5 {
-            display: none;
-        }
+    .sidebar.collapsed .nav-link span,
+    .sidebar.collapsed h5 {
+      display: none;
+    }
 
-        @media (max-width: 767.98px) {
-            .sidebar {
-                position: fixed;
-                height: calc(100vh - 80px);
-                margin-top: 60px;
-                left: -250px;
-                box-shadow: 2px 0 10px var(--sidebar-bg);
-            }
+    @media (max-width: 767.98px) {
+      .sidebar {
+        position: fixed;
+        height: calc(100vh - 80px);
+        margin-top: 60px;
+        left: -250px;
+        box-shadow: 2px 0 10px var(--sidebar-bg);
+      }
 
-            .sidebar.show {
-                left: 0;
-            }
-        }
-
-
-        /* ---------------- CONTENIDO PRINCIPAL ---------------- */
-        #content {
-            flex-grow: 1;
-            overflow-y: auto;
-            height: calc(100vh - 80px);
-            /*  height: 100vh; */
-            margin-left: 250px;
-            width: 104rem;
-            margin-top: 60px;
-            padding: 1rem;
-            transition: margin-left 0.3s ease;
-             /*  border: solid 2px #52a552; */
-        }
-
-        #content.collapsed {
-            margin-left: 80px;
-        }
+      .sidebar.show {
+        left: 0;
+      }
+    }
 
 
-        @media (max-width: 767.98px) {
-            #content {
-                margin-left: 0 !important;
+    /* ---------------- CONTENIDO PRINCIPAL ---------------- */
+    #content {
+      flex-grow: 1;
+      overflow-y: auto;
+      height: calc(100vh - 80px);
+      /*  height: 100vh; */
+      margin-left: 250px;
+      width: 104rem;
+      margin-top: 60px;
+      padding: 1rem;
+      transition: margin-left 0.3s ease;
+      /*  border: solid 2px #52a552; */
+    }
 
-            }
+    #content.collapsed {
+      margin-left: 80px;
+    }
 
-            #navContent {
-                margin-left: 0 !important;
 
-            }
+    @media (max-width: 767.98px) {
+      #content {
+        margin-left: 0 !important;
 
-        }
+      }
 
-        body.sidebar-collapsed #navContent {
-            left: 0px !important;
-        }
+      #navContent {
+        margin-left: 0 !important;
+
+      }
+
+    }
+
+    body.sidebar-collapsed #navContent {
+      left: 0px !important;
+    }
 
 
     .navbar {
@@ -276,7 +278,7 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
       display: none;
     }
 
- /*    @media (min-width: 992px) {
+    /*    @media (min-width: 992px) {
       .main-content {
         margin-left: var(--sidebar-collapsed-width);
         transition: margin-left 0.3s ease;
@@ -287,7 +289,7 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
       }
     } */
 
-     
+
     @media (max-width: 768px) {
       .sidebar {
         left: -100%;
@@ -299,7 +301,7 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
         z-index: 1040;
       }
 
-       
+
 
       .overlay {
         position: fixed;
@@ -312,7 +314,7 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
       }
     }
 
-    
+
 
     .sidebar-toggle {
       cursor: pointer;
@@ -324,6 +326,7 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
         opacity: 0;
         transform: translateY(20px);
       }
+
       100% {
         opacity: 1;
         transform: translateY(0);
@@ -335,6 +338,7 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
         opacity: 1;
         transform: translateY(0);
       }
+
       100% {
         opacity: 0;
         transform: translateY(-20px);
@@ -379,5 +383,5 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
     }
   </style>
 </head>
+
 <body>
- 

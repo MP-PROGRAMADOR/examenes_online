@@ -130,10 +130,27 @@ try {
 
         $stmt = $pdo->prepare("UPDATE examenes SET estado = 'finalizado', calificacion = ? WHERE id = ?");
         $stmt->execute([$calificacion, $examen_id]);
+
+        /* ----Actualizar el estado del carne para este estudiante ------- */
+        $estudiante = $_SESSION['estudiante']; // estudiante
+        $estudiante_id = $estudiante['id'];
+        // Obtener el id de la categoria del examen
+        $stmt = $pdo->prepare("SELECT categoria_id FROM examenes WHERE id = ?");
+        $stmt->execute([$examen_id]);
+        $categoria_id = (float) $stmt->fetchColumn();
+
+        if ($calificacion > 80) {
+            $stmt = $pdo->prepare("UPDATE estudiante_categorias SET estado = 'aprobado', fecha_aprobacion = NOW() WHERE estudiante_id = ? AND categoria_id = ?");
+            $stmt->execute([$estudiante_id, $categoria_id]);
+            
+        } else {
+            $stmt = $pdo->prepare("UPDATE estudiante_categorias SET estado = 'en_proceso' , fecha_aprobacion = NOW() WHERE estudiante_id = ? AND categoria_id = ?");
+            $stmt->execute([$estudiante_id, $categoria_id]);
+        
+
+        }
+
         unset($_SESSION['resumen']);
-
-
-
     }
 
     $pdo->commit();
@@ -144,7 +161,7 @@ try {
             'puntaje' => $puntaje ?? 0,
             'resumen' => $_SESSION['resumen'] ?? 0,
             'calificacion' => $calificacion ?? 0,
-            'vf'=> $es_correcta_vf ?? 0
+            'vf' => $es_correcta_vf ?? 0
         ]
     ]);
 
