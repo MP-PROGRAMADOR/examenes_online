@@ -20,7 +20,7 @@ try {
 }
 ?>
 
-<main class="container py-4">
+<main class="main-content" id="content">
   <div class="row g-4">
 
     <!-- CARD TEMPLATE -->
