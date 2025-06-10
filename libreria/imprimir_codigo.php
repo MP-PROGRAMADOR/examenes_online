@@ -86,9 +86,9 @@ try {
 
     foreach ($campos as $label => $valor) {
         $pdf->SetFont('Arial', 'B', 10);
-        $pdf->Cell(30, 6, utf8_decode($label) . ':', 0, 0);
+        $pdf->Cell(30, 5, utf8_decode($label) . ':', 0, 0);
         $pdf->SetFont('Arial', '', 10);
-        $pdf->MultiCell(0, 6, utf8_decode($valor), 0, 1);
+        $pdf->MultiCell(0, 5, utf8_decode($valor), 0, 1);
         $pdf->Ln(1);
     }
 

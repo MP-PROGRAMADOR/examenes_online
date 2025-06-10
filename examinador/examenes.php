@@ -124,11 +124,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                       <i class="bi bi-printer-fill me-1"></i> Imprimir
                     </a>
 
-                    <?php if ($examen['calificacion'] > 0): ?>
-                      <button class="btn btn-sm btn-outline-warning" onclick="imprimirExamen(<?= $examen['id'] ?>)">
-                        <i class="bi bi-printer-fill me-1"></i> Imprimir Examen
-                      </button>
-                    <?php endif; ?>
+                   
                   </td>
                 </tr>
               <?php endforeach; ?>
