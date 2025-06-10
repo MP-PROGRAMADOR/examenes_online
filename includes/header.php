@@ -55,8 +55,8 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
     }
 
     body {
-      display: flex;
-      flex-direction: column;
+     /*  display: flex;
+      flex-direction: column; */
       height: 100vh;
       overflow: hidden;
     }
@@ -64,9 +64,11 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
     .wrapper {
       display: flex;
       flex: 1;
-      overflow: hidden;
-      padding-top: 50px;
+      overflow: hidden; 
       background-color:rgba(236, 227, 227, 0.65);
+   /*     border: solid 2px rgb(0, 0, 0); */
+       width: 100%;
+      
     }
 
     /* .main-content { 
@@ -163,12 +165,13 @@ $nombre = htmlspecialchars($_SESSION['usuario']['nombre'], ENT_QUOTES, 'UTF-8');
             flex-grow: 1;
             overflow-y: auto;
             height: calc(100vh - 80px);
-            margin-top: 60px;
             /*  height: 100vh; */
             margin-left: 250px;
+            width: 104rem;
+            margin-top: 60px;
             padding: 1rem;
             transition: margin-left 0.3s ease;
-            /*   border: solid 2px #52a552; */
+             /*  border: solid 2px #52a552; */
         }
 
         #content.collapsed {

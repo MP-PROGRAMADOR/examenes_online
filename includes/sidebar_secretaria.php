@@ -18,6 +18,7 @@
         <i class="bi bi-person-circle fs-4 text-white"></i>
       </button>
 
+     
       <!-- Right content -->
       <div class="collapse navbar-collapse justify-content-end" id="navbarUserCollapse">
         <div class="d-flex align-items-center gap-3 flex-wrap p-3 rounded-3"
@@ -26,14 +27,13 @@
             <i class="bi bi-person-circle fs-3 text-white"></i>
             <span class="text-white fw-semibold text-truncate" style="max-width: 180px;">
               <?= htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8'); ?>
-              ( <?= htmlspecialchars($rol, ENT_QUOTES, 'UTF-8'); ?>)</span>
+              </span>
 
+              <span  
+                class="btn btn-outline-light btn-sm d-flex align-items-center gap-1 px-3 shadow-sm"            >
+                  ( <?= htmlspecialchars($rol, ENT_QUOTES, 'UTF-8'); ?>)
+              </span>
           </div>
-          <a href="../admin/index.php"
-            class="btn btn-outline-light btn-sm d-flex align-items-center gap-1 px-3 shadow-sm"
-            style="transition: background-color 0.3s ease;">
-            <i class="bi bi-house-door-fill fs-5"></i> Home
-          </a>
           <a href="../logout.php" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1 px-3 shadow-sm"
             style="transition: background-color 0.3s ease;">
             <i class="bi bi-box-arrow-right fs-5"></i> Cerrar

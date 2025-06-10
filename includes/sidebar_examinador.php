@@ -26,14 +26,14 @@
             <i class="bi bi-person-circle fs-3 text-white"></i>
             <span class="text-white fw-semibold text-truncate" style="max-width: 180px;">
               <?= htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8'); ?>
-              ( <?= htmlspecialchars($rol, ENT_QUOTES, 'UTF-8'); ?>)</span>
+              </span>
 
           </div>
-          <a href="../admin/index.php"
+          <span  
             class="btn btn-outline-light btn-sm d-flex align-items-center gap-1 px-3 shadow-sm"
             style="transition: background-color 0.3s ease;">
-            <i class="bi bi-house-door-fill fs-5"></i> Home
-          </a>
+              ( <?= htmlspecialchars($rol, ENT_QUOTES, 'UTF-8'); ?>)
+          </sp>
           <a href="../logout.php" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1 px-3 shadow-sm"
             style="transition: background-color 0.3s ease;">
             <i class="bi bi-box-arrow-right fs-5"></i> Cerrar
@@ -49,14 +49,16 @@
 <div class="wrapper">
   <!-- Sidebar -->
   <div id="sidebar" class="sidebar">
-    <a href="../secretaria/index.php" class="nav-link"><i class="bi bi-house-door"></i><span
+    <a href="../examinador/index.php" class="nav-link"><i class="bi bi-house-door"></i><span
         class="link-text">Inicio</span></a>
 
     <div class="section-title">Gestión Académica</div>
     <a href="../examinador/examenes.php" class="nav-link"><i class="bi bi-people"></i><span
         class="link-text">Estudiantes</span></a>
-    <a href="../secretaria/resultados.php" class="nav-link"><i class="bi bi-card-list"></i><span
-        class="link-text">Examenes</span></a>
+    <a href="../examinador/resultados.php" class="nav-link"><i class="bi bi-card-list"></i><span
+        class="link-text">Resultados</span></a>
+    <a href="../examinador/balances.php" class="nav-link"><i class="bi bi-card-list"></i><span
+        class="link-text">Balances</span></a>
     
   
   </div>

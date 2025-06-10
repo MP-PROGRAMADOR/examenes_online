@@ -24,11 +24,7 @@
               <?= htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8'); ?>
               ( <?= htmlspecialchars($rol, ENT_QUOTES, 'UTF-8'); ?>)</span> 
           </div>
-          <a href="../admin/index.php"
-            class="btn btn-outline-light btn-sm d-flex align-items-center gap-1 px-3 shadow-sm"
-            style="transition: background-color 0.3s ease;">
-            <i class="bi bi-house-door-fill fs-5"></i> Home
-          </a>
+           
           <a href="../logout.php" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1 px-3 shadow-sm"
             style="transition: background-color 0.3s ease;">
             <i class="bi bi-box-arrow-right fs-5"></i> Cerrar

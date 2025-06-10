@@ -30,8 +30,10 @@ $sql = "SELECT
         JOIN estudiantes est ON ex.estudiante_id = est.id
         JOIN categorias cat ON ex.categoria_id = cat.id
         LEFT JOIN usuarios us ON ex.asignado_por = us.id
+        WHERE ex.fecha_asignacion >= NOW()
         ORDER BY ex.fecha_asignacion DESC
         LIMIT :limite OFFSET :offset";
+
 
 $stmt = $pdo->prepare($sql);
 $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
@@ -39,10 +41,10 @@ $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
-
 <main class="main-content" id="content">
   <div class="card shadow-sm mb-4">
-    <div class="card-header bg-primary text-white d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 rounded-top">
+    <div
+      class="card-header bg-primary text-white d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 rounded-top">
       <h5 class="mb-0 d-flex align-items-center">
         <i class="bi bi-file-earmark-text-fill me-2"></i>Gestión de Exámenes
       </h5>
@@ -75,11 +77,9 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <tr>
               <th><i class="bi bi-hash me-1"></i> ID</th>
               <th><i class="bi bi-person-fill me-1"></i> Estudiante</th>
-              <th><i class="bi bi-tags-fill me-1"></i> Categoría</th>
-              <th><i class="bi bi-person-badge-fill me-1"></i> Asignado Por</th>
+              <th><i class="bi bi-tags-fill me-1"></i> Categoría</th> 
               <th><i class="bi bi-calendar-event-fill me-1"></i> Fecha</th>
-              <th><i class="bi bi-list-ol me-1"></i> Preguntas</th>
-              <th><i class="bi bi-clipboard-check-fill me-1"></i> Calificación</th>
+              <th><i class="bi bi-list-ol me-1"></i> Preguntas</th> 
               <th><i class="bi bi-key-fill me-1"></i> Código</th>
               <th><i class="bi bi-toggle-on me-1"></i> Estado</th>
               <th><i class="bi bi-gear-fill me-1"></i> Acciones</th>
@@ -91,29 +91,28 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <tr>
                   <td class="text-center"><?= htmlspecialchars($examen['id']) ?></td>
                   <td><?= htmlspecialchars($examen['estudiante']) ?></td>
-                  <td><?= htmlspecialchars($examen['categoria']) ?></td>
-                  <td><?= htmlspecialchars($examen['usuario'] ?? '—') ?></td>
+                  <td><?= htmlspecialchars($examen['categoria']) ?></td> 
                   <td><?= htmlspecialchars($examen['fecha_asignacion']) ?></td>
-                  <td class="text-center"><?= htmlspecialchars($examen['total_preguntas']) ?></td>
-                  <td class="text-center"><?= $examen['calificacion'] !== null ? htmlspecialchars($examen['calificacion']) : '—' ?></td>
+                  <td class="text-center"><?= htmlspecialchars($examen['total_preguntas']) ?></td> 
                   <td class="text-center"><code><?= htmlspecialchars($examen['codigo_acceso']) ?></code></td>
 
                   <td class="text-center">
-                    <?php if ($examen['estado'] === 'pendiente'): ?>
-                      <button
-                        class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                        title="Haz clic para desactivar"
-                        onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, 'inactivo')">
-                        <i class="bi bi-toggle-on fs-5"></i>
-                        Activo
-                      </button>
-                    <?php else: ?>
+                    <?php if ($examen['estado'] === 'INICIO'): ?>
                       <button
                         class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                        title="Haz clic para activar" onclick="cambiarEstadoEstudiante(<?= $examen['id'] ?>, 'activo')">
+                        title="Haz clic para activar" 
+                        onclick="cambiarEstadoEstudiante(<?= (int) $examen['id'] ?>, '<?= htmlspecialchars($examen['estudiante']) ?>', 'pendiente')">
                         <i class="bi bi-toggle-off fs-5"></i>
                         Inactivo
                       </button>
+                      <?php else: ?>
+                        <button
+                        class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"                
+                        title="Haz clic para activar" 
+                        onclick="cambiarEstadoEstudiante(<?= (int) $examen['id'] ?>, '<?= htmlspecialchars($examen['estudiante']) ?>', 'INICIO')">                          
+                          <i class="bi bi-toggle-on fs-5"></i>
+                          Activo
+                        </button>
                     <?php endif; ?>
                   </td>
 
@@ -298,6 +297,39 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   <script>
     let estudiantesData = []; // <- Aquí guardaremos los estudiantes
+    
+  function cambiarEstadoEstudiante(id, nombre, nuevoEstado) {
+    console.log(id)
+    console.log(nuevoEstado)
+    mostrarConfirmacionToast(
+      `¿Estás seguro de que deseas ${nuevoEstado == "INICIO" ? "activar" : "desactivar"} el examen del estudiante: ${nombre} ?`,
+      () => {
+
+        const formData = new FormData();
+        formData.append('id', id);
+        formData.append('estado', nuevoEstado);
+
+        fetch('../api/activar_examen.php', {
+          method: 'POST',
+          body: formData
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status) {
+              // Recargar la página o actualizar solo el botón
+              mostrarToast('success', data.message)
+              setTimeout((e) => { location.reload(); }, 500)
+            } else {
+              mostrarToast('warning', 'Error: ' + (data.message || 'No se pudo cambiar el estado.'));
+            }
+          })
+          .catch(error => {
+            console.error('Error AJAX:', error);
+            mostrarToast('danger', 'Ocurrió un error al cambiar el estado.');
+          });
+      })
+  }
+
   </script>
 
 

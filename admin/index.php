@@ -36,10 +36,13 @@ try {
 
   }
 
+  
+
+
   $sql = "
     SELECT 
       c.nombre AS categoria,
-      SUM(ec.estado = 'aprobado') AS aprobados,
+      COUNT(CASE WHEN ec.estado = 'aprobado' THEN 1 END) AS aprobados,
       SUM(ec.estado = 'rechazado') AS reprobados
     FROM estudiante_categorias ec
     JOIN categorias c ON ec.categoria_id = c.id
