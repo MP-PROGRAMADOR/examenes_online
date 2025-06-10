@@ -24,7 +24,12 @@ if (!isset($_SESSION['estudiante'])) {
     exit;
 }
 $estudiante = $_SESSION['estudiante'];
+
 $estudiante_id = $estudiante['id'];
+
+
+
+
 
 
 
