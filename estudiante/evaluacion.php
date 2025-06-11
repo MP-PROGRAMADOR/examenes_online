@@ -297,11 +297,15 @@ $codigo = $estudiante['usuario'];
             /* ----------------- seccion de rendirizado de la imagen -----------------------*/
             // Imagen (si hay)
             const imagenHTML = pregunta.imagenes[0]
-                ? `<div class="text-center mb-4">
-                    <img src="../api/${regunta.imagenes[0].ruta_imagen}" class="img-fluid rounded-3 shadow-sm" alt="Imagen relacionada">
-                    </div>`
-                : '';
-            console.log(pregunta)
+                    ? `<div class="text-center border border-2 mb-4 p-3 rounded-3 bg-light">
+                            <img src="../api/${pregunta.imagenes[0].ruta_imagen}" 
+                                class="img-fluid rounded-3 shadow-sm" 
+                                style="max-width: 400px; max-height: 300px; object-fit: contain;" 
+                                alt="Imagen relacionada">
+                        </div>`
+                    : '';
+
+           // console.log(pregunta)
             /* --------- fin de la seccion de renderizado de la imagen ------ */
 
             // Opciones HTML: checkbox o radio, con buena legibilidad
@@ -367,7 +371,7 @@ $codigo = $estudiante['usuario'];
                         preguntaActual++;
                         console.log(res.data);
                         // Puedes volver a habilitar esta línea si quieres continuar automáticamente
-                          mostrarPregunta();
+                         // mostrarPregunta();
                     } else {
                         console.log(res.message);
                     }
