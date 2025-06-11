@@ -301,7 +301,7 @@ $codigo = $estudiante['usuario'];
                     <img src="../api/${regunta.imagenes[0].ruta_imagen}" class="img-fluid rounded-3 shadow-sm" alt="Imagen relacionada">
                     </div>`
                 : '';
-            //console.log(pregunta)
+            console.log(pregunta)
             /* --------- fin de la seccion de renderizado de la imagen ------ */
 
             // Opciones HTML: checkbox o radio, con buena legibilidad
