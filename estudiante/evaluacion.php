@@ -371,7 +371,7 @@ $codigo = $estudiante['usuario'];
                         preguntaActual++;
                         console.log(res.data);
                         // Puedes volver a habilitar esta línea si quieres continuar automáticamente
-                         // mostrarPregunta();
+                          mostrarPregunta();
                     } else {
                         console.log(res.message);
                     }

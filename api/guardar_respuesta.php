@@ -139,7 +139,7 @@ try {
         $stmt->execute([$examen_id]);
         $categoria_id = (float) $stmt->fetchColumn();
 
-        if ($calificacion > 80) {
+        if ($calificacion >= 80) {
             $stmt = $pdo->prepare("UPDATE estudiante_categorias SET estado = 'aprobado', fecha_aprobacion = NOW() WHERE estudiante_id = ? AND categoria_id = ?");
             $stmt->execute([$estudiante_id, $categoria_id]);
             
