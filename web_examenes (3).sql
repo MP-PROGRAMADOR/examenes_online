@@ -38,7 +38,7 @@ CREATE TABLE `categorias` (
   `nombre` varchar(50) NOT NULL,
   `descripcion` text DEFAULT NULL,
   `edad_minima` tinyint(3) UNSIGNED NOT NULL DEFAULT 15
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `categorias`
@@ -73,7 +73,7 @@ CREATE TABLE `correos_enviados` (
   `cuerpo` text DEFAULT NULL,
   `enviado_por` int(11) DEFAULT NULL,
   `enviado_en` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -86,7 +86,7 @@ CREATE TABLE `escuelas_conduccion` (
   `nombre` varchar(100) NOT NULL,
   `ciudad` varchar(100) NOT NULL,
   `pais` varchar(100) DEFAULT 'Guinea Ecuatorial'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `escuelas_conduccion`
@@ -116,7 +116,7 @@ CREATE TABLE `estudiantes` (
   `direccion` varchar(250) DEFAULT NULL,
   `usuario` varchar(100) NOT NULL,
   `Doc` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `estudiantes`
@@ -143,7 +143,7 @@ CREATE TABLE `estudiante_categorias` (
   `estado` enum('pendiente','aprobado','rechazado','en_proceso') DEFAULT 'pendiente',
   `fecha_asignacion` datetime DEFAULT current_timestamp(),
   `fecha_aprobacion` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `estudiante_categorias`
@@ -155,8 +155,8 @@ INSERT INTO `estudiante_categorias` (`id`, `estudiante_id`, `categoria_id`, `est
 (5, 5, 4, 'pendiente', '2025-05-28 11:00:13', NULL),
 (6, 6, 1, 'pendiente', '2025-06-09 09:07:05', NULL),
 (11, 4, 12, 'pendiente', '2025-06-09 14:24:48', NULL),
-(12, 7, 6, 'en_proceso', '2025-06-10 14:00:56', '2025-06-10 15:34:46'),
-(13, 8, 6, 'en_proceso', '2025-06-10 15:48:48', '2025-06-10 15:56:03');
+(12, 7, 6, 'en_proceso', '2025-06-10 14:00:56', '2025-06-14 10:06:59'),
+(13, 8, 6, 'aprobado', '2025-06-10 15:48:48', '2025-06-11 12:24:22');
 
 -- --------------------------------------------------------
 
@@ -175,15 +175,17 @@ CREATE TABLE `examenes` (
   `estado` enum('pendiente','en_progreso','finalizado','INICIO') DEFAULT 'pendiente',
   `calificacion` decimal(5,2) DEFAULT NULL,
   `codigo_acceso` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `examenes`
 --
 
 INSERT INTO `examenes` (`id`, `estudiante_id`, `categoria_id`, `asignado_por`, `fecha_asignacion`, `duracion`, `total_preguntas`, `estado`, `calificacion`, `codigo_acceso`) VALUES
-(11, 5, 4, 1, '2025-06-15 00:00:00', 4, 5, 'pendiente', NULL, 'EXAM009514'),
-(12, 4, 12, 1, '2025-06-15 00:00:00', 4, 5, 'pendiente', NULL, 'EXAM247591');
+(11, 5, 4, 1, '2025-06-15 00:00:00', 4, 5, 'INICIO', NULL, 'EXAM009514'),
+(12, 4, 12, 1, '2025-06-15 00:00:00', 4, 5, 'pendiente', NULL, 'EXAM247591'),
+(13, 8, 6, 1, '2025-06-12 00:00:00', 4, 5, 'finalizado', 80.00, 'EXAM551027'),
+(14, 7, 6, 1, '2025-06-21 00:00:00', 8, 10, 'finalizado', 75.83, 'EXAM821332');
 
 -- --------------------------------------------------------
 
@@ -196,7 +198,7 @@ CREATE TABLE `examen_preguntas` (
   `examen_id` int(11) NOT NULL,
   `pregunta_id` int(11) NOT NULL,
   `respondida` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `examen_preguntas`
@@ -207,7 +209,22 @@ INSERT INTO `examen_preguntas` (`id`, `examen_id`, `pregunta_id`, `respondida`) 
 (90, 11, 28, 1),
 (91, 11, 57, 0),
 (92, 11, 55, 0),
-(93, 11, 42, 0);
+(93, 11, 42, 0),
+(94, 13, 53, 1),
+(95, 13, 45, 1),
+(96, 13, 52, 1),
+(97, 13, 57, 1),
+(98, 13, 25, 1),
+(99, 14, 53, 1),
+(100, 14, 52, 1),
+(101, 14, 23, 1),
+(102, 14, 39, 1),
+(103, 14, 28, 1),
+(104, 14, 50, 1),
+(105, 14, 24, 1),
+(106, 14, 57, 1),
+(107, 14, 26, 1),
+(108, 14, 56, 1);
 
 -- --------------------------------------------------------
 
@@ -220,7 +237,7 @@ CREATE TABLE `imagenes_pregunta` (
   `pregunta_id` int(11) NOT NULL,
   `ruta_imagen` varchar(255) NOT NULL,
   `descripcion` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `imagenes_pregunta`
@@ -244,7 +261,7 @@ CREATE TABLE `opciones_pregunta` (
   `pregunta_id` int(11) NOT NULL,
   `texto` varchar(255) NOT NULL,
   `es_correcta` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `opciones_pregunta`
@@ -379,7 +396,7 @@ CREATE TABLE `preguntas` (
   `tipo_contenido` enum('texto','ilustracion') NOT NULL,
   `activa` tinyint(1) DEFAULT 1,
   `creado_en` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `preguntas`
@@ -435,7 +452,7 @@ CREATE TABLE `pregunta_categoria` (
   `id` int(11) NOT NULL,
   `pregunta_id` int(11) NOT NULL,
   `categoria_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `pregunta_categoria`
@@ -725,7 +742,7 @@ CREATE TABLE `respuestas_estudiante` (
   `examen_pregunta_id` int(11) NOT NULL,
   `opcion_id` int(11) DEFAULT NULL,
   `fecha_respuesta` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `respuestas_estudiante`
@@ -735,7 +752,26 @@ INSERT INTO `respuestas_estudiante` (`id`, `examen_pregunta_id`, `opcion_id`, `f
 (302, 89, 55, '2025-06-11 11:41:07'),
 (303, 90, 72, '2025-06-11 11:41:26'),
 (304, 90, 73, '2025-06-11 11:41:26'),
-(305, 90, 75, '2025-06-11 11:41:26');
+(305, 90, 75, '2025-06-11 11:41:26'),
+(306, 94, 142, '2025-06-11 12:23:02'),
+(307, 95, 45, '2025-06-11 12:23:17'),
+(308, 96, 52, '2025-06-11 12:23:26'),
+(309, 97, 152, '2025-06-11 12:23:54'),
+(310, 98, 61, '2025-06-11 12:24:22'),
+(311, 99, 142, '2025-06-14 10:05:16'),
+(312, 100, 52, '2025-06-14 10:05:25'),
+(313, 101, 54, '2025-06-14 10:05:32'),
+(314, 102, 116, '2025-06-14 10:05:49'),
+(315, 102, 117, '2025-06-14 10:05:49'),
+(316, 102, 118, '2025-06-14 10:05:49'),
+(317, 103, 72, '2025-06-14 10:06:02'),
+(318, 103, 73, '2025-06-14 10:06:02'),
+(319, 103, 75, '2025-06-14 10:06:02'),
+(320, 104, 50, '2025-06-14 10:06:08'),
+(321, 105, 57, '2025-06-14 10:06:20'),
+(322, 106, 152, '2025-06-14 10:06:28'),
+(323, 107, 66, '2025-06-14 10:06:48'),
+(324, 108, 150, '2025-06-14 10:06:59');
 
 -- --------------------------------------------------------
 
@@ -751,7 +787,7 @@ CREATE TABLE `usuarios` (
   `rol` enum('admin','examinador','secretaria') NOT NULL,
   `creado_en` datetime DEFAULT current_timestamp(),
   `activo` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `usuarios`
@@ -904,13 +940,13 @@ ALTER TABLE `estudiante_categorias`
 -- AUTO_INCREMENT de la tabla `examenes`
 --
 ALTER TABLE `examenes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `examen_preguntas`
 --
 ALTER TABLE `examen_preguntas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=94;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=109;
 
 --
 -- AUTO_INCREMENT de la tabla `imagenes_pregunta`
@@ -940,7 +976,7 @@ ALTER TABLE `pregunta_categoria`
 -- AUTO_INCREMENT de la tabla `respuestas_estudiante`
 --
 ALTER TABLE `respuestas_estudiante`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=306;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=325;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
