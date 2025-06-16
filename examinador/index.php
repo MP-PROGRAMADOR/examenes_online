@@ -19,7 +19,7 @@ try {
 }
 ?>
 
-<main class="main-content" id="content">
+<main class="container-fluid">
   <div class="row g-4">
 
     <!-- CARD TEMPLATE -->
@@ -51,7 +51,6 @@ try {
     ?>
   </div>
 
-
   <div class="row mt-5 mb-4"">
     <div class=" col-12 col-md-6">
     <div class="card shadow-sm">
@@ -69,7 +68,7 @@ try {
       </div>
     </div>
   </div>
- 
+
 
   <div class="col-12 col-md-6 ">
     <div class="card shadow-sm">

@@ -55,90 +55,92 @@ $stmt->execute();
 $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<main  id="content">
-    <div class="card shadow-sm mb-4">
+
+<div class="card shadow-sm mb-4">
+    <div
+        class="card-header bg-primary text-white d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 p-3 rounded-top">
+        <h5 class="mb-2 mb-md-0 d-flex align-items-center">
+            <i class="bi bi-graph-up-arrow me-2"></i>Resultados por Categoría
+        </h5>
         <div
-            class="card-header bg-primary text-white d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 rounded-top">
-            <h5 class="mb-0 d-flex align-items-center">
-                <i class="bi bi-graph-up-arrow me-2"></i>Resultados por Categoría
-            </h5>
-            <div class="d-flex align-items-center gap-3 flex-grow-1 flex-wrap justify-content-end">
-                <div class="position-relative">
-                    <input type="text" class="form-control ps-5 form-control-sm shadow-sm" id="customSearch"
-                        placeholder="Buscar categoría...">
-                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <label for="container-length" class="mb-0 fw-semibold text-white">Mostrar:</label>
-                    <select id="container-length" class="form-select form-select-sm w-auto shadow-sm">
-                        <?php foreach ([5, 10, 15, 20, 25] as $op): ?>
-                            <option value="<?= $op ?>" <?= $limite == $op ? 'selected' : '' ?>><?= $op ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+            class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2 w-100 justify-content-md-end">
+            <div class="position-relative w-100 w-md-auto">
+                <input type="text" class="form-control ps-5 form-control-sm shadow-sm w-100" id="customSearch"
+                    placeholder="Buscar categoría...">
+                <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
             </div>
-        </div>
-
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered align-middle mb-0">
-                    <thead class="table-primary text-center">
-                        <tr>
-                            <th><i class="bi bi-tags-fill me-1"></i>Categoría</th>
-                            <th><i class="bi bi-person-check-fill me-1"></i>Aprobados</th>
-                            <th><i class="bi bi-people-fill me-1"></i>Inscritos</th>
-                            <th><i class="bi bi-clock-history me-1"></i>Pendientes</th>
-                            <th><i class="bi bi-x-circle me-1"></i>Reprobados</th>
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($resultados)): ?>
-                            <?php foreach ($resultados as $row): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($row['categoria']) ?></td>
-                                    <td class="text-center text-success fw-semibold"><?= $row['total_aprobados'] ?></td>
-                                    <td class="text-center"><?= $row['total_inscritos'] ?></td>
-                                    <td class="text-warning fw-semibold"><?= $row['pendientes_examen'] ?></td>
-                                    <td class="text-danger fw-semibold"><?= $row['total_reprobados'] ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4">
-                                    <div class="alert alert-warning text-center m-0 rounded-0">
-                                        <i class="bi bi-exclamation-circle-fill me-2"></i>No hay resultados disponibles.
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+            <div class="d-flex align-items-center gap-2">
+                <label for="container-length" class="mb-0 fw-semibold text-white">Mostrar:</label>
+                <select id="container-length" class="form-select form-select-sm shadow-sm">
+                    <?php foreach ([5, 10, 15, 20, 25] as $op): ?>
+                        <option value="<?= $op ?>" <?= $limite == $op ? 'selected' : '' ?>><?= $op ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
-
-            <?php if ($total_paginas > 1): ?>
-                <nav aria-label="Paginación de resultados" class="my-3">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
-                            <a class="page-link" href="?pagina=<?= $pagina - 1 ?>&limite=<?= $limite ?>">Anterior</a>
-                        </li>
-                        <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
-                            <li class="page-item <?= $pagina == $i ? 'active' : '' ?>">
-                                <a class="page-link" href="?pagina=<?= $i ?>&limite=<?= $limite ?>"><?= $i ?></a>
-                            </li>
-                        <?php endfor; ?>
-                        <li class="page-item <?= $pagina >= $total_paginas ? 'disabled' : '' ?>">
-                            <a class="page-link" href="?pagina=<?= $pagina + 1 ?>&limite=<?= $limite ?>">Siguiente</a>
-                        </li>
-                    </ul>
-                </nav>
-            <?php endif; ?>
         </div>
     </div>
 
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle mb-0">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th><i class="bi bi-tags-fill me-1"></i>Categoría</th>
+                        <th><i class="bi bi-person-check-fill me-1"></i>Aprobados</th>
+                        <th><i class="bi bi-people-fill me-1"></i>Inscritos</th>
+                        <th><i class="bi bi-clock-history me-1"></i>Pendientes</th>
+                        <th><i class="bi bi-x-circle me-1"></i>Reprobados</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($resultados)): ?>
+                        <?php foreach ($resultados as $row): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($row['categoria']) ?></td>
+                                <td class="text-center text-success fw-semibold"><?= $row['total_aprobados'] ?></td>
+                                <td class="text-center"><?= $row['total_inscritos'] ?></td>
+                                <td class="text-warning fw-semibold"><?= $row['pendientes_examen'] ?></td>
+                                <td class="text-danger fw-semibold"><?= $row['total_reprobados'] ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">
+                                <div class="alert alert-warning text-center m-0 rounded-0">
+                                    <i class="bi bi-exclamation-circle-fill me-2"></i>No hay resultados disponibles.
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
 
-</main>
+        <?php if ($total_paginas > 1): ?>
+            <nav aria-label="Paginación de resultados" class="my-3">
+                <ul class="pagination justify-content-center flex-wrap">
+                    <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
+                        <a class="page-link" href="?pagina=<?= $pagina - 1 ?>&limite=<?= $limite ?>">Anterior</a>
+                    </li>
+                    <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+                        <li class="page-item <?= $pagina == $i ? 'active' : '' ?>">
+                            <a class="page-link" href="?pagina=<?= $i ?>&limite=<?= $limite ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+                    <li class="page-item <?= $pagina >= $total_paginas ? 'disabled' : '' ?>">
+                        <a class="page-link" href="?pagina=<?= $pagina + 1 ?>&limite=<?= $limite ?>">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        <?php endif; ?>
+    </div>
+</div>
+
+
+<!-- Bootstrap Icons (por si no los tienes aún) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 <script>
     $(document).ready(function () {
         function filterTable() {
