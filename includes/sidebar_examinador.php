@@ -65,6 +65,6 @@
   <!-- Overlay para móviles -->
   <div id="overlay" class="overlay d-none"></div>
   <!-- Main content -->
-  <div id="main" class="main-content">
+  <div id="content" class="main-content">
     <div id="toast-container" class="position-fixed top-0 start-50 translate-middle-x p-3"
       style="z-index: 1060; max-width: 90%; width: 400px;"></div>

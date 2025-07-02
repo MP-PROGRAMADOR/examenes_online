@@ -7,7 +7,7 @@ require_once 'fpdf.php'; // Ruta correcta a FPDF
 require('../fqr/qrlib.php'); // Ruta hacia qrlib.php
 
 try {
-    $examen_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+    $examen_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
     if (!$examen_id) {
         throw new Exception("ID de examen no válido.");
@@ -35,6 +35,13 @@ try {
     if (!$resultado) {
         throw new Exception("No se encontró el examen con ID $examen_id.");
     }
+
+    // Validar si GD está habilitado
+    if (!function_exists('imagecreate')) {
+        throw new Exception("La extensión GD no está habilitada. Actívala en php.ini");
+    }
+
+
 
     // Crear QR temporal
     $qrData = "Nombre: {$resultado['nombre']} {$resultado['apellidos']}\n"
@@ -74,14 +81,14 @@ try {
     $pdf->SetTextColor(0, 0, 0);
 
     $campos = [
-        'Nombre'              => $resultado['nombre'],
-         'Apellidos'          => $resultado['apellidos'],
-        'Email'               => $resultado['email'],
-        'Usuario'             => $resultado['usuario'],
-        'Categoría'           => $resultado['categoria'],
-        'T.Preguntas'  => $resultado['total_preguntas'],
-        'F.Examen'    => $resultado['fecha_asignacion'],
-        'Calificacion'    => $resultado['calificacion'],
+        'Nombre' => $resultado['nombre'],
+        'Apellidos' => $resultado['apellidos'],
+        'Email' => $resultado['email'],
+        'Usuario' => $resultado['usuario'],
+        'Categoría' => $resultado['categoria'],
+        'T.Preguntas' => $resultado['total_preguntas'],
+        'F.Examen' => $resultado['fecha_asignacion'],
+        'Calificacion' => $resultado['calificacion'],
     ];
 
     foreach ($campos as $label => $valor) {

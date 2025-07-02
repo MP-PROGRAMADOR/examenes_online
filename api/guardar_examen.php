@@ -60,15 +60,15 @@ foreach ($lista as $index => $item) {
         continue;
     }
 
-    // Validar si ya existe un examen con esa combinación
+    // Si quieres registrar en log que ya tenía examen anterior, puedes hacerlo aquí (opcional):
     $sql_check = "SELECT COUNT(*) FROM examenes WHERE estudiante_id = ? AND categoria_id = ?";
     $stmt_check = $pdo->prepare($sql_check);
     $stmt_check->execute([$estudiante_id, $categoria_id]);
     $existe = $stmt_check->fetchColumn();
 
     if ($existe > 0) {
-        $errores[] = "Registro #" . ($index + 1) . ": el estudiante ya tiene examen asignado para esa categoría.";
-        continue;
+        // Puedes registrar como "nota" si lo deseas, pero ya no lo tratamos como error
+        $notas[] = "Registro #" . ($index + 1) . ": estudiante ya tenía exámenes anteriores en esa categoría. Se agregó otro.";
     }
 
     // Calcular duración total
@@ -98,6 +98,7 @@ foreach ($lista as $index => $item) {
         $errores[] = "Registro #" . ($index + 1) . ": error al guardar examen en la base de datos.";
     }
 }
+
 
 echo json_encode([
     'status' => $exitos > 0,
