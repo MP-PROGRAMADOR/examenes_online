@@ -37,8 +37,8 @@ try {
 }
 ?>
 
-<main class="main-content" id="content">
-    <div class="card shadow-sm mb-4">
+<main class="main-content " id="content">
+    <div class="card shadow-sm mb-4 ">
         <div class="card-header bg-primary text-white d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 rounded-top">
             <h5 class="mb-0 d-flex align-items-center">
                 <i class="bi bi-people-fill me-2"></i>Listado de Estudiantes
@@ -74,6 +74,7 @@ try {
                         <tr>
                             <th>ID</th>
                             <th>Nombre</th>
+                            <th>Estado</th>
                             <th>DNI</th>
                             <th>Escuela</th>
                             <th>Email</th>
@@ -83,7 +84,6 @@ try {
                             <th>Categoría</th>
                             <th>Código</th>
                             <th>Documento</th>
-                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -93,6 +93,24 @@ try {
                                 <tr>
                                     <td class="text-center"><?= htmlspecialchars($est['id']) ?></td>
                                     <td><?= htmlspecialchars($est['apellidos'] . ' ' . $est['nombre']) ?></td>
+                                    <td class="text-center">
+                   <?php if ($est['estado'] === 'activo'): ?>
+                     <button
+                       class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
+                       title="Haz clic para desactivar"
+                       onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, 'inactivo')">
+                       <i class="bi bi-toggle-on fs-5"></i>
+                       Activo
+                     </button>
+                   <?php else: ?>
+                     <button
+                       class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
+                       title="Haz clic para activar" onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, 'activo')">
+                       <i class="bi bi-toggle-off fs-5"></i>
+                       Inactivo
+                     </button>
+                   <?php endif; ?>
+                 </td>
                                     <td><?= htmlspecialchars($est['dni']) ?></td>
                                     <td><?= htmlspecialchars($est['escuela'] ?? '—') ?></td>
                                     <td><?= htmlspecialchars($est['email']) ?></td>
@@ -103,24 +121,6 @@ try {
                                     <td><?= htmlspecialchars($est['usuario']) ?></td>
                                     <td><?= htmlspecialchars($est['Doc']) ?></td>
                                    
-                                     <td class="text-center">
-                    <?php if ($est['estado'] === 'activo'): ?>
-                      <button
-                        class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                        title="Haz clic para desactivar"
-                        onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, 'inactivo')">
-                        <i class="bi bi-toggle-on fs-5"></i>
-                        Activo
-                      </button>
-                    <?php else: ?>
-                      <button
-                        class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                        title="Haz clic para activar" onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, 'activo')">
-                        <i class="bi bi-toggle-off fs-5"></i>
-                        Inactivo
-                      </button>
-                    <?php endif; ?>
-                  </td>
                                     <td class="text-center">
                                         <button class="btn btn-sm btn-outline-warning me-1" title="Editar"
                                             onclick="editarEstudiante(<?= $est['id'] ?>)">

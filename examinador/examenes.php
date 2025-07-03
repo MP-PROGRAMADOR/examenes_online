@@ -77,11 +77,11 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <tr>
             <th><i class="bi bi-hash me-1"></i> ID</th>
             <th><i class="bi bi-person-fill me-1"></i> Estudiante</th>
+            <th><i class="bi bi-toggle-on me-1"></i> Estado</th>
             <th><i class="bi bi-tags-fill me-1"></i> Categoría</th>
             <th><i class="bi bi-calendar-event-fill me-1"></i> Fecha</th>
             <th><i class="bi bi-list-ol me-1"></i> Preguntas</th>
             <th><i class="bi bi-key-fill me-1"></i> Código</th>
-            <th><i class="bi bi-toggle-on me-1"></i> Estado</th>
             <th><i class="bi bi-gear-fill me-1"></i> Acciones</th>
           </tr>
         </thead>
@@ -91,11 +91,6 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
               <tr>
                 <td class="text-center"><?= htmlspecialchars($examen['id']) ?></td>
                 <td><?= htmlspecialchars($examen['estudiante']) ?></td>
-                <td><?= htmlspecialchars($examen['categoria']) ?></td>
-                <td><?= htmlspecialchars($examen['fecha_asignacion']) ?></td>
-                <td class="text-center"><?= htmlspecialchars($examen['total_preguntas']) ?></td>
-                <td class="text-center"><code><?= htmlspecialchars($examen['codigo_acceso']) ?></code></td>
-
                 <td class="text-center">
                   <?php if ($examen['estado'] === 'INICIO'): ?>
                     <button
@@ -115,6 +110,11 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </button>
                   <?php endif; ?>
                 </td>
+                <td><?= htmlspecialchars($examen['categoria']) ?></td>
+                <td><?= htmlspecialchars($examen['fecha_asignacion']) ?></td>
+                <td class="text-center"><?= htmlspecialchars($examen['total_preguntas']) ?></td>
+                <td class="text-center"><code><?= htmlspecialchars($examen['codigo_acceso']) ?></code></td>
+
 
 
 
