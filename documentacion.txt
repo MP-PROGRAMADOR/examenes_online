@@ -1,0 +1,224 @@
+
+
+
+
+
+
+
+* ---------------- Documentación del Módulo de Gestión de Escuelas ------------------------*
+        Este documento describe la implementación de la 
+        funcionalidad de listado, búsqueda dinámica y paginación en 
+        tiempo real para las escuelas de conducción, así como la gestión de su creación, edición y eliminación.
+
+1. Backend API: api/buscar_escuelas.php
+    Este script PHP actúa como un endpoint de API que provee los datos de las escuelas de conducción de forma paginada y filtrada.
+    Ruta: ../api/buscar_escuelas.php
+
+    Método HTTP: GET
+
+    Parámetros de Solicitud (Query Parameters):
+        page (opcional, entero): El número de página actual solicitada. Por defecto es 1.
+        limit (opcional, entero): La cantidad máxima de registros a devolver por página. Por defecto es 10.
+        search (opcional, cadena de texto): Un término de búsqueda para filtrar los resultados. 
+        La búsqueda se realiza en los campos nombre, telefono, director, nif, ciudad, correo, pais, ubicacion y numero_registro
+    Respuesta (JSON):
+    Campo                       Tipo                                             Descripción
+   ----------------       ------------------         -----------------------------------------------------------------------------------------------------------                                        
+    status                    booleano                 true si la consulta fue exitosa, false en caso contrario.
+    escuelas                  array                     Un array de objetos, donde cada objeto representa una escuela de conducción con todos sus atributos.
+    currentPage               entero                      El número de la página actual devuelta.
+    perPage                   entero                     El número de registros por página especificado en la solicitud o el valor por defecto.
+    totalRecords              entero                      El número total de registros que coinciden con los criterios de búsqueda (sin aplicar el límite/offset).
+    totalPages                entero                      El número total de páginas disponibles, calculado en base a totalRecords y perPage.
+    message                   cadena de                   (Opcional) Un mensaje de error o información en caso de que status sea false.
+
+    Lógica Interna:
+
+        1. Conexión a la Base de Datos: Incluye ../includes/conexion.php para establecer la conexión PDO.
+
+        2. Recolección de Parámetros: Obtiene los valores de page, limit y search de la URL. Si no están presentes o son inválidos, asigna valores por defecto.
+
+        3. Construcción de Consultas:
+
+            Prepara dos consultas SQL: una para obtener el total de registros (COUNT(*)) y otra para obtener los datos de las escuelas para la página actual.
+
+            Si se proporciona un search term, añade una cláusula WHERE a ambas consultas, buscando coincidencias (LIKE %searchTerm%) en múltiples campos relevantes para la escuela.
+
+            Aplica LIMIT y OFFSET a la consulta de datos para implementar la paginación a nivel de base de datos.
+
+        4. Ejecución de Consultas:
+
+            Ejecuta la consulta COUNT(*) primero para determinar totalRecords y totalPages.
+
+            Luego, ejecuta la consulta de datos para recuperar las escuelas de la página actual.
+
+        5. Manejo de Errores: Utiliza bloques try-catch para capturar PDOException y otras excepciones, devolviendo un JSON con status: false y un mensaje descriptivo.
+
+2. Frontend: escuelas.php (Sección JavaScript)
+        Este script JavaScript gestiona la interfaz de usuario para el listado 
+        de escuelas, incluyendo la búsqueda en tiempo real, la paginación dinámica, 
+        y la interacción con los modales de registro/edición y eliminación.
+
+    Archivos Relacionados:
+        ../includes/header.php
+        ../includes/sidebar.php
+        ../includes/footer.php
+        ../api/buscar_escuelas.php
+        ../api/guardar_actualizar_escuela.php
+        ../api/eliminar_escuela.php
+
+    Variables Globales:
+        currentPage: (number) La página de resultados que se está mostrando actualmente. Inicializa en 1.
+        recordsPerPage: (number) El número de registros que se muestran por página. Su valor se obtiene del selector #container-length.
+        searchTerm: (string) El texto introducido en el campo de búsqueda #customSearch.
+        userRole: (string) El rol del usuario logueado (ej. 'admin'), pasado desde PHP, para controlar la visibilidad de acciones como eliminar.
+        totalPages: (number) El número total de páginas disponibles, calculado por el backend y actualizado en cada fetchEscuelas().
+
+    Funciones Clave:
+        document.addEventListener('DOMContentLoaded', function() { ... });
+        Se ejecuta cuando el DOM está completamente cargado.
+        Llama a fetchEscuelas() para la carga inicial de datos.
+
+        Configura Event Listeners para:
+            Buscador (#customSearch): Detecta la entrada del usuario (keyup). Implementa un debounce (setTimeout) de 300ms para evitar peticiones excesivas al servidor mientras el usuario escribe. Al detectar un cambio significativo, resetea currentPage a 1 y llama a fetchEscuelas().
+            Selector "Mostrar X registros" (#container-length): Detecta el cambio en la selección. Actualiza recordsPerPage, resetea currentPage a 1 y llama a fetchEscuelas().
+           
+            Envío del Formulario (#formularioEditarRegistrar):
+                Prevención del envío por defecto (e.preventDefault()).
+                Realiza validación de Bootstrap.
+                Recolecta los datos del formulario usando FormData.
+                Envía los datos a ../api/guardar_actualizar_escuela.php mediante fetch (método POST).
+                Muestra Toast de éxito o error.
+                Al completar la operación (registro o edición), cierra el modal y llama a fetchEscuelas() para actualizar la tabla sin recargar la página completa, reflejando los cambios en tiempo real
+
+        async function fetchEscuelas() { ... }
+            Propósito: Función asíncrona principal para obtener datos de escuelas desde el backend.
+
+            Comportamiento:    
+                Muestra un spinner de carga en la tabla y limpia la información de paginación previa.
+                Construye la URL de la API (../api/obtener_escuelas.php) incluyendo currentPage, recordsPerPage y searchTerm como parámetros.
+                Realiza una solicitud fetch a la API.
+                Procesa la respuesta JSON:
+                    Si status es true, actualiza la variable global totalPages y llama a renderTable() y renderPagination() para actualizar la UI.
+                    Si status es false, muestra un mensaje de error en la tabla.
+                Maneja errores de red o servidor (catch), mostrando un mensaje apropiado.
+
+        function renderTable(escuelas) { ... }
+            Propósito: Dibuja las filas de la tabla de escuelas en el DOM.
+
+            Comportamiento:
+                impia el contenido actual del <tbody> (#escuelas-table-body).
+                Si no hay escuelas (escuelas.length === 0), muestra un mensaje indicando que no hay resultados.
+
+                Itera sobre el array escuelas:
+                    Por cada escuela, construye una fila <tr> con sus datos.
+                    Seguridad: Utiliza escapeHTML() para prevenir ataques de Cross-Site Scripting (XSS) al insertar datos del backend en el DOM.
+                    Genera dinámicamente los botones de "Editar" y "Eliminar". El botón "Eliminar" se muestra condicionalmente solo si userRole es 'admin'.
+                    Añade la fila al <tbody>.
+
+        function renderPagination(currPage, totalPages, totalRecords, perPage) { ... }
+            Propósito: Genera y actualiza los controles de paginación y la información de registro.
+
+            Comportamiento:
+                Actualiza el texto que indica el rango de registros mostrados (ej. "Mostrando 1 a 10 de 50 registros").
+                Limpia los controles de paginación previos.
+                Si no hay registros (totalRecords === 0), solo muestra la información y no genera botones.
+                Crea el botón "Anterior", deshabilitándolo si currPage es la primera página.
+                Genera un conjunto de botones numéricos para las páginas, centrándolos alrededor de currPage y mostrando un máximo de 5 botones. La página actual se marca como active.
+                Crea el botón "Siguiente", deshabilitándolo si currPage es la última página.
+                Adjunta todos los botones al elemento #pagination-controls.
+
+        function changePage(page) { ... }
+            Propósito: Cambia la página actual y recarga los datos.
+
+            Comportamiento:
+                Valida que la page solicitada esté dentro del rango válido (entre 1 y totalPages).
+                Si es válida, actualiza la variable global currentPage y llama a fetchEscuelas() para cargar los datos de la nueva página.
+
+        function abrirModalRegistro() { ... }
+            Propósito: Prepara y abre el modal para registrar una nueva escuela.
+            Comportamiento:
+                Establece el título del modal y el texto del botón en "Registrar".
+                Limpia todos los campos del formulario y el estado de validación previo.
+                Establece el valor por defecto para pais ("Guinea Ecuatorial").
+                Abre el modal de Bootstrap
+
+        function abrirModalEdicion(escuela) { ... }
+            Propósito: Prepara y abre el modal para editar una escuela existente.
+            Comportamiento:
+                Establece el título del modal y el texto del botón en "Actualizar".
+                Rellena todos los campos del formulario con los datos de la escuela proporcionada
+                Limpia el estado de validación previo.
+                Abre el modal de Bootstrap.
+
+        function eliminarEscuela(idEscuela, escuelaNombre) { ... }
+            Propósito: Maneja la lógica para eliminar una escuela.
+            Comportamiento:
+                Muestra un Toast de confirmación al usuario (requiere una función mostrarConfirmacionToast que no está incluida en este fragmento pero se asume existente).
+                Si el usuario confirma, envía una solicitud fetch (método POST) a ../api/eliminar_escuela.php con el id de la escuela.
+                Muestra un Toast de éxito o error según la respuesta del servidor.
+                Llama a fetchEscuelas() para actualizar la tabla después de la eliminación.
+
+        function escapeHTML(str) { ... }
+            Propósito: Función de utilidad para sanear cadenas de texto, convirtiendo caracteres HTML especiales en sus entidades correspondientes.
+            Importancia: Crucial para la seguridad, ya que previene ataques de inyección de scripts (XSS) al mostrar datos en la página.
+        Validación de Bootstrap:
+            Se mantiene el bloque de código Bootstrap para la validación de formularios, asegurando que los campos requeridos se validen antes del envío.
+
+3. Backend API: api/guardar_actualizar_escuela.php 
+        Este script PHP actúa como un endpoint de API para registrar nuevas escuelas de conducción o 
+        actualizar los datos de escuelas existentes. Realiza validaciones en el servidor y maneja la persistencia de datos en la base de datos.
+
+    Ruta: ../api/guardar_actualizar_escuelas.php
+
+    Método HTTP: POST
+
+    Parámetros de Solicitud (Form Data / $_POST):
+
+    Lógica Interna y Funcionalidad:
+        1. Validación del Método de Solicitud:
+            Verifica que la solicitud HTTP sea de tipo POST. Si no lo es, devuelve un error.
+
+        2. Inclusión de Conexión:
+            Incluye el archivo ../includes/conexion.php para establecer la conexión a la base de datos utilizando PDO.
+
+        3. Recolección y Saneamiento de Datos:
+            Recoge todos los parámetros enviados en la solicitud POST.
+            Utiliza isset() y el operador de coalescencia nula ?? para asegurar que las variables existan, asignando un valor predeterminado si es necesario (ej. '' para cadenas vacías, null para escuela_id, 'Guinea Ecuatorial' para pais).
+            Aplica trim() a todas las cadenas para eliminar espacios en blanco al inicio y al final.
+            escuela_id se convierte explícitamente a (int) o permanece null.        
+
+        4. Bloque try-catch para Manejo de Errores:
+            Toda la lógica principal está envuelta en un bloque try-catch para capturar y manejar cualquier excepción, devolviendo una respuesta JSON consistente con un mensaje de error.
+        
+        5. Validaciones de Entrada:
+            Campos Obligatorios: Verifica que todos los campos requeridos (nombre, telefono, director, nif, ciudad, ubicacion, numero_registro) no estén vacíos. Si alguno lo está, lanza una Exception.
+            Formato de Correo: Si el campo correo no está vacío, valida su formato usando filter_var($correo, FILTER_VALIDATE_EMAIL). Si es inválido, lanza una Exception.
+
+        6. Lógica Condicional (Insertar vs. Actualizar):
+            * La lógica principal se bifurca dependiendo del valor de $escuela_id:
+                Si $escuela_id es null o 0 (considerado falsy): Se procede con la inserción de una nueva escuela.
+                Si $escuela_id tiene un valor entero positivo: Se procede con la actualización de una escuela existente.
+                
+            A. Lógica para INSERTAR Nueva Escuela:
+                1. Verificación de Duplicados (Registro):
+                    Realiza una consulta para verificar si ya existe alguna escuela con el mismo nombre, nif o numero_registro en la base de datos.
+                    Si se encuentra un registro duplicado, lanza una Exception con un mensaje indicando el conflicto.
+                2. Preparación y Ejecución de Inserción:
+                    Prepara una sentencia SQL INSERT con marcadores de posición (?) para todos los campos de la tabla escuelas_conduccion.
+                    Ejecuta la sentencia, pasando los valores saneados.
+                    Manejo de correo: Si el correo está vacío (''), se guarda como NULL en la base de datos, lo cual es apropiado para campos opcionales.
+                3. Respuesta de Éxito: Devuelve un JSON con status: true y un mensaje de éxito.
+
+            B. Lógica para ACTUALIZAR Escuela Existente:
+                1. Verificación de Duplicados (Actualización):
+                    Realiza una consulta para verificar si ya existe otra escuela con el mismo nombre, nif o numero_registro, excluyendo la escuela que se está actualizando (AND id != ?). Esto previene conflictos consigo misma si los valores no cambian.
+                    Si se encuentra un duplicado, lanza una Exception.
+                2.Preparación y Ejecución de Actualización:
+                    Prepara una sentencia SQL UPDATE para la tabla escuelas_conduccion, actualizando todos los campos basándose en el id de la escuela.
+                    Ejecuta la sentencia, pasando los nuevos valores saneados y el escuela_id.
+                    Manejo de correo: Al igual que en la inserción, si el correo está vacío (''), se actualiza como NULL.
+                3. Verificación de Cambios y Respuesta:
+                    $stmt->rowCount(): Verifica si la operación de UPDATE afectó alguna fila.
+                    Si rowCount() > 0, significa que la actualización se realizó con éxito y devuelve un mensaje de status: true.
+                    Si rowCount() es 0, indica que no se hicieron cambios o que la escuela con el id especificado no existe, devolviendo un status: false y un mensaje informativo.

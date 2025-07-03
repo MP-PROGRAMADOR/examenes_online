@@ -1,10 +1,9 @@
 
   <?php
   
-  include_once("../includes/header.php");
-include_once("../includes/sidebar_secretaria.php");
-?>
-<?php
+ // Suponiendo que $pdo ya está inicializado y es accesible 
+ require_once '../includes/conexion.php'; 
+ 
  
 
 try {
@@ -18,8 +17,14 @@ try {
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage();
 }
+ 
+
+
+require_once 'header.php';
 ?>
 
+ <span class="mt-5"></span>
+<span class="mt-5"></span>
 <main class="main-content" id="content">
   <div class="row g-4">
 
@@ -56,5 +61,7 @@ try {
     ?>
   </div>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 
-<?php include_once('../includes/footer.php'); ?>
+</html>

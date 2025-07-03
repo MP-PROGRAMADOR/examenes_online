@@ -3,15 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 11-06-2025 a las 10:56:34
+-- Tiempo de generación: 03-07-2025 a las 09:50:21
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
-
-drop database if exists web_examenes;
-create database web_examenes;
-use web_examenes;
-
-
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -84,17 +78,23 @@ CREATE TABLE `correos_enviados` (
 CREATE TABLE `escuelas_conduccion` (
   `id` int(11) NOT NULL,
   `nombre` varchar(100) NOT NULL,
+  `telefono` varchar(25) NOT NULL,
+  `director` varchar(100) NOT NULL,
+  `nif` varchar(100) NOT NULL,
   `ciudad` varchar(100) NOT NULL,
-  `pais` varchar(100) DEFAULT 'Guinea Ecuatorial'
+  `correo` varchar(25) DEFAULT NULL,
+  `pais` varchar(100) DEFAULT 'Guinea Ecuatorial',
+  `ubicacion` varchar(50) NOT NULL,
+  `numero_registro` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `escuelas_conduccion`
 --
 
-INSERT INTO `escuelas_conduccion` (`id`, `nombre`, `ciudad`, `pais`) VALUES
-(1, 'Nana mangue', 'Malabo', 'Guinea Ecuatorial'),
-(2, 'babe', 'baney', 'Guinea Ecuatorial');
+INSERT INTO `escuelas_conduccion` (`id`, `nombre`, `telefono`, `director`, `nif`, `ciudad`, `correo`, `pais`, `ubicacion`, `numero_registro`) VALUES
+(1, 'Nana mangue', '', '', '', 'Malabo', NULL, 'Guinea Ecuatorial', '', ''),
+(2, 'babe', '', '', '', 'baney', NULL, 'Guinea Ecuatorial', '', '');
 
 -- --------------------------------------------------------
 
@@ -156,7 +156,8 @@ INSERT INTO `estudiante_categorias` (`id`, `estudiante_id`, `categoria_id`, `est
 (6, 6, 1, 'pendiente', '2025-06-09 09:07:05', NULL),
 (11, 4, 12, 'pendiente', '2025-06-09 14:24:48', NULL),
 (12, 7, 6, 'en_proceso', '2025-06-10 14:00:56', '2025-06-14 10:06:59'),
-(13, 8, 6, 'aprobado', '2025-06-10 15:48:48', '2025-06-11 12:24:22');
+(13, 8, 6, 'aprobado', '2025-06-10 15:48:48', '2025-06-11 12:24:22'),
+(14, 7, 4, 'pendiente', '2025-06-16 11:03:29', NULL);
 
 -- --------------------------------------------------------
 
@@ -185,7 +186,8 @@ INSERT INTO `examenes` (`id`, `estudiante_id`, `categoria_id`, `asignado_por`, `
 (11, 5, 4, 1, '2025-06-15 00:00:00', 4, 5, 'INICIO', NULL, 'EXAM009514'),
 (12, 4, 12, 1, '2025-06-15 00:00:00', 4, 5, 'pendiente', NULL, 'EXAM247591'),
 (13, 8, 6, 1, '2025-06-12 00:00:00', 4, 5, 'finalizado', 80.00, 'EXAM551027'),
-(14, 7, 6, 1, '2025-06-21 00:00:00', 8, 10, 'finalizado', 75.83, 'EXAM821332');
+(14, 7, 6, 1, '2025-06-21 00:00:00', 8, 10, 'finalizado', 75.83, 'EXAM821332'),
+(15, 7, 6, 1, '2025-06-16 00:00:00', 4, 5, 'INICIO', NULL, 'EXAM602946');
 
 -- --------------------------------------------------------
 
@@ -934,13 +936,13 @@ ALTER TABLE `estudiantes`
 -- AUTO_INCREMENT de la tabla `estudiante_categorias`
 --
 ALTER TABLE `estudiante_categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `examenes`
 --
 ALTER TABLE `examenes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT de la tabla `examen_preguntas`

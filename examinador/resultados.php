@@ -135,7 +135,6 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <th><i class="bi bi-list-ol me-1"></i> Preguntas</th>
                         <th><i class="bi bi-check-circle-fill me-1"></i> Aciertos</th>
                         <th><i class="bi bi-x-circle-fill me-1"></i> Fallos</th>
-
                         <th><i class="bi bi-toggle-on me-1"></i> Estado</th>
                         <th><i class="bi bi-clipboard-check-fill me-1"></i> Calificación</th>
                         <th><i class="bi bi-gear-fill me-1"></i> Acciones</th>
@@ -186,7 +185,8 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="d-flex gap-2 justify-content-center flex-wrap">
                                         <button class="btn btn-sm btn-outline-primary"
                                             onclick="verExamen(<?= $examen['examen_id'] ?>)">
-                                            <i class="bi bi-eye-fill me-1"></i> Ver
+                                            <i class="bi bi-file-earmark-pdf-fill"></i>
+                                            PDF
                                         </button>
                                     </div>
                                 </td>
@@ -304,25 +304,9 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
     function verExamen(idExamen) {
-        const modal = new bootstrap.Modal(document.getElementById('modalDetalleExamen'));
-        modal.show();
+        window.open(`../libreria/imprimir_detalles_examen.php?id=${idExamen}`, '_blank');
 
-        const detalle = document.getElementById('detalleContenido');
-        detalle.innerHTML = `
-        <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Cargando...</span>
-            </div>
-        </div>`;
 
-        fetch(`../api/detalles_examen.php?id=${idExamen}`)
-            .then(response => response.text())
-            .then(html => {
-                detalle.innerHTML = html;
-            })
-            .catch(() => {
-                detalle.innerHTML = `<div class="alert alert-danger">Error al cargar el examen.</div>`;
-            });
     }
 
 </script>

@@ -44,6 +44,9 @@
         class="link-text">Estudiantes</span></a>
     <a href="../admin/examenes.php" class="nav-link"><i class="bi bi-card-list"></i><span
         class="link-text">Exámenes</span></a>
+    <a href="../admin/resultados.php" class="nav-link"><i class="bi bi-clipboard-check"></i>
+<span
+        class="link-text">Resultados</span></a>
     <a href="../admin/preguntas.php" class="nav-link"><i class="bi bi-collection"></i><span
         class="link-text">Preguntas</span></a>
     <a href="../admin/escuelas.php" class="nav-link"><i class="bi bi-bank"></i><span
