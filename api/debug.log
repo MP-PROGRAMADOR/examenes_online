@@ -1,0 +1,386 @@
+[2025-07-04 13:21:40] Script started.
+[2025-07-04 13:21:40] POST data: Array
+(
+    [examen_id] => 16
+    [pregunta_id] => 22
+    [tipo_pregunta] => unica
+    [opciones] => Array
+        (
+            [0] => 
+        )
+
+)
+
+[2025-07-04 13:21:40] Examen ID: 16, Pregunta ID: 22, Tipo Pregunta: unica
+[2025-07-04 13:21:40] Opciones seleccionadas (filtered and intval'd): Array
+(
+)
+
+[2025-07-04 13:21:40] Transaction started.
+[2025-07-04 13:21:40] Executing: SELECT id FROM examen_preguntas WHERE examen_id = 16 AND pregunta_id = 22
+[2025-07-04 13:21:40] examen_pregunta_id: 124
+[2025-07-04 13:21:40] Executing: DELETE FROM respuestas_estudiante WHERE examen_pregunta_id = 124
+[2025-07-04 13:21:40] Tipo de pregunta: unica
+[2025-07-04 13:21:40] Multiple/Unica question: No option selected. Puntaje remains 0.
+[2025-07-04 13:21:40] Transaction rolled back due to error.
+[2025-07-04 13:21:40] Caught exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'puntaje_obtenido' in 'field list'
+[2025-07-04 13:21:40] Script finished.
+[2025-07-04 13:22:04] Script started.
+[2025-07-04 13:22:04] POST data: Array
+(
+    [examen_id] => 16
+    [pregunta_id] => 40
+    [tipo_pregunta] => multiple
+    [opciones] => Array
+        (
+            [0] => 
+        )
+
+)
+
+[2025-07-04 13:22:04] Examen ID: 16, Pregunta ID: 40, Tipo Pregunta: multiple
+[2025-07-04 13:22:04] Opciones seleccionadas (filtered and intval'd): Array
+(
+)
+
+[2025-07-04 13:22:04] Transaction started.
+[2025-07-04 13:22:04] Executing: SELECT id FROM examen_preguntas WHERE examen_id = 16 AND pregunta_id = 40
+[2025-07-04 13:22:04] examen_pregunta_id: 125
+[2025-07-04 13:22:04] Executing: DELETE FROM respuestas_estudiante WHERE examen_pregunta_id = 125
+[2025-07-04 13:22:04] Tipo de pregunta: multiple
+[2025-07-04 13:22:04] Multiple/Unica question: No option selected. Puntaje remains 0.
+[2025-07-04 13:22:04] Transaction rolled back due to error.
+[2025-07-04 13:22:04] Caught exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'puntaje_obtenido' in 'field list'
+[2025-07-04 13:22:04] Script finished.
+[2025-07-04 13:23:38] Script started.
+[2025-07-04 13:23:38] POST data received: Array
+(
+    [examen_id] => 16
+    [pregunta_id] => 22
+    [tipo_pregunta] => unica
+    [opciones] => Array
+        (
+            [0] => 
+        )
+
+)
+
+[2025-07-04 13:23:38] Parsed variables: Examen ID: 16, Pregunta ID: 22, Tipo: unica
+[2025-07-04 13:23:38] Normalized selected options: Array
+(
+)
+
+[2025-07-04 13:23:38] Database transaction started.
+[2025-07-04 13:23:38] Executing query: SELECT id FROM examen_preguntas WHERE examen_id = 16 AND pregunta_id = 22
+[2025-07-04 13:23:38] examen_pregunta_id obtained: 124
+[2025-07-04 13:23:38] Executing delete previous answers for examen_pregunta_id: 124
+[2025-07-04 13:23:38] Previous answers deleted.
+[2025-07-04 13:23:38] Handling Multiple/Unique question logic (Type: unica).
+[2025-07-04 13:23:38] Multiple/Unique question: No option was selected by user. Puntaje remains 0.
+[2025-07-04 13:23:38] Transaction rolled back due to caught exception.
+[2025-07-04 13:23:38] Caught exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'puntaje_obtenido' in 'field list' on line 141
+[2025-07-04 13:23:38] Script finished.
+[2025-07-04 13:23:58] Script started.
+[2025-07-04 13:23:58] POST data received: Array
+(
+    [examen_id] => 16
+    [pregunta_id] => 40
+    [tipo_pregunta] => multiple
+    [opciones] => Array
+        (
+            [0] => 
+        )
+
+)
+
+[2025-07-04 13:23:58] Parsed variables: Examen ID: 16, Pregunta ID: 40, Tipo: multiple
+[2025-07-04 13:23:58] Normalized selected options: Array
+(
+)
+
+[2025-07-04 13:23:58] Database transaction started.
+[2025-07-04 13:23:58] Executing query: SELECT id FROM examen_preguntas WHERE examen_id = 16 AND pregunta_id = 40
+[2025-07-04 13:23:58] examen_pregunta_id obtained: 125
+[2025-07-04 13:23:58] Executing delete previous answers for examen_pregunta_id: 125
+[2025-07-04 13:23:58] Previous answers deleted.
+[2025-07-04 13:23:58] Handling Multiple/Unique question logic (Type: multiple).
+[2025-07-04 13:23:58] Multiple/Unique question: No option was selected by user. Puntaje remains 0.
+[2025-07-04 13:23:58] Transaction rolled back due to caught exception.
+[2025-07-04 13:23:58] Caught exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'puntaje_obtenido' in 'field list' on line 141
+[2025-07-04 13:23:58] Script finished.
+[2025-07-04 13:29:39] Script started.
+[2025-07-04 13:29:39] POST data received: Array
+(
+    [examen_id] => 16
+    [pregunta_id] => 22
+    [tipo_pregunta] => unica
+    [opciones] => Array
+        (
+            [0] => 
+        )
+
+)
+
+[2025-07-04 13:29:39] Parsed variables: Examen ID: 16, Pregunta ID: 22, Tipo: unica
+[2025-07-04 13:29:39] Normalized selected options: Array
+(
+)
+
+[2025-07-04 13:29:39] Database transaction started.
+[2025-07-04 13:29:39] Executing query: SELECT id FROM examen_preguntas WHERE examen_id = 16 AND pregunta_id = 22
+[2025-07-04 13:29:39] examen_pregunta_id obtained: 124
+[2025-07-04 13:29:39] Executing delete previous answers for examen_pregunta_id: 124
+[2025-07-04 13:29:39] Previous answers deleted.
+[2025-07-04 13:29:39] Handling Multiple/Unique question logic (Type: unica).
+[2025-07-04 13:29:39] Multiple/Unique question: No option was selected by user. Puntaje remains 0.
+[2025-07-04 13:29:39] Transaction rolled back due to caught exception.
+[2025-07-04 13:29:39] Caught exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'puntaje_obtenido' in 'field list' on line 141
+[2025-07-04 13:29:39] Script finished.
+[2025-07-04 13:30:00] Script started.
+[2025-07-04 13:30:00] POST data received: Array
+(
+    [examen_id] => 16
+    [pregunta_id] => 40
+    [tipo_pregunta] => multiple
+    [opciones] => Array
+        (
+            [0] => 
+        )
+
+)
+
+[2025-07-04 13:30:00] Parsed variables: Examen ID: 16, Pregunta ID: 40, Tipo: multiple
+[2025-07-04 13:30:00] Normalized selected options: Array
+(
+)
+
+[2025-07-04 13:30:00] Database transaction started.
+[2025-07-04 13:30:00] Executing query: SELECT id FROM examen_preguntas WHERE examen_id = 16 AND pregunta_id = 40
+[2025-07-04 13:30:00] examen_pregunta_id obtained: 125
+[2025-07-04 13:30:00] Executing delete previous answers for examen_pregunta_id: 125
+[2025-07-04 13:30:00] Previous answers deleted.
+[2025-07-04 13:30:00] Handling Multiple/Unique question logic (Type: multiple).
+[2025-07-04 13:30:00] Multiple/Unique question: No option was selected by user. Puntaje remains 0.
+[2025-07-04 13:30:00] Transaction rolled back due to caught exception.
+[2025-07-04 13:30:00] Caught exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'puntaje_obtenido' in 'field list' on line 141
+[2025-07-04 13:30:00] Script finished.
+[2025-07-04 13:32:24] Script started.
+[2025-07-04 13:32:24] POST data received: Array
+(
+    [examen_id] => 16
+    [pregunta_id] => 22
+    [tipo_pregunta] => unica
+    [opciones] => Array
+        (
+            [0] => 
+        )
+
+)
+
+[2025-07-04 13:32:24] Parsed variables: Examen ID: 16, Pregunta ID: 22, Tipo: unica
+[2025-07-04 13:32:24] Normalized selected options: Array
+(
+)
+
+[2025-07-04 13:32:24] Database transaction started.
+[2025-07-04 13:32:24] Executing query: SELECT id FROM examen_preguntas WHERE examen_id = 16 AND pregunta_id = 22
+[2025-07-04 13:32:24] examen_pregunta_id obtained: 124
+[2025-07-04 13:32:24] Executing delete previous answers for examen_pregunta_id: 124
+[2025-07-04 13:32:24] Previous answers deleted.
+[2025-07-04 13:32:24] Handling Multiple/Unique question logic (Type: unica).
+[2025-07-04 13:32:24] Multiple/Unique question: No option was selected by user. Puntaje remains 0.
+[2025-07-04 13:32:24] Transaction rolled back due to caught exception.
+[2025-07-04 13:32:24] Caught exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'puntaje_obtenido' in 'field list' on line 141
+[2025-07-04 13:32:24] Script finished.
+[2025-07-04 13:38:30] Script started.
+[2025-07-04 13:38:30] POST data received: Array
+(
+    [examen_id] => 16
+    [pregunta_id] => 22
+    [tipo_pregunta] => unica
+    [opciones] => Array
+        (
+            [0] => 
+        )
+
+)
+
+[2025-07-04 13:38:30] Parsed variables: Examen ID: 16, Pregunta ID: 22, Tipo: unica
+[2025-07-04 13:38:30] Normalized selected options: Array
+(
+)
+
+[2025-07-04 13:38:30] Database transaction started.
+[2025-07-04 13:38:30] Executing query: SELECT id FROM examen_preguntas WHERE examen_id = 16 AND pregunta_id = 22
+[2025-07-04 13:38:30] examen_pregunta_id obtained: 124
+[2025-07-04 13:38:30] Executing delete previous answers for examen_pregunta_id: 124
+[2025-07-04 13:38:30] Previous answers deleted.
+[2025-07-04 13:38:30] Handling Multiple/Unique question logic (Type: unica).
+[2025-07-04 13:38:30] Multiple/Unique question: No option was selected by user. Puntaje remains 0.
+[2025-07-04 13:38:30] Transaction rolled back due to caught exception.
+[2025-07-04 13:38:30] Caught exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'puntaje_obtenido' in 'field list' on line 141
+[2025-07-04 13:38:30] Script finished.
+[2025-07-04 13:40:21] Script started.
+[2025-07-04 13:40:21] POST data received: Array
+(
+    [examen_id] => 16
+    [pregunta_id] => 22
+    [tipo_pregunta] => unica
+    [opciones] => Array
+        (
+            [0] => 
+        )
+
+)
+
+[2025-07-04 13:40:21] Parsed variables: Examen ID: 16, Pregunta ID: 22, Tipo: unica
+[2025-07-04 13:40:21] Normalized selected options: Array
+(
+)
+
+[2025-07-04 13:40:21] Database transaction started.
+[2025-07-04 13:40:21] Executing query: SELECT id FROM examen_preguntas WHERE examen_id = 16 AND pregunta_id = 22
+[2025-07-04 13:40:21] examen_pregunta_id obtained: 124
+[2025-07-04 13:40:21] Executing delete previous answers for examen_pregunta_id: 124
+[2025-07-04 13:40:21] Previous answers deleted.
+[2025-07-04 13:40:21] Handling Multiple/Unique question logic (Type: unica).
+[2025-07-04 13:40:21] Multiple/Unique question: No option was selected by user. Puntaje remains 0.
+[2025-07-04 13:40:21] Transaction rolled back due to caught exception.
+[2025-07-04 13:40:21] Caught exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'puntaje_obtenido' in 'field list' on line 141
+[2025-07-04 13:40:21] Script finished.
+[2025-07-04 13:41:20] Script started.
+[2025-07-04 13:41:20] POST data received: Array
+(
+    [examen_id] => 16
+    [pregunta_id] => 22
+    [tipo_pregunta] => unica
+    [opciones] => Array
+        (
+            [0] => 
+        )
+
+)
+
+[2025-07-04 13:41:20] Parsed variables: Examen ID: 16, Pregunta ID: 22, Tipo: unica
+[2025-07-04 13:41:20] Normalized selected options: Array
+(
+)
+
+[2025-07-04 13:41:20] Database transaction started.
+[2025-07-04 13:41:20] Executing query: SELECT id FROM examen_preguntas WHERE examen_id = 16 AND pregunta_id = 22
+[2025-07-04 13:41:20] examen_pregunta_id obtained: 124
+[2025-07-04 13:41:20] Executing delete previous answers for examen_pregunta_id: 124
+[2025-07-04 13:41:20] Previous answers deleted.
+[2025-07-04 13:41:20] Handling Multiple/Unique question logic (Type: unica).
+[2025-07-04 13:41:20] Multiple/Unique question: No option was selected by user. Puntaje remains 0.
+[2025-07-04 13:41:20] Transaction rolled back due to caught exception.
+[2025-07-04 13:41:20] Caught exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'puntaje_obtenido' in 'field list' on line 141
+[2025-07-04 13:41:20] Script finished.
+[2025-07-04 13:43:37] Script started.
+[2025-07-04 13:43:37] POST data received: Array
+(
+    [examen_id] => 16
+    [pregunta_id] => 40
+    [tipo_pregunta] => multiple
+    [opciones] => Array
+        (
+            [0] => 
+        )
+
+)
+
+[2025-07-04 13:43:37] Parsed variables: Examen ID: 16, Pregunta ID: 40, Tipo: multiple
+[2025-07-04 13:43:37] Normalized selected options: Array
+(
+)
+
+[2025-07-04 13:43:37] Database transaction started.
+[2025-07-04 13:43:37] Executing query: SELECT id FROM examen_preguntas WHERE examen_id = 16 AND pregunta_id = 40
+[2025-07-04 13:43:37] examen_pregunta_id obtained: 125
+[2025-07-04 13:43:37] Executing delete previous answers for examen_pregunta_id: 125
+[2025-07-04 13:43:37] Previous answers deleted.
+[2025-07-04 13:43:37] Handling Multiple/Unique question logic (Type: multiple).
+[2025-07-04 13:43:37] Multiple/Unique question: No option was selected by user. Puntaje remains 0.
+[2025-07-04 13:43:37] Transaction rolled back due to caught exception.
+[2025-07-04 13:43:37] Caught exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'puntaje_obtenido' in 'field list' on line 141
+[2025-07-04 13:43:37] Script finished.
+[2025-07-04 13:43:58] Script started.
+[2025-07-04 13:43:58] POST data received: Array
+(
+    [examen_id] => 16
+    [pregunta_id] => 22
+    [tipo_pregunta] => unica
+    [opciones] => Array
+        (
+            [0] => 
+        )
+
+)
+
+[2025-07-04 13:43:58] Parsed variables: Examen ID: 16, Pregunta ID: 22, Tipo: unica
+[2025-07-04 13:43:58] Normalized selected options: Array
+(
+)
+
+[2025-07-04 13:43:58] Database transaction started.
+[2025-07-04 13:43:58] Executing query: SELECT id FROM examen_preguntas WHERE examen_id = 16 AND pregunta_id = 22
+[2025-07-04 13:43:58] examen_pregunta_id obtained: 124
+[2025-07-04 13:43:58] Executing delete previous answers for examen_pregunta_id: 124
+[2025-07-04 13:43:58] Previous answers deleted.
+[2025-07-04 13:43:58] Handling Multiple/Unique question logic (Type: unica).
+[2025-07-04 13:43:58] Multiple/Unique question: No option was selected by user. Puntaje remains 0.
+[2025-07-04 13:43:58] Transaction rolled back due to caught exception.
+[2025-07-04 13:43:58] Caught exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'puntaje_obtenido' in 'field list' on line 141
+[2025-07-04 13:43:58] Script finished.
+[2025-07-04 13:44:19] Script started.
+[2025-07-04 13:44:19] POST data received: Array
+(
+    [examen_id] => 16
+    [pregunta_id] => 40
+    [tipo_pregunta] => multiple
+    [opciones] => Array
+        (
+            [0] => 
+        )
+
+)
+
+[2025-07-04 13:44:19] Parsed variables: Examen ID: 16, Pregunta ID: 40, Tipo: multiple
+[2025-07-04 13:44:19] Normalized selected options: Array
+(
+)
+
+[2025-07-04 13:44:19] Database transaction started.
+[2025-07-04 13:44:19] Executing query: SELECT id FROM examen_preguntas WHERE examen_id = 16 AND pregunta_id = 40
+[2025-07-04 13:44:19] Error: Question not assigned to exam or does not exist.
+[2025-07-04 13:44:19] Transaction rolled back due to caught exception.
+[2025-07-04 13:44:19] Caught exception: Pregunta no asignada al examen o no existe. on line 60
+[2025-07-04 13:44:19] Script finished.
+[2025-07-04 13:45:23] Script started.
+[2025-07-04 13:45:23] POST data received: Array
+(
+    [examen_id] => 16
+    [pregunta_id] => 25
+    [tipo_pregunta] => unica
+    [opciones] => Array
+        (
+            [0] => 
+        )
+
+)
+
+[2025-07-04 13:45:23] Parsed variables: Examen ID: 16, Pregunta ID: 25, Tipo: unica
+[2025-07-04 13:45:23] Normalized selected options: Array
+(
+)
+
+[2025-07-04 13:45:23] Database transaction started.
+[2025-07-04 13:45:23] Executing query: SELECT id FROM examen_preguntas WHERE examen_id = 16 AND pregunta_id = 25
+[2025-07-04 13:45:23] examen_pregunta_id obtained: 129
+[2025-07-04 13:45:23] Executing delete previous answers for examen_pregunta_id: 129
+[2025-07-04 13:45:23] Previous answers deleted.
+[2025-07-04 13:45:23] Handling Multiple/Unique question logic (Type: unica).
+[2025-07-04 13:45:23] Multiple/Unique question: No option was selected by user. Puntaje remains 0.
+[2025-07-04 13:45:23] Transaction rolled back due to caught exception.
+[2025-07-04 13:45:24] Caught exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'puntaje_obtenido' in 'field list' on line 141
+[2025-07-04 13:45:24] Script finished.

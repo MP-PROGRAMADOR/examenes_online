@@ -126,7 +126,7 @@ try {
     echo json_encode([
         'status' => true,
         'preguntas' => $preguntas_completas,
-        'duracion' => $examen['total_preguntas'] * 15 // segundos por pregunta
+        'duracion' => $examen['total_preguntas'] * 10 // segundos por pregunta
     ]);
 
 } catch (Exception $e) {

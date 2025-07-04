@@ -116,7 +116,8 @@ $codigo = $estudiante['usuario'];
         .timer-container {
             display: flex;
             align-items: center;
-            gap: 15px; /* Espacio entre los temporizadores */
+            gap: 15px;
+            /* Espacio entre los temporizadores */
         }
 
         .timer-box {
@@ -133,12 +134,14 @@ $codigo = $estudiante['usuario'];
         }
 
         .timer-box.general {
-            color: #28a745; /* Verde para el temporizador general */
+            color: #28a745;
+            /* Verde para el temporizador general */
             font-size: 1.1rem;
         }
 
         .timer-box.question {
-            color: #dc3545; /* Rojo para el temporizador de pregunta */
+            color: #dc3545;
+            /* Rojo para el temporizador de pregunta */
             font-size: 1.1rem;
         }
 
@@ -152,7 +155,8 @@ $codigo = $estudiante['usuario'];
     <div class="container py-5">
         <div id="vistaExamen" class="shadow-lg rounded-4 bg-white overflow-hidden position-relative">
 
-            <div class="bg-light px-4 py-3 border-bottom sticky-top z-1 d-flex justify-content-between align-items-center">
+            <div
+                class="bg-light px-4 py-3 border-bottom sticky-top z-1 d-flex justify-content-between align-items-center">
                 <div class="progress rounded-pill flex-grow-1 me-3" style="height: 0.9rem;">
                     <div class="progress-bar bg-success" id="progresoBarra" style="width: 0%;">
                     </div>
@@ -178,7 +182,7 @@ $codigo = $estudiante['usuario'];
                 </div>
 
                 <div class="card-body" id="preguntaContenido">
-                    </div>
+                </div>
 
                 <div class="card-footer bg-white border-top text-end py-4">
                     <button id="btnSiguiente" class="btn btn-primary px-4 py-2 rounded-pill shadow" disabled>
@@ -225,7 +229,7 @@ $codigo = $estudiante['usuario'];
         let tiempoRestantePregunta = 0; // Duración de la pregunta actual en segundos
         let intervaloTemporizadorPregunta; // ID del intervalo para el temporizador de pregunta
         const TIEMPO_VF = 10; // Segundos para preguntas Verdadero/Falso
-        const TIEMPO_OTRAS = 15; // Segundos para preguntas Múltiple/Única
+        const TIEMPO_OTRAS = 10; // Segundos para preguntas Múltiple/Única
 
         // Elementos del DOM
         const btnSiguiente = document.getElementById('btnSiguiente');
@@ -330,42 +334,47 @@ $codigo = $estudiante['usuario'];
                 method: 'POST',
                 body: datos
             })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                return res.json();
-            })
-            .then(res => {
-                if (!res.status) {
-                    console.error("Error al cargar preguntas:", res.message);
-                    alert("No se pudieron cargar las preguntas: " + res.message);
-                    window.location.href = 'aspirante.php';
-                } else {
-                    listaPreguntas = res.preguntas;
-                    totalPreguntas = res.preguntas.length; // Asegúrate de que esta variable está bien escrita
-                    tiempoRestanteGeneral = res.duracion;
-
-                    if (totalPreguntas > 0 && tiempoRestanteGeneral > 0) {
-                        mostrarPregunta();
-                        iniciarTemporizadorGeneral(); // Inicia el temporizador general
-                    } else {
-                        alert("El examen no tiene preguntas o la duración es inválida.");
-                        window.location.href = 'aspirante.php';
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
                     }
-                }
-            })
-            .catch(err => {
-                alert('Error inesperado al cargar preguntas: ' + err.message);
-                console.error(err);
-                window.location.href = 'aspirante.php';
-            });
+                    return res.json();
+                })
+                .then(res => {
+                    if (!res.status) {
+                        console.error("Error al cargar preguntas:", res.message);
+                        alert("No se pudieron cargar las preguntas: " + res.message);
+                        window.location.href = 'aspirante.php';
+                    } else {
+                        listaPreguntas = res.preguntas;
+                        totalPreguntas = res.preguntas.length; // Asegúrate de que esta variable está bien escrita
+                        tiempoRestanteGeneral = res.duracion;
+
+                        if (totalPreguntas > 0 && tiempoRestanteGeneral > 0) {
+                            mostrarPregunta();
+                            iniciarTemporizadorGeneral(); // Inicia el temporizador general
+                        } else {
+                            alert("El examen no tiene preguntas o la duración es inválida.");
+                            // window.location.href = 'aspirante.php';
+                        }
+                    }
+                })
+                .catch(err => {
+                    alert('Error inesperado al cargar preguntas: ' + err.message);
+                    console.error(err);
+                    // window.location.href = 'aspirante.php';
+                });
         }
 
         function mostrarPregunta() {
             if (preguntaActual >= totalPreguntas) {
-                return finalizarExamen();
+                return; // No mostrar nada si ya no hay preguntas
             }
+            /* 
+            if (preguntaActual >= totalPreguntas) {
+                return finalizarExamen();
+            } 
+                */
 
             const pregunta = listaPreguntas[preguntaActual];
             seleccionUsuario = null; // Reiniciar selección
@@ -420,7 +429,7 @@ $codigo = $estudiante['usuario'];
 
             // Event Listeners para opciones
             document.querySelectorAll('.opcion').forEach(opcionDiv => {
-                opcionDiv.addEventListener('click', function() {
+                opcionDiv.addEventListener('click', function () {
                     const input = this.querySelector('input[name="opciones"]');
                     if (input) {
                         // Para radios, desmarcar otros y marcar este
@@ -465,12 +474,10 @@ $codigo = $estudiante['usuario'];
                     body: datos
                 });
 
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
+
                 const data = await res.json();
 
-                if (data.success) {
+                if (data.status) {
                     console.log("Respuesta guardada:", data.data);
                     preguntaActual++;
                     mostrarPregunta(); // Muestra la siguiente pregunta o finaliza
@@ -505,20 +512,26 @@ $codigo = $estudiante['usuario'];
             // Opcional: Enviar una señal final al servidor de que el examen ha sido completado
             // fetch('../api/finalizar_examen.php', { method: 'POST', body: JSON.stringify({ examen_id: examenId, motivo: 'completado' }), headers: { 'Content-Type': 'application/json' }})...
 
-            window.location.href = `aspirante.php?examen_id=${examenId}&estado=finalizado`;
+            // window.location.href = `aspirante.php?examen_id=${examenId}&estado=finalizado`;
         }
 
-        function finalizarExamenPorTiempo() {
+
+        async function finalizarExamenPorTiempo() {
             clearInterval(intervaloTemporizadorGeneral);
             clearInterval(intervaloTemporizadorPregunta);
             window.onbeforeunload = null;
 
-            alert('¡Se ha agotado el tiempo para el examen! El examen ha finalizado.');
-            // Opcional: Enviar una señal final al servidor de que el examen ha terminado por tiempo
-            // fetch('../api/finalizar_examen.php', { method: 'POST', body: JSON.stringify({ examen_id: examenId, motivo: 'tiempo_agotado' }), headers: { 'Content-Type': 'application/json' }})...
+            // Verifica si estás en la última pregunta sin responder aún
+            if (preguntaActual < totalPreguntas) {
+                await guardarRespuestaYContinuar(); // Espera a que se guarde la última respuesta
+            }
 
-            window.location.href = `aspirante.php?examen_id=${examenId}&estado=tiempo_agotado`;
+            alert('¡Se ha agotado el tiempo para el examen! El examen ha finalizado.');
+
+            // Redirigir al final
+            // window.location.href = `aspirante.php?examen_id=${examenId}&estado=tiempo_agotado`;
         }
+
 
         // Iniciar la carga de preguntas al cargar la página
         cargarPreguntas();
