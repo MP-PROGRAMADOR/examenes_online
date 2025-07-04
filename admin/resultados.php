@@ -179,13 +179,21 @@ include_once("../includes/sidebar.php");
                         <button class="btn btn-sm btn-outline-info" onclick="abrirModalVerExamen(${estudiante.ultimo_examen_id})">
                             <i class="bi bi-eye me-1"></i> Ver Examen
                         </button>
+                    
+                            <button class="btn btn-sm btn-outline-warning mb-1"
+                                 onclick="imprimirExamen(${estudiante.ultimo_examen_id})">
+                                 <i class="bi bi-printer-fill me-1"></i> PDF
+                             </button> 
                     </td>
                 </tr>
             `;
             tableBody.insertAdjacentHTML('beforeend', row);
         });
     }
-
+    window.imprimirExamen = function (examenId) {
+        // Aquí puedes redirigir a una página para generar el PDF del examen
+        window.open(`../libreria/imprimir_detalles_examen.php?id=${examenId}`, '_blank');
+    };
     // Funciones de paginación (copiar de escuelas.php)
     function renderPagination(currPage, totalPages, totalRecords, perPage) {
         const paginationInfo = document.getElementById('pagination-info');

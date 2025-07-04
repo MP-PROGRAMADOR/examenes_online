@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-
 // Verificar si hay sesión activa
 if (!isset($_SESSION['estudiante'])) {
     header("Location: index.php");
@@ -77,7 +76,6 @@ $codigo = $estudiante['usuario'];
             margin-right: 10px;
         }
 
-
         /* Estilo moderno de tarjeta de examen */
         .pregunta-card {
             background: #ffffff;
@@ -114,11 +112,38 @@ $codigo = $estudiante['usuario'];
             }
         }
 
-        /* Estilos para el temporizador */
-        #temporizador {
-            font-size: 1.2rem;
+        /* Estilos para los temporizadores */
+        .timer-container {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Espacio entre los temporizadores */
+        }
+
+        .timer-box {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 1rem;
             font-weight: bold;
-            color: #dc3545; /* Rojo para el temporizador */
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .timer-box.general {
+            color: #28a745; /* Verde para el temporizador general */
+            font-size: 1.1rem;
+        }
+
+        .timer-box.question {
+            color: #dc3545; /* Rojo para el temporizador de pregunta */
+            font-size: 1.1rem;
+        }
+
+        .timer-icon {
+            font-size: 1.2rem;
         }
     </style>
 </head>
@@ -130,9 +155,18 @@ $codigo = $estudiante['usuario'];
             <div class="bg-light px-4 py-3 border-bottom sticky-top z-1 d-flex justify-content-between align-items-center">
                 <div class="progress rounded-pill flex-grow-1 me-3" style="height: 0.9rem;">
                     <div class="progress-bar bg-success" id="progresoBarra" style="width: 0%;">
-                        </div>
+                    </div>
                 </div>
-                <div id="temporizador">00:00</div>
+                <div class="timer-container">
+                    <div class="timer-box general">
+                        <i class="bi bi-hourglass-split timer-icon"></i>
+                        <span id="temporizadorGeneral">00:00</span>
+                    </div>
+                    <div class="timer-box question">
+                        <i class="bi bi-clock-fill timer-icon"></i>
+                        <span id="temporizadorPregunta">00:00</span>
+                    </div>
+                </div>
             </div>
 
             <div class="card border-0 rounded-0">
@@ -144,8 +178,7 @@ $codigo = $estudiante['usuario'];
                 </div>
 
                 <div class="card-body" id="preguntaContenido">
-
-                </div>
+                    </div>
 
                 <div class="card-footer bg-white border-top text-end py-4">
                     <button id="btnSiguiente" class="btn btn-primary px-4 py-2 rounded-pill shadow" disabled>
@@ -174,44 +207,48 @@ $codigo = $estudiante['usuario'];
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-
         const params = new URLSearchParams(window.location.search);
-
         let examenId = params.get('examen_id');
         let preguntaActual = 0;
         let totalPreguntas = 0;
         let listaPreguntas = [];
         let seleccionUsuario = null;
-        let tiempoRestante = 0; // Duración total del examen en segundos
-        let intervaloTemporizador; // Para almacenar el ID del setInterval
 
-        console.log('id de examen: ' + examenId)
+        // Temporizadores
+        let tiempoRestanteGeneral = 0; // Duración total del examen en segundos
+        let intervaloTemporizadorGeneral; // ID del intervalo para el temporizador general
 
+        let tiempoRestantePregunta = 0; // Duración de la pregunta actual en segundos
+        let intervaloTemporizadorPregunta; // ID del intervalo para el temporizador de pregunta
+        const TIEMPO_VF = 10; // Segundos para preguntas Verdadero/Falso
+        const TIEMPO_OTRAS = 15; // Segundos para preguntas Múltiple/Única
 
+        // Elementos del DOM
         const btnSiguiente = document.getElementById('btnSiguiente');
         const preguntaContenido = document.getElementById('preguntaContenido');
         const modalSalir = new bootstrap.Modal(document.getElementById('modalSalir'));
         const confirmarSalir = document.getElementById('confirmarSalir');
         const progresoBarra = document.getElementById('progresoBarra');
-        const temporizadorDisplay = document.getElementById('temporizador'); // Elemento para mostrar el temporizador
+        const temporizadorGeneralDisplay = document.getElementById('temporizadorGeneral');
+        const temporizadorPreguntaDisplay = document.getElementById('temporizadorPregunta');
 
         // Evitar navegación/salida
         window.onbeforeunload = () => "¿Seguro que quieres salir? El examen se cancelará.";
 
-        // Detectar cambio de pestaña o minimización
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden') {
-                // Puedes optar por finalizar el examen o mostrar una advertencia más estricta aquí
-                // Por ahora, solo mostraremos el modal de confirmación si intentan salir (como con F5)
-                // O podrías hacer que termine el examen automáticamente:
-                // window.onbeforeunload = null;
-                // window.location.href = 'aspirante.php?motivo=abandono';
-            }
-        });
-
+        // Detectar cambio de pestaña o minimización - CONSIDERACIÓN: Podrías hacer que el examen finalice automáticamente aquí
+        // document.addEventListener('visibilitychange', () => {
+        //     if (document.visibilityState === 'hidden') {
+        //         // Opcional: Finalizar examen si el usuario cambia de pestaña
+        //         // clearInterval(intervaloTemporizadorGeneral);
+        //         // clearInterval(intervaloTemporizadorPregunta);
+        //         // window.onbeforeunload = null;
+        //         // window.location.href = 'aspirante.php?motivo=abandono';
+        //     }
+        // });
 
         // Evitar recargar con Ctrl+R o F5
         document.addEventListener('keydown', e => {
@@ -223,50 +260,69 @@ $codigo = $estudiante['usuario'];
 
         // Confirmar salida desde el modal
         confirmarSalir.addEventListener('click', () => {
+            clearInterval(intervaloTemporizadorGeneral);
+            clearInterval(intervaloTemporizadorPregunta);
             window.onbeforeunload = null;
-            // Detener el temporizador antes de redirigir
-            clearInterval(intervaloTemporizador);
             window.location.href = 'aspirante.php';
         });
 
-
-        // 🚫 Dispositivos pequeños
-
+        // 🚫 Bloqueo para dispositivos pequeños
         const esDispositivoPequenio = window.innerWidth <= 768 || /android|iphone|ipad/.test(navigator.userAgent.toLowerCase());
-
         if (esDispositivoPequenio) {
-            alert('Este examen no está disponible para dispositivos pequeños.');
+            alert('Este examen no está disponible para dispositivos pequeños. Por favor, usa una pantalla más grande.');
             window.location.href = 'aspirante.php?motivo=Dispositivo_no_permitido';
         }
 
-
-        // Función para actualizar el display del temporizador
-        function actualizarTemporizadorDisplay() {
-            const minutos = Math.floor(tiempoRestante / 60);
-            const segundos = tiempoRestante % 60;
-            temporizadorDisplay.innerText = 
-                `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+        // --- Funciones de Temporizador ---
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
         }
 
-        // Función para iniciar el temporizador
-        function iniciarTemporizador() {
-            actualizarTemporizadorDisplay(); // Muestra el tiempo inicial
-            intervaloTemporizador = setInterval(() => {
-                tiempoRestante--;
-                actualizarTemporizadorDisplay();
+        function iniciarTemporizadorGeneral() {
+            clearInterval(intervaloTemporizadorGeneral); // Asegura que no haya intervalos duplicados
+            temporizadorGeneralDisplay.innerText = formatTime(tiempoRestanteGeneral);
 
-                if (tiempoRestante <= 0) {
-                    clearInterval(intervaloTemporizador);
+            intervaloTemporizadorGeneral = setInterval(() => {
+                tiempoRestanteGeneral--;
+                temporizadorGeneralDisplay.innerText = formatTime(tiempoRestanteGeneral);
+
+                if (tiempoRestanteGeneral <= 0) {
+                    clearInterval(intervaloTemporizadorGeneral);
+                    clearInterval(intervaloTemporizadorPregunta); // Detener el temporizador de pregunta también
                     finalizarExamenPorTiempo();
                 }
-            }, 1000); // Cada segundo
+            }, 1000);
         }
 
+        function iniciarTemporizadorPregunta() {
+            clearInterval(intervaloTemporizadorPregunta); // Reinicia el temporizador de la pregunta anterior
+
+            const pregunta = listaPreguntas[preguntaActual];
+            tiempoRestantePregunta = (pregunta.tipo === 'vf') ? TIEMPO_VF : TIEMPO_OTRAS;
+            temporizadorPreguntaDisplay.innerText = formatTime(tiempoRestantePregunta);
+
+            intervaloTemporizadorPregunta = setInterval(() => {
+                tiempoRestantePregunta--;
+                temporizadorPreguntaDisplay.innerText = formatTime(tiempoRestantePregunta);
+
+                if (tiempoRestantePregunta <= 0) {
+                    clearInterval(intervaloTemporizadorPregunta);
+                    // Si el tiempo de la pregunta se agota, guarda la respuesta (si existe) y avanza
+                    guardarRespuestaYContinuar();
+                }
+            }, 1000);
+        }
+
+        // --- Lógica del Examen ---
         function cargarPreguntas() {
             if (!examenId || isNaN(examenId)) {
-                alert("Examen inválido (ID no definido en URL)");
+                alert("Examen inválido (ID no definido en URL).");
+                window.location.href = 'aspirante.php';
                 return;
             }
+
             const datos = new FormData();
             datos.append('examen_id', examenId);
 
@@ -274,78 +330,78 @@ $codigo = $estudiante['usuario'];
                 method: 'POST',
                 body: datos
             })
-                .then(res => {
-                    if (!res.ok) {
-                        throw new Error(`HTTP error! status: ${res.status}`);
-                    }
-                    return res.json();
-                })
-                .then(res => {
-                    if (!res.status) {
-                        console.log(res.message);
-                        alert("No se pudieron cargar las preguntas: " + res.message);
-                        window.location.href = 'aspirante.php'; // Redirige si no hay preguntas
-                    } else {
-                        listaPreguntas = res.preguntas;
-                        totalPreguntas = listaPreguntas.length;
-                        tiempoRestante = res.duracion; // Asigna la duración del JSON
-                        
-                        if (totalPreguntas > 0 && tiempoRestante > 0) {
-                            mostrarPregunta();
-                            iniciarTemporizador(); // Inicia el temporizador una vez cargadas las preguntas
-                        } else {
-                            alert("El examen no tiene preguntas o la duración es inválida.");
-                            window.location.href = 'aspirante.php';
-                        }
-                    }
-                })
-                .catch(err => {
-                    alert('Error inesperado al cargar preguntas: ' + err.message);
-                    console.error(err);
-                    window.location.href = 'aspirante.php'; // Redirige en caso de error de fetch
-                });
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(res => {
+                if (!res.status) {
+                    console.error("Error al cargar preguntas:", res.message);
+                    alert("No se pudieron cargar las preguntas: " + res.message);
+                    window.location.href = 'aspirante.php';
+                } else {
+                    listaPreguntas = res.preguntas;
+                    totalPreguntas = res.preguntas.length; // Asegúrate de que esta variable está bien escrita
+                    tiempoRestanteGeneral = res.duracion;
 
+                    if (totalPreguntas > 0 && tiempoRestanteGeneral > 0) {
+                        mostrarPregunta();
+                        iniciarTemporizadorGeneral(); // Inicia el temporizador general
+                    } else {
+                        alert("El examen no tiene preguntas o la duración es inválida.");
+                        window.location.href = 'aspirante.php';
+                    }
+                }
+            })
+            .catch(err => {
+                alert('Error inesperado al cargar preguntas: ' + err.message);
+                console.error(err);
+                window.location.href = 'aspirante.php';
+            });
         }
 
         function mostrarPregunta() {
-            if (preguntaActual >= totalPreguntas) return finalizarExamen();
+            if (preguntaActual >= totalPreguntas) {
+                return finalizarExamen();
+            }
 
             const pregunta = listaPreguntas[preguntaActual];
-            seleccionUsuario = null;
+            seleccionUsuario = null; // Reiniciar selección
             btnSiguiente.disabled = true;
+
+            // Iniciar o reiniciar el temporizador de pregunta
+            iniciarTemporizadorPregunta();
 
             // Actualizar barra de progreso
             const progreso = Math.round(((preguntaActual + 1) / totalPreguntas) * 100);
             progresoBarra.style.width = `${progreso}%`;
             progresoBarra.innerText = `Pregunta ${preguntaActual + 1} de ${totalPreguntas}`;
 
-            // Insertar título de la pregunta en el header
-            const tituloHTML = `
+            // Actualizar título de la pregunta
+            document.getElementById('preguntaTitulo').innerHTML = `
                 <h5 class="fw-semibold mb-0 text-primary d-flex align-items-start">
                     <i class="bi bi-question-circle me-2"></i> ${pregunta.texto}
                 </h5>`;
-            document.getElementById('preguntaTitulo').innerHTML = tituloHTML;
 
-            /* ----------------- seccion de rendirizado de la imagen -----------------------*/
-            // Imagen (si hay)
-            const imagenHTML = pregunta.imagenes && pregunta.imagenes[0]
-                    ? `<div class="text-center border border-2 mb-4 p-3 rounded-3 bg-light">
-                            <img src="../api/${pregunta.imagenes[0].ruta_imagen}" 
-                                class="img-fluid rounded-3 shadow-sm" 
-                                style="max-width: 400px; max-height: 300px; object-fit: contain;" 
-                                alt="Imagen relacionada">
-                        </div>`
-                    : '';
+            // Renderizar imagen (si existe)
+            const imagenHTML = (pregunta.imagenes && pregunta.imagenes.length > 0 && pregunta.imagenes[0].ruta_imagen)
+                ? `<div class="text-center border border-2 mb-4 p-3 rounded-3 bg-light">
+                        <img src="../api/${pregunta.imagenes[0].ruta_imagen}"
+                            class="img-fluid rounded-3 shadow-sm"
+                            style="max-width: 400px; max-height: 300px; object-fit: contain;"
+                            alt="Imagen relacionada">
+                    </div>`
+                : '';
 
-            /* --------- fin de la seccion de renderizado de la imagen ------ */
-
-            // Opciones HTML: checkbox o radio, con buena legibilidad
+            // Renderizar opciones
             let opcionesHTML = '';
             const crearOpcion = (id, texto, tipo) => `
-                <div class="opcion p-3 border rounded-3 mb-3 bg-light shadow-sm d-flex justify-content-between align-items-center fs-5" style="cursor: pointer;">
+                <div class="opcion p-3 border rounded-3 mb-3 bg-light shadow-sm d-flex justify-content-between align-items-center fs-5" data-option-id="${id}">
                     <label class="mb-0 flex-grow-1" for="opcion-${id}">${texto}</label>
                     <input class="form-check-input fs-4 ms-3" type="${tipo}" name="opciones" value="${id}" id="opcion-${id}">
-                </div>`; // Añadido id único para el input y el label
+                </div>`;
 
             if (pregunta.tipo === 'vf') {
                 opcionesHTML += crearOpcion("1", "Verdadero", "radio");
@@ -357,110 +413,115 @@ $codigo = $estudiante['usuario'];
                 });
             }
 
-            // Renderizar contenido en el cuerpo del card
             document.getElementById('preguntaContenido').innerHTML = `
-        ${imagenHTML}
-        <form id="formPregunta" class="mt-3">${opcionesHTML}</form>
-    `;
+                ${imagenHTML}
+                <form id="formPregunta" class="mt-3">${opcionesHTML}</form>
+            `;
 
-            // Activar botón siguiente al seleccionar opción
-            document.querySelectorAll('input[name="opciones"]').forEach(input => {
-                input.addEventListener('change', () => {
-                    seleccionUsuario = true;
-                    btnSiguiente.disabled = false;
-                });
-            });
-            // Añadir event listener a los div.opcion para que también activen el input
+            // Event Listeners para opciones
             document.querySelectorAll('.opcion').forEach(opcionDiv => {
                 opcionDiv.addEventListener('click', function() {
                     const input = this.querySelector('input[name="opciones"]');
                     if (input) {
-                        input.checked = true;
-                        input.dispatchEvent(new Event('change')); // Dispara el evento change
+                        // Para radios, desmarcar otros y marcar este
+                        if (input.type === 'radio') {
+                            document.querySelectorAll('input[name="opciones"]').forEach(radio => radio.checked = false);
+                        }
+                        input.checked = !input.checked; // Alternar para checkboxes, marcar para radios
+
+                        // Asegurarse de que el botón Siguiente se habilite si hay alguna selección
+                        seleccionUsuario = Array.from(document.querySelectorAll('input[name="opciones"]:checked')).length > 0;
+                        btnSiguiente.disabled = !seleccionUsuario;
                     }
+                });
+            });
+            // Asegurar que el cambio en el input también actualice el estado
+            document.querySelectorAll('input[name="opciones"]').forEach(input => {
+                input.addEventListener('change', () => {
+                    seleccionUsuario = Array.from(document.querySelectorAll('input[name="opciones"]:checked')).length > 0;
+                    btnSiguiente.disabled = !seleccionUsuario;
                 });
             });
         }
 
-
-        btnSiguiente.addEventListener('click', () => {
+        async function guardarRespuestaYContinuar() {
             const seleccionados = Array.from(document.querySelectorAll('input[name="opciones"]:checked'))
                 .map(input => input.value);
-
-            if (seleccionados.length === 0) {
-                alert("Por favor, selecciona una opción antes de continuar.");
-                return;
-            }
 
             const datos = new FormData();
             datos.append('examen_id', examenId);
             datos.append('pregunta_id', listaPreguntas[preguntaActual].pregunta_id);
             datos.append('tipo_pregunta', listaPreguntas[preguntaActual].tipo);
-            seleccionados.forEach(id => datos.append('opciones[]', id));
+            // Si no hay selección, envía un array vacío o un valor nulo, según tu API
+            if (seleccionados.length > 0) {
+                seleccionados.forEach(id => datos.append('opciones[]', id));
+            } else {
+                datos.append('opciones[]', ''); // O enviar un indicador de "sin respuesta" si tu API lo espera
+            }
 
-            fetch('../api/guardar_respuesta.php', {
-                method: 'POST',
-                body: datos
-            })
-                .then(res => {
-                    if (!res.ok) {
-                        throw new Error(`HTTP error! status: ${res.status}`);
-                    }
-                    return res.json();
-                })
-                .then(res => {
-                    if (res.success) {
-                        preguntaActual++;
-                        console.log(res.data);
-                        mostrarPregunta(); // Muestra la siguiente pregunta o finaliza
-                    } else {
-                        console.log(res.message);
-                        alert("Error al guardar la respuesta: " + res.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al guardar la respuesta:', error);
-                    alert('Hubo un problema al guardar tu respuesta. Por favor, inténtalo de nuevo.');
+            try {
+                const res = await fetch('../api/guardar_respuesta.php', {
+                    method: 'POST',
+                    body: datos
                 });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                const data = await res.json();
+
+                if (data.success) {
+                    console.log("Respuesta guardada:", data.data);
+                    preguntaActual++;
+                    mostrarPregunta(); // Muestra la siguiente pregunta o finaliza
+                } else {
+                    console.error("Error al guardar la respuesta:", data.message);
+                    // Decide cómo manejar un error al guardar la respuesta. Podrías continuar o alertar.
+                    // Por ahora, solo logueamos el error y continuamos para no detener el examen.
+                    preguntaActual++;
+                    mostrarPregunta();
+                }
+            } catch (error) {
+                console.error('Error en la solicitud de guardar respuesta:', error);
+                alert('Hubo un problema al guardar tu respuesta. Por favor, verifica tu conexión o contacta soporte.');
+                // En un escenario real, podrías querer pausar el examen o forzar la salida
+                preguntaActual++; // Intentar avanzar a la siguiente pregunta a pesar del error
+                mostrarPregunta();
+            }
+        }
+
+        // Listener para el botón "Siguiente"
+        btnSiguiente.addEventListener('click', () => {
+            clearInterval(intervaloTemporizadorPregunta); // Detener el temporizador de la pregunta actual
+            guardarRespuestaYContinuar();
         });
 
         function finalizarExamen() {
-            // Detener el temporizador
-            clearInterval(intervaloTemporizador); 
-            alert('¡Has finalizado el examen!');
-            // Puedes enviar una última señal al servidor de que el examen ha terminado
-            // fetch('../api/finalizar_examen.php', {
-            //     method: 'POST',
-            //     body: JSON.stringify({ examen_id: examenId, motivo: 'completado' }),
-            //     headers: { 'Content-Type': 'application/json' }
-            // }).then(response => response.json())
-            // .then(data => console.log('Examen finalizado en el servidor:', data))
-            // .catch(error => console.error('Error al finalizar examen en servidor:', error));
-
+            clearInterval(intervaloTemporizadorGeneral);
+            clearInterval(intervaloTemporizadorPregunta);
             window.onbeforeunload = null; // Quitar el aviso de salida
+
+            alert('¡Has finalizado el examen!');
+            // Opcional: Enviar una señal final al servidor de que el examen ha sido completado
+            // fetch('../api/finalizar_examen.php', { method: 'POST', body: JSON.stringify({ examen_id: examenId, motivo: 'completado' }), headers: { 'Content-Type': 'application/json' }})...
+
             window.location.href = `aspirante.php?examen_id=${examenId}&estado=finalizado`;
         }
 
         function finalizarExamenPorTiempo() {
-            // Detener el temporizador si no se ha detenido ya
-            clearInterval(intervaloTemporizador);
-            alert('¡Se ha agotado el tiempo! El examen ha finalizado.');
-            // Aquí podrías enviar un evento al servidor indicando que el examen finalizó por tiempo
-            // fetch('../api/finalizar_examen.php', {
-            //     method: 'POST',
-            //     body: JSON.stringify({ examen_id: examenId, motivo: 'tiempo_agotado' }),
-            //     headers: { 'Content-Type': 'application/json' }
-            // }).then(response => response.json())
-            // .then(data => console.log('Examen finalizado por tiempo en el servidor:', data))
-            // .catch(error => console.error('Error al finalizar examen por tiempo en servidor:', error));
+            clearInterval(intervaloTemporizadorGeneral);
+            clearInterval(intervaloTemporizadorPregunta);
+            window.onbeforeunload = null;
 
-            window.onbeforeunload = null; // Quitar el aviso de salida
+            alert('¡Se ha agotado el tiempo para el examen! El examen ha finalizado.');
+            // Opcional: Enviar una señal final al servidor de que el examen ha terminado por tiempo
+            // fetch('../api/finalizar_examen.php', { method: 'POST', body: JSON.stringify({ examen_id: examenId, motivo: 'tiempo_agotado' }), headers: { 'Content-Type': 'application/json' }})...
+
             window.location.href = `aspirante.php?examen_id=${examenId}&estado=tiempo_agotado`;
         }
 
         // Iniciar la carga de preguntas al cargar la página
         cargarPreguntas();
-
     </script>
 
 </body>

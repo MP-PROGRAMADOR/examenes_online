@@ -10,32 +10,23 @@ session_start();
 require_once '../includes/conexion.php';
 
 
-//contador de aciertos
-if (!isset($_SESSION['resumen'])) {
-    $_SESSION['resumen'] = 0.0;
-    $_SESSION['contador_de_pregunta'] = 0;
-}
-$puntaje = 0.0;
-
 // Validar datos
 if (!isset($_POST['examen_id'], $_POST['pregunta_id'], $_POST['opciones'], $_POST['tipo_pregunta'])) {
-   // http_response_code(400);
-
-    $_SESSION['contador_de_pregunta'] +=1;
-
-
-    echo json_encode(['success' => false, ' message' => 'Datos incompletos', 'data' => htmlspecialchars($_SESSION['contador_de_pregunta'])]);
+    http_response_code(400);
+    echo json_encode(['success' => false, ' message' => 'Datos incompletos']);
     exit;
-}else{
-
-
+}
 
 $examen_id = (int) trim($_POST['examen_id']);
 $pregunta_id = (int) trim($_POST['pregunta_id']);
 $opciones = $_POST['opciones']; // array
 $tipo_pregunta = $_POST['tipo_pregunta']; // array
 
-
+//contador de aciertos
+if (!isset($_SESSION['resumen'])) {
+    $_SESSION['resumen'] = 0.0;
+}
+$puntaje = 0.0;
 
 try {
     $pdo->beginTransaction();
@@ -57,7 +48,7 @@ try {
 
 
     if ($tipo_pregunta === 'vf') {
-      
+        if(!empty($opciones)){
             $respuesta = (int) $opciones[0];
             // Insertar opciones seleccionadas
             $stmtInsert = $pdo->prepare("INSERT INTO respuestas_estudiante (examen_pregunta_id, opcion_id) VALUES (?, ?)");
@@ -69,10 +60,14 @@ try {
             $es_correcta_vf = (int) $stmtCompare->fetchColumn();
     
             $puntaje = (int) $es_correcta_vf;
- 
+
+        }else{
+
+
+        }
 
     } else {
-         
+          if(!empty($opciones)){
         // Insertar opciones seleccionadas y verificar cuáles son correctas
         $aciertos = 0.0;
 
@@ -123,7 +118,8 @@ try {
 
 
     }
-    
+    }
+
 
 
 
@@ -144,10 +140,10 @@ try {
     $stmt = $pdo->prepare("SELECT total_preguntas FROM examenes WHERE id = ?");
     $stmt->execute([$examen_id]);
     $total = (float) $stmt->fetchColumn();
-    $respondidasMaNoRespondida =  (int) $_SESSION['contador_de_pregunta'] + $respondidas;
 
 
-    if ($respondidasMaNoRespondida == $total) {
+
+    if ($respondidas == $total) {
         // Calcular la nota  
         //$resumen = $_SESSION['resumen'];
         $calificacion = ((float) $_SESSION['resumen'] / (float) $total) * 100;
@@ -195,4 +191,3 @@ try {
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
 
-}
