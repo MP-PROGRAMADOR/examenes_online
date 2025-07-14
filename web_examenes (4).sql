@@ -113,8 +113,7 @@ CREATE TABLE `estudiantes` (
   `estado` enum('activo','inactivo') DEFAULT 'activo',
   `creado_en` datetime DEFAULT current_timestamp(),
   `apellidos` varchar(250) DEFAULT NULL,
-  `direccion` varchar(250) DEFAULT NULL,
-  `usuario` varchar(100) NOT NULL,
+  `direccion` varchar(250) DEFAULT NULL, 
   `Doc` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

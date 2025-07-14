@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
 
-            
+
             $stmt = $pdo->prepare("SELECT id, nombre, rol, contrasena_hash, email, activo FROM usuarios WHERE email = :usuario LIMIT 1");
             $stmt->execute(['usuario' => $usuario]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -71,33 +71,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception('Código de acceso requerido.');
             }
 
-            // Consulta con alias para evitar confusión de ids
+            // Consulta correcta con JOIN para obtener datos del estudiante
             $stmt = $pdo->prepare("
-                                        SELECT * 
-                                        FROM estudiantes 
-                                        WHERE usuario = :usuario AND estado = 'activo'
-                                    ");
+                            SELECT e.*, s.nombre, s.apellidos
+                            FROM examenes e
+                            INNER JOIN estudiantes s ON s.id = e.estudiante_id
+                            WHERE e.codigo_acceso = :codigo_acceso
+                            AND e.estado IN ('pendiente', 'INICIO')
+                            AND s.estado = 'activo'
+                            LIMIT 1
+                        ");
 
-            $stmt->execute(['usuario' => $codigo]); // <-- debe coincidir con :usuario
-            $estudiante = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->execute(['codigo_acceso' => $codigo]);
+            $examen = $stmt->fetch(PDO::FETCH_ASSOC);
 
-
-            if ($estudiante) {
-                $_SESSION['estudiante_id'] = $estudiante['id'];
-                $_SESSION['estudiante_nombre'] = $estudiante['nombre'];
-                $_SESSION['estudiante'] = $estudiante; // puedes usarlo para detalles
+            if ($examen) {
+                $_SESSION['estudiante_id'] = $examen['estudiante_id'];
+                $_SESSION['estudiante_nombre'] = $examen['nombre'] . ' ' . $examen['apellidos'];
+                $_SESSION['estudiante'] = $examen; // puedes usarlo para más datos del examen
 
                 $response = [
                     'status' => true,
-                    'message' => 'Bienvenido/a ' . htmlspecialchars($estudiante['nombre']),
-                    'redirect' => 'aspirante.php'
+                    'message' => 'Bienvenido/a ' . htmlspecialchars($examen['nombre']),
+                    'redirect' => 'politicas.php'
                 ];
             } else {
-                throw new Exception('Código inválido.');
+                throw new Exception('Código inválido o examen no disponible.');
             }
         } else {
             throw new Exception('Tipo de usuario inválido.');
         }
+
     } catch (Exception $e) {
         $response['message'] = $e->getMessage();
     }
