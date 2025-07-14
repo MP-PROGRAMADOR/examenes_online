@@ -8,9 +8,9 @@ if (!isset($_SESSION['estudiante'])) {
 }
 
 // Acceder a los datos del estudiante
-$estudiante = $_SESSION['estudiante'];
-$nombre = $estudiante['nombre'] . ' ' . $estudiante['apellidos'];
-$codigo = $estudiante['usuario'];
+$estudiante = $_SESSION['estudiante'] ?? [];
+$nombre = $estudiante['estudiante_nombre']   ?? ''  ;
+$codigo = $estudiante['codigo_acceso'] ?? '';
 
 ?>
 <!DOCTYPE html>
@@ -267,14 +267,14 @@ $codigo = $estudiante['usuario'];
             clearInterval(intervaloTemporizadorGeneral);
             clearInterval(intervaloTemporizadorPregunta);
             window.onbeforeunload = null;
-            window.location.href = 'aspirante.php';
+           // window.location.href = 'aspirante.php';
         });
 
         // 🚫 Bloqueo para dispositivos pequeños
         const esDispositivoPequenio = window.innerWidth <= 768 || /android|iphone|ipad/.test(navigator.userAgent.toLowerCase());
         if (esDispositivoPequenio) {
             alert('Este examen no está disponible para dispositivos pequeños. Por favor, usa una pantalla más grande.');
-            window.location.href = 'aspirante.php?motivo=Dispositivo_no_permitido';
+            window.location.href = 'index.php?motivo=Dispositivo_no_permitido';
         }
 
         // --- Funciones de Temporizador ---
@@ -323,7 +323,7 @@ $codigo = $estudiante['usuario'];
         function cargarPreguntas() {
             if (!examenId || isNaN(examenId)) {
                 alert("Examen inválido (ID no definido en URL).");
-                window.location.href = 'aspirante.php';
+               // window.location.href = 'aspirante.php';
                 return;
             }
 
@@ -344,7 +344,7 @@ $codigo = $estudiante['usuario'];
                     if (!res.status) {
                         console.error("Error al cargar preguntas:", res.message);
                         alert("No se pudieron cargar las preguntas: " + res.message);
-                        window.location.href = 'aspirante.php';
+                       // window.location.href = 'aspirante.php';
                     } else {
                         listaPreguntas = res.preguntas;
                         totalPreguntas = res.preguntas.length; // Asegúrate de que esta variable está bien escrita

@@ -10,8 +10,8 @@ if (!isset($_SESSION['estudiante'])) {
 
 // Acceder a los datos del estudiante
 $estudiante = $_SESSION['estudiante'];
-$nombre = $estudiante['nombre'] . ' ' . $estudiante['apellidos'];
-$codigo = $estudiante['usuario'];
+$nombre = $estudiante['estudiante_nombre']  ;
+$codigo = $estudiante['codigo_acceso'];
 
 // Conexión
 require_once '../includes/conexion.php';

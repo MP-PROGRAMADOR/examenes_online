@@ -1,75 +1,185 @@
-<?php include_once('includes/header.php') ;
+<?php
+session_start();
+require '../includes/conexion.php';
 
-$id = $estudiante['id']; 
+if (!isset($_SESSION['estudiante'])) {
+    header("Location: cerrar_sesion.php");
+    exit();
+}
 
-require '../includes/conexion.php';  
+$examen = $_SESSION['estudiante'];
+$nombre = $examen['nombre'] ?? 'Estudiante';
+$codigo = $examen['codigo_acceso'] ?? '';
+$estudiante_id = (int)($examen['estudiante_id'] ?? 0);
+$examen_id = (int)($examen['examen_id'] ?? 15);
+$preguntas = $examen['total_preguntas'] ?? 30;
+$duracion = $examen['duracion'] ?? 10;
 
-// Obtener el id de la categoría del carne del estudiante
-$stmtCategoria = $pdo->prepare("SELECT categoria_carne_id FROM estudiantes WHERE id = :id ORDER BY id DESC LIMIT 1");
-$stmtCategoria->execute(['id' => $id]);
-$categoria_carne = $stmtCategoria->fetch(PDO::FETCH_ASSOC); // Usamos fetch para obtener una sola fila
-
-if ($categoria_carne) {
-    $id_carne = $categoria_carne['categoria_carne_id'];
-
-    // Obtener el examen asociado a la categoría del carne
-    $stmtExamen = $pdo->prepare("SELECT * FROM examenes WHERE categoria_carne_id = :id ORDER BY id DESC LIMIT 1");
-    $stmtExamen->execute(['id' => $id_carne]);
-    $examen = $stmtExamen->fetch(PDO::FETCH_ASSOC); // Usamos fetch para obtener una sola fila
-} 
 
 ?>
-    <main class="container my-5 flex-grow-1 main-section">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="info-card">
-                    <h2>Información Importante del Examen</h2>
-                    <p class="lead">Antes de comenzar, por favor lee atentamente las políticas y condiciones del examen.</p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel del Estudiante</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-                    <h3>Políticas del Examen</h3>
-                    <ul>
-                        <li><strong>Duración del Examen:</strong> Este examen tiene una duración máxima de <span id="exam-duration">60 minutos</span>. Una vez que inicies, el tiempo comenzará a correr y no se detendrá.</li>
-                        <li><strong>Número de Preguntas:</strong> El examen consta de <span id="exam-questions">30 preguntas</span> de opción múltiple.</li>
-                        <li><strong>Navegación:</strong> Puedes navegar libremente entre las preguntas. Revisa bien tus respuestas antes de finalizar.</li>
-                        <li><strong>Finalización:</strong> Una vez que hayas respondido todas las preguntas o se agote el tiempo, podrás finalizar el examen y ver tu puntuación.</li>
-                        <li><strong>Integridad Académica:</strong> Se espera que realices este examen de manera individual y sin ayuda externa. Cualquier intento de plagio o copia resultará en la descalificación.</li>
-                        <li><strong>Conexión a Internet:</strong> Asegúrate de tener una conexión a internet estable durante todo el examen para evitar interrupciones.</li>
-                    </ul>
+    <!-- Google Fonts & Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-                    <h3>Condiciones del Examen</h3>
-                    <ul>
-                         <li><strong>Puntuación:</strong> La puntuación se basará en el número de respuestas correctas. Cada pregunta tiene el mismo valor.</li>
-                        <li><strong>Resultados:</strong> Los resultados del examen estarán disponibles inmediatamente después de la finalización.</li>
-                        <li><strong>Revisión:</strong> En caso de dudas sobre alguna pregunta o resultado, puedes contactar a tu instructor a través de la plataforma.</li>
-                        <li><strong>Intentos:</strong> Tendrás un máximo de <span id="exam-attempts">un intento</span> para realizar este examen.</li>
-                        <li><strong>Confidencialidad:</strong> El contenido de este examen es confidencial y no debe ser compartido con otros estudiantes.</li>
-                    </ul>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding-top: 70px;
+        }
 
-                    <div class="important-note">
-                        <strong>Importante:</strong> Al hacer clic en "Comenzar Examen", confirmas que has leído y aceptas todas las políticas y condiciones mencionadas anteriormente. ¡Mucho éxito!
-                    </div>
+        .navbar {
+            background-color: #084298;
+        }
 
-                    <a href="evaluacion.php?id=<?= $examen['id'] ?>" class="btn btn-start-exam btn-block mt-4">Comenzar Examen</a>
-                  
+        .navbar-brand, .navbar .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+        }
+
+        .info-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .info-card h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #0d6efd;
+        }
+
+        .info-card ul {
+            padding-left: 1rem;
+        }
+
+        .info-card li {
+            margin-bottom: 10px;
+        }
+
+        .important-note {
+            background-color: #e7f3ff;
+            border-left: 4px solid #0d6efd;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            font-weight: 500;
+        }
+
+        .btn-start {
+            background-color: #0d6efd;
+            color: #fff;
+            border-radius: 30px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .btn-start:hover {
+            background-color: #0b5ed7;
+        }
+
+        footer {
+            margin-top: 4rem;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .info-card {
+                padding: 25px;
+            }
+
+            .info-card h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top shadow-sm">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand" href="#">
+            <i class="bi bi-mortarboard-fill me-2 fs-4"></i> CÓDIGO: <strong><?= htmlspecialchars($codigo) ?></strong>
+        </a>
+        <div class="collapse navbar-collapse justify-content-end">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <span class="nav-link"><i class="bi bi-person-circle"></i> <?= htmlspecialchars($nombre) ?></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="info-card mt-5">
+                <h2 class="mb-3">Información del Examen</h2>
+                <p class="text-muted mb-4">Lee cuidadosamente las siguientes reglas y condiciones antes de comenzar:</p>
+
+                <h5 class="text-primary mb-2">Políticas</h5>
+                <ul>
+                    <li><strong>Duración:</strong> <span id="exam-duration">--</span></li>
+                    <li><strong>Preguntas:</strong> <span id="exam-questions">--</span></li>
+                    <li><strong>Navegación:</strong> Puedes avanzar y retroceder libremente.</li>
+                    <li><strong>Finalización:</strong> El examen se cierra automáticamente al finalizar.</li>
+                    <li><strong>Intentos:</strong> <span id="exam-attempts">--</span></li>
+                    <li><strong>Internet:</strong> Conexión estable es obligatoria.</li>
+                </ul>
+
+                <h5 class="text-primary mt-4 mb-2">Condiciones</h5>
+                <ul>
+                    <li><strong>Calificación mínima:</strong> 90% de respuestas correctas (varía por categoría).</li>
+                    <li><strong>Envío de resultados:</strong> Automáticamente a tu autoescuela.</li>
+                    <li><strong>Reclamos:</strong> Solo ante la Dirección General de Tráfico.</li>
+                    <li><strong>Confidencialidad:</strong> El contenido del examen es privado.</li>
+                </ul>
+
+                <div class="important-note">
+                    Al iniciar el examen, aceptas todas las condiciones establecidas. No compartas tu contenido ni repitas el intento.
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="evaluacion.php?examen_id=<?= htmlspecialchars($examen_id )?>" class="btn btn-start">
+                        <i class="bi bi-play-circle-fill me-2"></i> Comenzar Examen
+                    </a>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 
-    <footer class="bg-light text-center py-3">
-        <p>&copy; 2024 Autoescuela Online</p>
-    </footer>
+<footer class="text-center text-muted py-4">
+    &copy; <?= date('Y') ?> Autoescuela Online. Todos los derechos reservados.
+</footer>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- Bootstrap JS -->
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Puedes personalizar la duración, número de preguntas e intentos desde JavaScript si es dinámico
-        document.getElementById('exam-duration').textContent = '45 minutos';
-        document.getElementById('exam-questions').textContent = '25 preguntas';
-        document.getElementById('exam-attempts').textContent = 'dos intentos';
-    </script>
+
+<script>
+  
+    const totalPreguntas = <?= json_encode((int)$preguntas) ?>;
+    const totalTiempo = <?= json_encode((int)$duracion) ?>;
+    document.getElementById('exam-questions').textContent = totalPreguntas + ' preguntas';
+ 
+
+    document.getElementById('exam-duration').textContent = totalTiempo +' minutos';
+    
+    document.getElementById('exam-attempts').textContent = '1 intento';
+</script>
 </body>
 </html>

@@ -302,7 +302,7 @@ if (isset($_SESSION['estudiante'])) {
 
         
 
-        fetch('../api/login.php', {
+        fetch('../api/procesar_login_estudiante.php', {
             method: 'POST',
             body: formData
           })
@@ -312,7 +312,7 @@ if (isset($_SESSION['estudiante'])) {
             if (data.status) {
               mostrarToast('success', data.message || 'Inicio de sesión exitoso');
               setTimeout(() => {
-                window.location.href = data.redirect || 'aspirante.php';
+                window.location.href = data.redirect || 'politicas.php';
               }, 1200);
             } else {
               mostrarToast('danger', data.message || 'Credenciales incorrectas');

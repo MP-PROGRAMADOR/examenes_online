@@ -73,17 +73,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Consulta correcta con JOIN para obtener datos del estudiante
             $stmt = $pdo->prepare("
-                            SELECT e.*, s.nombre, s.apellidos
-                            FROM examenes e
-                            INNER JOIN estudiantes s ON s.id = e.estudiante_id
-                            WHERE e.codigo_acceso = :codigo_acceso
-                            AND e.estado IN ('pendiente', 'INICIO')
-                            AND s.estado = 'activo'
-                            LIMIT 1
-                        ");
+                    SELECT 
+                        e.id AS examen_id,
+                        e.estudiante_id,
+                        e.categoria_id,
+                        e.asignado_por,
+                        e.fecha_asignacion,
+                        e.duracion,
+                        e.total_preguntas,
+                        e.estado AS estado_examen,
+                        e.calificacion,
+                        e.codigo_acceso,
+
+                        s.id AS estudiante_id,
+                        s.dni,
+                        s.nombre AS estudiante_nombre,
+                        s.apellidos,
+                        s.email,
+                        s.telefono,
+                        s.fecha_nacimiento,
+                        s.escuela_id,
+                        s.direccion,
+                        s.Doc,
+                        s.estado AS estado_estudiante,
+                        s.creado_en,
+
+                        c.nombre AS categoria_nombre,
+                        c.descripcion AS categoria_descripcion,
+                        c.edad_minima
+
+                    FROM examenes e
+                    INNER JOIN estudiantes s ON s.id = e.estudiante_id
+                    INNER JOIN categorias c ON c.id = e.categoria_id
+
+                    WHERE e.codigo_acceso = :codigo_acceso
+                    AND e.estado IN ('pendiente', 'INICIO')
+                    
+
+                    LIMIT 1
+                ");
 
             $stmt->execute(['codigo_acceso' => $codigo]);
             $examen = $stmt->fetch(PDO::FETCH_ASSOC);
+
 
             if ($examen) {
                 $_SESSION['estudiante_id'] = $examen['estudiante_id'];
@@ -92,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $response = [
                     'status' => true,
-                    'message' => 'Bienvenido/a ' . htmlspecialchars($examen['nombre']),
+                    'message' => 'Bienvenido/a ' . htmlspecialchars($examen['estudiante_nombre']),
                     'redirect' => 'politicas.php'
                 ];
             } else {
