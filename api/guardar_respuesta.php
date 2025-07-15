@@ -137,7 +137,7 @@ try {
             $stmt = $pdo->prepare("UPDATE examenes SET estado = 'finalizado', calificacion = ? WHERE id = ?");
             $stmt->execute([$calificacion_final, $_POST['examen_id']]);
 
-            $estudiante_id = $_SESSION['estudiante']['id'];
+            $estudiante_id = $_SESSION['estudiante']['estudiante_id'];
             $stmt = $pdo->prepare("SELECT categoria_id FROM examenes WHERE id = ?");
             $stmt->execute([$_POST['examen_id']]);
             $categoria_id = (int) $stmt->fetchColumn();
@@ -208,11 +208,11 @@ try {
             $opcion_seleccionada_id = (int) $opciones_seleccionadas[0];
 
             $stmtInsert = $pdo->prepare("INSERT INTO respuestas_estudiante (examen_pregunta_id, opcion_id) VALUES (?, ?)");
-            $stmtInsert->execute([$examen_pregunta_id, $opcion_seleccionada_id]); // CORREGIDO: Usar el ID real de la opción
+            $stmtInsert->execute([$examen_pregunta_id, $pregunta_id]); // CORREGIDO: Usar el ID real de la opción
 
             // Verificar si la opción seleccionada es correcta según su ID
             $stmtCheckCorrectVF = $pdo->prepare('SELECT es_correcta FROM opciones_pregunta WHERE id = ?');
-            $stmtCheckCorrectVF->execute([$opcion_seleccionada_id]); // CORREGIDO: Usar el ID real de la opción
+            $stmtCheckCorrectVF->execute([$pregunta_id]); // CORREGIDO: Usar el ID real de la opción
             $is_correct_vf = (bool) $stmtCheckCorrectVF->fetchColumn();
 
             $puntaje_pregunta = $is_correct_vf ? 1.0 : 0.0;
@@ -290,15 +290,15 @@ try {
     $total_preguntas_examen = (int) $stmt->fetchColumn();
 
     // Verificar si todas las preguntas han sido respondidas o saltadas
-    $totalRespondidasMasNoRespondidas = (int) $_SESSION['contador_de_pregunta'] + $respondidas_bd;
+    $totalRespondidasMasNoRespondidas = (int) $_SESSION['contador_de_pregunta'];
 
-    if ($totalRespondidasMasNoRespondidas === $total_preguntas_examen) {
+    if ($respondidas_bd === $total_preguntas_examen) {
         $calificacion_final = ($_SESSION['resumen'] / $total_preguntas_examen) * 100;
 
         $stmt = $pdo->prepare("UPDATE examenes SET estado = 'finalizado', calificacion = ? WHERE id = ?");
         $stmt->execute([$calificacion_final, $examen_id]);
 
-        $estudiante_id = $_SESSION['estudiante']['id'];
+        $estudiante_id = $_SESSION['estudiante']['estudiante_id'];
 
         $stmt = $pdo->prepare("SELECT categoria_id FROM examenes WHERE id = ?");
         $stmt->execute([$examen_id]);
@@ -316,8 +316,10 @@ try {
 
     echo json_encode([
         'status' => true,
+        'finalizado' => ($respondidas_bd === $total_preguntas_examen),
         'message' => 'Respuesta guardada exitosamente.',
         'data' => [
+            'iguales' => ($respondidas_bd === $total_preguntas_examen),
             'total_respon_no_respon' => $totalRespondidasMasNoRespondidas,
             'puntaje_pregunta_actual' => round($puntaje_pregunta, 2),
             'resumen_acumulado' => isset($_SESSION['resumen']) ? round($_SESSION['resumen'], 2) : 0.0,

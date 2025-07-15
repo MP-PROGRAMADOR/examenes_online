@@ -228,7 +228,7 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
 
         let tiempoRestantePregunta = 0; // Duración de la pregunta actual en segundos
         let intervaloTemporizadorPregunta; // ID del intervalo para el temporizador de pregunta
-        const TIEMPO_VF = 10; // Segundos para preguntas Verdadero/Falso
+        const TIEMPO_VF = 9; // Segundos para preguntas Verdadero/Falso
         const TIEMPO_OTRAS = 10; // Segundos para preguntas Múltiple/Única
 
         // Elementos del DOM
@@ -250,7 +250,7 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
         //         // clearInterval(intervaloTemporizadorGeneral);
         //         // clearInterval(intervaloTemporizadorPregunta);
         //         // window.onbeforeunload = null;
-        //         // window.location.href = 'aspirante.php?motivo=abandono';
+        //         // window.location.href = 'index.php?motivo=abandono';
         //     }
         // });
 
@@ -267,7 +267,7 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
             clearInterval(intervaloTemporizadorGeneral);
             clearInterval(intervaloTemporizadorPregunta);
             window.onbeforeunload = null;
-           // window.location.href = 'aspirante.php';
+           // window.location.href = 'index.php';
         });
 
         // 🚫 Bloqueo para dispositivos pequeños
@@ -323,7 +323,7 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
         function cargarPreguntas() {
             if (!examenId || isNaN(examenId)) {
                 alert("Examen inválido (ID no definido en URL).");
-               // window.location.href = 'aspirante.php';
+                 window.location.href = 'index.php';
                 return;
             }
 
@@ -344,7 +344,7 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
                     if (!res.status) {
                         console.error("Error al cargar preguntas:", res.message);
                         alert("No se pudieron cargar las preguntas: " + res.message);
-                       // window.location.href = 'aspirante.php';
+                        window.location.href = 'index.php';
                     } else {
                         listaPreguntas = res.preguntas;
                         totalPreguntas = res.preguntas.length; // Asegúrate de que esta variable está bien escrita
@@ -355,14 +355,14 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
                             iniciarTemporizadorGeneral(); // Inicia el temporizador general
                         } else {
                             alert("El examen no tiene preguntas o la duración es inválida.");
-                            // window.location.href = 'aspirante.php';
+                             window.location.href = 'index.php';
                         }
                     }
                 })
                 .catch(err => {
                     alert('Error inesperado al cargar preguntas: ' + err.message);
                     console.error(err);
-                    // window.location.href = 'aspirante.php';
+                    // window.location.href = 'index.php';
                 });
         }
 
@@ -478,9 +478,15 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
                 const data = await res.json();
 
                 if (data.status) {
-                    console.log("Respuesta guardada:", data.data);
-                    preguntaActual++;
-                    mostrarPregunta(); // Muestra la siguiente pregunta o finaliza
+                    if(data.finalizado){
+                        finalizarExamen()
+                    }else{
+                        console.log("Respuesta guardada:", data.data);
+                        preguntaActual++;
+                        mostrarPregunta(); // Muestra la siguiente pregunta o finaliza
+
+                    }
+
                 } else {
                     console.error("Error al guardar la respuesta:", data.message);
                     // Decide cómo manejar un error al guardar la respuesta. Podrías continuar o alertar.
@@ -508,11 +514,8 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
             clearInterval(intervaloTemporizadorPregunta);
             window.onbeforeunload = null; // Quitar el aviso de salida
 
-            alert('¡Has finalizado el examen!');
-            // Opcional: Enviar una señal final al servidor de que el examen ha sido completado
-            // fetch('../api/finalizar_examen.php', { method: 'POST', body: JSON.stringify({ examen_id: examenId, motivo: 'completado' }), headers: { 'Content-Type': 'application/json' }})...
-
-            // window.location.href = `aspirante.php?examen_id=${examenId}&estado=finalizado`;
+            alert('¡Has finalizado el examen!'); 
+              window.location.href = `cerrar_sesion.php?examen_id=${examenId}&estado=finalizado`;
         }
 
 
@@ -529,7 +532,7 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
             alert('¡Se ha agotado el tiempo para el examen! El examen ha finalizado.');
 
             // Redirigir al final
-            // window.location.href = `aspirante.php?examen_id=${examenId}&estado=tiempo_agotado`;
+              window.location.href = `index.php?examen_id=${examenId}&estado=tiempo_agotado`;
         }
 
 
