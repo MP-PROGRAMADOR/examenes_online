@@ -21,12 +21,13 @@ try {
     esc.nombre AS escuela, 
     c.nombre AS categoria, 
     ec.categoria_id
-  FROM estudiantes e
-  LEFT JOIN escuelas_conduccion esc ON e.escuela_id = esc.id
-  LEFT JOIN estudiante_categorias ec ON ec.estudiante_id = e.id
-  LEFT JOIN categorias c ON ec.categoria_id = c.id
-  ORDER BY e.id DESC
-  LIMIT :inicio, :limite
+FROM estudiantes e
+LEFT JOIN escuelas_conduccion esc ON e.escuela_id = esc.id
+LEFT JOIN estudiante_categorias ec ON ec.estudiante_id = e.id
+LEFT JOIN categorias c ON ec.categoria_id = c.id
+ORDER BY e.creado_en DESC
+LIMIT :inicio, :limite
+
 ";
   $stmt = $pdo->prepare($sql);
   $stmt->bindValue(':inicio', $inicio, PDO::PARAM_INT);
@@ -219,10 +220,10 @@ try {
           <!-- DNI -->
           <div class="mb-3 col-12 col-md-6">
             <label for="dni_estudiante" class="form-label fw-semibold">
-              <i class="bi bi-card-text me-2 text-primary"></i>DNI <span class="text-danger">*</span>
+              <i class="bi bi-card-text me-2 text-primary"></i>D.I.P <span class="text-danger">*</span>
             </label>
             <input type="text" class="form-control shadow-sm" id="dni_estudiante" name="dni" required>
-            <div class="invalid-feedback">Por favor ingresa el DNI del estudiante.</div>
+            <div class="invalid-feedback">Por favor ingresa el D.I.P del estudiante.</div>
           </div>
 
           <!-- Nombres -->
@@ -304,7 +305,7 @@ try {
 
           <div class="mb-3 col-12 col-md-6">
             <label for="categorias_id" class="form-label fw-semibold">
-              <i class="bi bi-file-earmark-text me-2 text-primary"></i>Número de Documento <span
+              <i class="bi bi-file-earmark-text me-2 text-primary"></i>Número de Registro del Documento <span
                 class="text-danger">*</span>
             </label>
             <input type="text" class="form-control shadow-sm" id="num" name="num">
