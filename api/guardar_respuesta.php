@@ -16,6 +16,9 @@ if (!isset($_SESSION['contador_de_pregunta'])) {
     $_SESSION['contador_de_pregunta'] = 0;
 }
 
+
+
+
 // Función de validación
 function validarDatosPregunta(): array
 {
@@ -304,7 +307,7 @@ try {
         $stmt->execute([$examen_id]);
         $categoria_id = (int) $stmt->fetchColumn();
 
-        $nuevo_estado = ($calificacion_final >= 80) ? 'aprobado' : 'en_proceso';
+        $nuevo_estado = ($calificacion_final >= 90) ? 'aprobado' : 'en_proceso';
         $stmt = $pdo->prepare("UPDATE estudiante_categorias SET estado = ?, fecha_aprobacion = NOW() WHERE estudiante_id = ? AND categoria_id = ?");
         $stmt->execute([$nuevo_estado, $estudiante_id, $categoria_id]);
 
