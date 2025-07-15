@@ -9,7 +9,7 @@ if (!isset($_SESSION['estudiante'])) {
 
 // Acceder a los datos del estudiante
 $estudiante = $_SESSION['estudiante'] ?? [];
-$nombre = $estudiante['estudiante_nombre']   ?? ''  ;
+$nombre = $estudiante['estudiante_nombre'] ?? '';
 $codigo = $estudiante['codigo_acceso'] ?? '';
 
 ?>
@@ -244,15 +244,17 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
         window.onbeforeunload = () => "¿Seguro que quieres salir? El examen se cancelará.";
 
         // Detectar cambio de pestaña o minimización - CONSIDERACIÓN: Podrías hacer que el examen finalice automáticamente aquí
-        // document.addEventListener('visibilitychange', () => {
-        //     if (document.visibilityState === 'hidden') {
-        //         // Opcional: Finalizar examen si el usuario cambia de pestaña
-        //         // clearInterval(intervaloTemporizadorGeneral);
-        //         // clearInterval(intervaloTemporizadorPregunta);
-        //         // window.onbeforeunload = null;
-        //         // window.location.href = 'index.php?motivo=abandono';
-        //     }
-        // });
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                // Opcional: Finalizar examen si el usuario cambia de pestaña
+                clearInterval(intervaloTemporizadorGeneral);
+                clearInterval(intervaloTemporizadorPregunta);
+                window.onbeforeunload = null;
+
+
+
+            }
+        });
 
         // Evitar recargar con Ctrl+R o F5
         document.addEventListener('keydown', e => {
@@ -267,14 +269,14 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
             clearInterval(intervaloTemporizadorGeneral);
             clearInterval(intervaloTemporizadorPregunta);
             window.onbeforeunload = null;
-           // window.location.href = 'index.php';
+            window.location.href = 'cerrar_sesion.php';
         });
 
         // 🚫 Bloqueo para dispositivos pequeños
         const esDispositivoPequenio = window.innerWidth <= 768 || /android|iphone|ipad/.test(navigator.userAgent.toLowerCase());
         if (esDispositivoPequenio) {
             alert('Este examen no está disponible para dispositivos pequeños. Por favor, usa una pantalla más grande.');
-            window.location.href = 'index.php?motivo=Dispositivo_no_permitido';
+            window.location.href = 'cerrar_sesion.php?motivo=Dispositivo_no_permitido';
         }
 
         // --- Funciones de Temporizador ---
@@ -323,7 +325,7 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
         function cargarPreguntas() {
             if (!examenId || isNaN(examenId)) {
                 alert("Examen inválido (ID no definido en URL).");
-                 window.location.href = 'index.php';
+                window.location.href = 'cerrar_sesion.php';
                 return;
             }
 
@@ -344,7 +346,7 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
                     if (!res.status) {
                         console.error("Error al cargar preguntas:", res.message);
                         alert("No se pudieron cargar las preguntas: " + res.message);
-                        window.location.href = 'index.php';
+                        window.location.href = 'cerrar_sesion.php';
                     } else {
                         listaPreguntas = res.preguntas;
                         totalPreguntas = res.preguntas.length; // Asegúrate de que esta variable está bien escrita
@@ -355,14 +357,14 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
                             iniciarTemporizadorGeneral(); // Inicia el temporizador general
                         } else {
                             alert("El examen no tiene preguntas o la duración es inválida.");
-                             window.location.href = 'index.php';
+                            window.location.href = 'cerrar_sesion.php';
                         }
                     }
                 })
                 .catch(err => {
                     alert('Error inesperado al cargar preguntas: ' + err.message);
                     console.error(err);
-                    // window.location.href = 'index.php';
+                    // window.location.href = 'cerrar_sesion.php';
                 });
         }
 
@@ -478,13 +480,12 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
                 const data = await res.json();
 
                 if (data.status) {
-                    if(data.finalizado){
+                    if (data.finalizado) {
                         finalizarExamen()
-                    }else{
+                    } else {
                         console.log("Respuesta guardada:", data.data);
                         preguntaActual++;
                         mostrarPregunta(); // Muestra la siguiente pregunta o finaliza
-
                     }
 
                 } else {
@@ -514,8 +515,8 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
             clearInterval(intervaloTemporizadorPregunta);
             window.onbeforeunload = null; // Quitar el aviso de salida
 
-            alert('¡Has finalizado el examen!'); 
-              window.location.href = `cerrar_sesion.php?examen_id=${examenId}&estado=finalizado`;
+            alert('¡Has finalizado el examen!');
+            window.location.href = `cerrar_sesion.php?examen_id=${examenId}&estado=finalizado`;
         }
 
 
@@ -532,12 +533,45 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
             alert('¡Se ha agotado el tiempo para el examen! El examen ha finalizado.');
 
             // Redirigir al final
-              window.location.href = `index.php?examen_id=${examenId}&estado=tiempo_agotado`;
+            window.location.href = `cerrar_sesion.php?examen_id=${examenId}&estado=tiempo_agotado`;
         }
 
 
         // Iniciar la carga de preguntas al cargar la página
         cargarPreguntas();
+
+
+
+
+        function finalizarExamenPorFraude() {
+
+            const datos = new FormData();
+            datos.append('examen_id', examenId);
+            datos.append('accion', 'fraude');
+
+            fetch('../api/guardar_respuesta.php', {
+                method: 'POST',
+                body: datos
+            })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
+                .then(res => {
+                    if (res.status) {
+                        console.error("Fraude ", res.message);
+                        alert("FRAUDE: " + res.message);
+                        window.location.href = 'cerrar_sesion.php';
+                    }
+                })
+                .catch(err => {
+                    alert('Error inesperado al finalizar examen: ' + err.message);
+                    console.error(err);
+                    // window.location.href = 'cerrar_sesion.php';
+                });
+        }
     </script>
 
 </body>
