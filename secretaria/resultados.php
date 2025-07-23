@@ -98,8 +98,8 @@ require_once 'header.php';
                             <th><i class="bi bi-calendar-event-fill me-1"></i> Fecha</th>
                             <th><i class="bi bi-list-ol me-1"></i> Preguntas</th>
                             <th><i class="bi bi-toggle-on me-1"></i> Estado</th>
-                            <th><i class="bi bi-clipboard-check-fill me-1"></i> Calificación</th>
-                            <th><i class="bi bi-key-fill me-1"></i> Código</th>
+                          <!--   <th><i class="bi bi-clipboard-check-fill me-1"></i> Calificación</th> -->
+                           <!--  <th><i class="bi bi-key-fill me-1"></i> Código</th> -->
                             <th><i class="bi bi-gear-fill me-1"></i> Acciones</th>
                         </tr>
                     </thead>
@@ -119,21 +119,21 @@ require_once 'header.php';
                                             <?= strtoupper(str_replace('_', ' ', $examen['estado'])) ?>
                                         </span>
                                     </td>
-                                    <td class="text-center">
+                                  <!--   <td class="text-center">
                                         <?= $examen['calificacion'] !== null ? htmlspecialchars($examen['calificacion']) : '—' ?>
-                                    </td>
-                                    <td class="text-center"><code><?= htmlspecialchars($examen['codigo_acceso']) ?></code></td>
+                                    </td> -->
+                                  <!--   <td class="text-center"><code><?= htmlspecialchars($examen['codigo_acceso']) ?></code></td> -->
                                     <td class="text-center">
                                         <a href="../libreria/imprimir_codigo.php?id=<?= $examen['id'] ?>"
                                             class="btn btn-sm btn-outline-secondary mb-1">
                                             <i class="bi bi-printer-fill me-1"></i> Imprimir Código
                                         </a>
-                                        <?php if ($examen['calificacion'] !== null && $examen['calificacion'] > 0): ?>
+                                       <!--  <?php if ($examen['calificacion'] !== null && $examen['calificacion'] > 0): ?>
                                             <button class="btn btn-sm btn-outline-warning mb-1"
                                                 onclick="imprimirExamen(<?= $examen['id'] ?>)">
                                                 <i class="bi bi-printer-fill me-1"></i> Imprimir Examen
                                             </button>
-                                        <?php endif; ?>
+                                        <?php endif; ?> -->
 
                                     </td>
                                 </tr>

@@ -22,6 +22,7 @@ try {
                 categorias.nombre AS categoria,
                 examenes.total_preguntas,
                 examenes.calificacion,
+                examenes.codigo_acceso,
                 examenes.fecha_asignacion
             FROM estudiantes
             LEFT JOIN examenes ON examenes.estudiante_id = estudiantes.id
@@ -45,7 +46,7 @@ try {
 
     // Crear QR temporal
     $qrData = "Nombre: {$resultado['nombre']} {$resultado['apellidos']}\n"
-        . "Usuario: {$resultado['usuario']}\n"
+        . "Codigo: {$resultado['codigo_acceso']}\n"
         . "Email: {$resultado['email']}\n"
         . "Fecha: {$resultado['fecha_asignacion']}";
     $qrTempFile = tempnam(sys_get_temp_dir(), 'qr_') . '.png';
@@ -84,11 +85,11 @@ try {
         'Nombre' => $resultado['nombre'],
         'Apellidos' => $resultado['apellidos'],
         'Email' => $resultado['email'],
-        'Usuario' => $resultado['usuario'],
+        'Codigo' => $resultado['codigo_acceso'],
         'Categoría' => $resultado['categoria'],
         'T.Preguntas' => $resultado['total_preguntas'],
         'F.Examen' => $resultado['fecha_asignacion'],
-        'Calificacion' => $resultado['calificacion'],
+        /* 'Calificacion' => $resultado['calificacion'], */
     ];
 
     foreach ($campos as $label => $valor) {

@@ -136,8 +136,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <th><i class="bi bi-check-circle-fill me-1"></i> Aciertos</th>
                         <th><i class="bi bi-x-circle-fill me-1"></i> Fallos</th>
                         <th><i class="bi bi-toggle-on me-1"></i> Estado</th>
-                        <th><i class="bi bi-clipboard-check-fill me-1"></i> Calificación</th>
-                        <th><i class="bi bi-gear-fill me-1"></i> Acciones</th>
+                        <th><i class="bi bi-clipboard-check-fill me-1"></i> Calificación</th> 
                     </tr>
                 </thead>
                 <tbody>
@@ -181,15 +180,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         —
                                     <?php endif; ?>
                                 </td>
-                                <td class="text-center">
-                                    <div class="d-flex gap-2 justify-content-center flex-wrap">
-                                        <button class="btn btn-sm btn-outline-primary"
-                                            onclick="verExamen(<?= $examen['examen_id'] ?>)">
-                                            <i class="bi bi-file-earmark-pdf-fill"></i>
-                                            PDF
-                                        </button>
-                                    </div>
-                                </td>
+                          
 
                             </tr>
                         <?php endforeach; ?>
@@ -302,7 +293,6 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         filterTable();
     });
 
-
     function verExamen(idExamen) {
         window.open(`../libreria/imprimir_detalles_examen.php?id=${idExamen}`, '_blank');
 
@@ -310,7 +300,5 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
 </script>
-
-
 
 <?php include_once('../includes/footer.php'); ?>
