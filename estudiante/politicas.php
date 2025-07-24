@@ -13,7 +13,7 @@ $codigo = $examen['codigo_acceso'] ?? '';
 $estudiante_id = (int)($examen['estudiante_id'] ?? 0);
 $examen_id = (int)($examen['examen_id'] ?? 15);
 $preguntas = $examen['total_preguntas'] ?? 30;
-$duracion = $examen['duracion'] ?? 10;
+$duracion = $examen['duracion'] ?? 50;
 
 
 ?>
@@ -176,8 +176,7 @@ $duracion = $examen['duracion'] ?? 10;
     const totalTiempo = <?= json_encode((int)$duracion) ?>;
     document.getElementById('exam-questions').textContent = totalPreguntas + ' preguntas';
  
-
-    document.getElementById('exam-duration').textContent = totalTiempo +' minutos';
+    document.getElementById('exam-duration').textContent = ((totalTiempo * 50) / 60).toFixed(2) + ' minutos';
     
     document.getElementById('exam-attempts').textContent = '1 intento';
 </script>
