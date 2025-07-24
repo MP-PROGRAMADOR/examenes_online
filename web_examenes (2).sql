@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 03-07-2025 a las 09:50:21
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Servidor: localhost:3306
+-- Tiempo de generación: 24-07-2025 a las 14:54:17
+-- Versión del servidor: 10.4.25-MariaDB
+-- Versión de PHP: 8.1.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -32,7 +32,7 @@ CREATE TABLE `categorias` (
   `nombre` varchar(50) NOT NULL,
   `descripcion` text DEFAULT NULL,
   `edad_minima` tinyint(3) UNSIGNED NOT NULL DEFAULT 15
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `categorias`
@@ -67,7 +67,7 @@ CREATE TABLE `correos_enviados` (
   `cuerpo` text DEFAULT NULL,
   `enviado_por` int(11) DEFAULT NULL,
   `enviado_en` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -86,15 +86,14 @@ CREATE TABLE `escuelas_conduccion` (
   `pais` varchar(100) DEFAULT 'Guinea Ecuatorial',
   `ubicacion` varchar(50) NOT NULL,
   `numero_registro` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `escuelas_conduccion`
 --
 
 INSERT INTO `escuelas_conduccion` (`id`, `nombre`, `telefono`, `director`, `nif`, `ciudad`, `correo`, `pais`, `ubicacion`, `numero_registro`) VALUES
-(1, 'Nana mangue', '', '', '', 'Malabo', NULL, 'Guinea Ecuatorial', '', ''),
-(2, 'babe', '', '', '', 'baney', NULL, 'Guinea Ecuatorial', '', '');
+(1, 'Guinea Circula', '222478702', 'Serafin Riberi Belope', '00987654', 'Malabo', 'salvadormete2@gmail.com', 'Guinea Ecuatorial', 'Buena Esperanza I', '98302');
 
 -- --------------------------------------------------------
 
@@ -113,27 +112,12 @@ CREATE TABLE `estudiantes` (
   `estado` enum('activo','inactivo') DEFAULT 'activo',
   `creado_en` datetime DEFAULT current_timestamp(),
   `apellidos` varchar(250) DEFAULT NULL,
-  `direccion` varchar(250) DEFAULT NULL, 
+  `direccion` varchar(250) DEFAULT NULL,
+  `usuario` varchar(100) NOT NULL,
   `Doc` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Volcado de datos para la tabla `estudiantes`
---
 
-INSERT INTO `estudiantes` (`id`, `dni`, `nombre`, `email`, `telefono`, `fecha_nacimiento`, `escuela_id`, `estado`, `creado_en`, `apellidos`, `direccion`, `usuario`, `Doc`) VALUES
-(3, '00012589741', 'Bubi', 'marie@gmail.com', '555214782', '2004-05-04', 1, 'activo', '2025-05-20 12:26:08', 'mabale', 'adfg', 'ENA25181', ''),
-(4, '000121415', 'jesus', 'jes@gmail.com', '222141516', '2000-01-26', 1, 'inactivo', '2025-05-26 10:33:06', 'topola', 'Bisinga', 'ENA2546A', ''),
-(5, '874653', 'salvador', 'salvadormete4@gmail.com', '33309876543', '2004-02-04', 1, 'activo', '2025-05-28 11:00:13', 'mete bijeri', 'buena esperanza 1', 'ENA25454', ''),
-(6, '00948371', 'panchos', 'spaocholojilo@gmail.com', '333098765', '2000-05-09', 1, 'activo', '2025-06-09 09:07:05', 'asitos', 'campo yaunde', 'ENA25104', '0406'),
-(7, '114477', 'Serafina', 'bapori@gmail.com', '555477895', '2004-06-10', 1, 'activo', '2025-06-10 14:00:56', 'Bapori', 'Lampert', 'ENA2562D', '401'),
-(8, '258963', 'Marta', 'tortosa@gmail.com', '55514152', '2002-06-12', 1, 'activo', '2025-06-10 15:48:48', 'Tortosa', 'Malabo 2 de semu', 'ENA2568D', '4012');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `estudiante_categorias`
---
 
 CREATE TABLE `estudiante_categorias` (
   `id` int(11) NOT NULL,
@@ -142,27 +126,9 @@ CREATE TABLE `estudiante_categorias` (
   `estado` enum('pendiente','aprobado','rechazado','en_proceso') DEFAULT 'pendiente',
   `fecha_asignacion` datetime DEFAULT current_timestamp(),
   `fecha_aprobacion` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Volcado de datos para la tabla `estudiante_categorias`
---
 
-INSERT INTO `estudiante_categorias` (`id`, `estudiante_id`, `categoria_id`, `estado`, `fecha_asignacion`, `fecha_aprobacion`) VALUES
-(2, 3, 4, 'pendiente', '2025-05-20 16:01:46', NULL),
-(4, 4, 4, 'pendiente', '2025-05-26 10:33:06', NULL),
-(5, 5, 4, 'pendiente', '2025-05-28 11:00:13', NULL),
-(6, 6, 1, 'pendiente', '2025-06-09 09:07:05', NULL),
-(11, 4, 12, 'pendiente', '2025-06-09 14:24:48', NULL),
-(12, 7, 6, 'en_proceso', '2025-06-10 14:00:56', '2025-06-14 10:06:59'),
-(13, 8, 6, 'aprobado', '2025-06-10 15:48:48', '2025-06-11 12:24:22'),
-(14, 7, 4, 'pendiente', '2025-06-16 11:03:29', NULL);
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `examenes`
---
 
 CREATE TABLE `examenes` (
   `id` int(11) NOT NULL,
@@ -175,70 +141,24 @@ CREATE TABLE `examenes` (
   `estado` enum('pendiente','en_progreso','finalizado','INICIO') DEFAULT 'pendiente',
   `calificacion` decimal(5,2) DEFAULT NULL,
   `codigo_acceso` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Volcado de datos para la tabla `examenes`
---
-
-INSERT INTO `examenes` (`id`, `estudiante_id`, `categoria_id`, `asignado_por`, `fecha_asignacion`, `duracion`, `total_preguntas`, `estado`, `calificacion`, `codigo_acceso`) VALUES
-(11, 5, 4, 1, '2025-06-15 00:00:00', 4, 5, 'INICIO', NULL, 'EXAM009514'),
-(12, 4, 12, 1, '2025-06-15 00:00:00', 4, 5, 'pendiente', NULL, 'EXAM247591'),
-(13, 8, 6, 1, '2025-06-12 00:00:00', 4, 5, 'finalizado', 80.00, 'EXAM551027'),
-(14, 7, 6, 1, '2025-06-21 00:00:00', 8, 10, 'finalizado', 75.83, 'EXAM821332'),
-(15, 7, 6, 1, '2025-06-16 00:00:00', 4, 5, 'INICIO', NULL, 'EXAM602946');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `examen_preguntas`
---
 
 CREATE TABLE `examen_preguntas` (
   `id` int(11) NOT NULL,
   `examen_id` int(11) NOT NULL,
   `pregunta_id` int(11) NOT NULL,
   `respondida` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Volcado de datos para la tabla `examen_preguntas`
---
 
-INSERT INTO `examen_preguntas` (`id`, `examen_id`, `pregunta_id`, `respondida`) VALUES
-(89, 11, 23, 1),
-(90, 11, 28, 1),
-(91, 11, 57, 0),
-(92, 11, 55, 0),
-(93, 11, 42, 0),
-(94, 13, 53, 1),
-(95, 13, 45, 1),
-(96, 13, 52, 1),
-(97, 13, 57, 1),
-(98, 13, 25, 1),
-(99, 14, 53, 1),
-(100, 14, 52, 1),
-(101, 14, 23, 1),
-(102, 14, 39, 1),
-(103, 14, 28, 1),
-(104, 14, 50, 1),
-(105, 14, 24, 1),
-(106, 14, 57, 1),
-(107, 14, 26, 1),
-(108, 14, 56, 1);
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `imagenes_pregunta`
---
 
 CREATE TABLE `imagenes_pregunta` (
   `id` int(11) NOT NULL,
   `pregunta_id` int(11) NOT NULL,
   `ruta_imagen` varchar(255) NOT NULL,
   `descripcion` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `imagenes_pregunta`
@@ -262,7 +182,7 @@ CREATE TABLE `opciones_pregunta` (
   `pregunta_id` int(11) NOT NULL,
   `texto` varchar(255) NOT NULL,
   `es_correcta` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `opciones_pregunta`
@@ -382,7 +302,115 @@ INSERT INTO `opciones_pregunta` (`id`, `pregunta_id`, `texto`, `es_correcta`) VA
 (150, 56, 'La señal C', 0),
 (151, 57, 'Inicio de doble mano.', 0),
 (152, 57, 'Encrucijada (bifurcación).', 1),
-(153, 57, 'Estrechamiento (en una sola mano).', 0);
+(153, 57, 'Estrechamiento (en una sola mano).', 0),
+(154, 58, '100 km/h', 0),
+(155, 58, '90 km/h', 1),
+(156, 58, '80 km/h', 0),
+(157, 59, 'Que se puede adelantar si no viene nadie', 0),
+(158, 59, 'Que está prohibido adelantar', 1),
+(159, 59, 'Que es una vía de doble sentido', 0),
+(160, 60, 'Tocar el claxon para avisarle', 0),
+(161, 60, 'Reducir la velocidad', 0),
+(162, 60, 'Detenerse y ceder el paso', 1),
+(163, 61, '0,25 mg/l', 1),
+(164, 61, '0,5 mg/l', 0),
+(165, 61, '0,0 mg/l', 0),
+(166, 62, 'No, solo para el conductor', 0),
+(167, 62, 'Sí, siempre', 1),
+(168, 62, 'Solo si circula por carretera', 0),
+(169, 63, 'No', 0),
+(170, 63, 'Sí, si se hace a velocidad moderada y con precaución', 1),
+(171, 63, 'Sí, a cualquier velocidad', 0),
+(172, 64, '100 km/h', 0),
+(173, 64, '90 km/h', 0),
+(174, 64, '80 km/h', 1),
+(175, 65, 'Solo freno de servicio', 0),
+(176, 65, 'Freno de estacionamiento y freno de emergencia', 1),
+(177, 65, 'Freno de mano únicamente', 0),
+(178, 66, 'Permiso de circulación', 0),
+(179, 66, 'Ficha técnica del vehículo', 0),
+(180, 66, 'Carta de porte y autorización ADR', 1),
+(181, 67, 'Acelerar con suavidad', 0),
+(182, 67, 'Frenar bruscamente', 0),
+(183, 67, 'Conducir con especial precaución', 1),
+(184, 68, '10 horas', 0),
+(185, 68, '9 horas', 1),
+(186, 68, '8 horas', 0),
+(187, 69, 'No', 0),
+(188, 69, 'Sí', 1),
+(189, 69, 'Solo en trayectos superiores a 50 km', 0),
+(190, 70, 'Cuando hay un peatón cruzando en un paso de cebra.', 1),
+(191, 70, 'Cuando un semáforo está en rojo.', 1),
+(192, 70, 'Cuando circula un ciclista por el carril derecho.', 0),
+(193, 70, 'Cuando hay una señal de ceda el paso.', 0),
+(194, 71, 'Permiso de conducción correspondiente', 1),
+(195, 71, 'Seguro obligatorio del vehículo', 1),
+(196, 71, 'Pasaporte del conductor', 0),
+(197, 71, 'Permiso de circulación del vehículo', 1),
+(198, 72, 'Chaleco reflectante', 1),
+(199, 72, 'Dos triángulos de preseñalización', 1),
+(200, 72, 'Extintor', 0),
+(201, 72, 'Una rueda de repuesto o kit reparapinchazos', 1),
+(202, 73, 'Dos espejos retrovisores', 1),
+(203, 73, 'Luz de posición trasera', 1),
+(204, 73, 'Botiquín de primeros auxilios', 0),
+(205, 73, 'Silenciador de escape en buen estado', 1),
+(206, 74, 'Reducir la velocidad', 1),
+(207, 74, 'Usar ropa reflectante', 1),
+(208, 74, 'Frenar bruscamente al inicio de la curva', 0),
+(209, 74, 'Evitar circular sobre marcas viales pintadas', 1),
+(210, 75, 'Estado de los frenos', 1),
+(211, 75, 'Nivel de aceite del motor', 1),
+(212, 75, 'Color de la matrícula', 0),
+(213, 75, 'Presión de los neumáticos', 1),
+(214, 76, 'Avería del sistema de frenos', 1),
+(215, 76, 'Pérdida de carga en circulación', 1),
+(216, 76, 'Falta de aire acondicionado', 0),
+(217, 76, 'Accidente o emergencia en la vía', 1),
+(218, 77, 'Garantizar la seguridad durante el trayecto', 1),
+(219, 77, 'Informar sobre las paradas', 1),
+(220, 77, 'Permitir fumar dentro del autobús', 0),
+(221, 77, 'Asegurarse de que todos están sentados antes de arrancar', 1),
+(222, 78, 'Señal V-10 (transporte escolar)', 1),
+(223, 78, 'Extintor', 1),
+(224, 78, 'Neumáticos de invierno', 0),
+(225, 78, 'Botiquín de primeros auxilios', 1),
+(226, 79, 'Conducir con neumáticos desgastados', 1),
+(227, 79, 'Circular con lluvia o hielo', 1),
+(228, 79, 'Frenar en una recta seca', 0),
+(229, 79, 'Llevar el coche sobrecargado', 1),
+(230, 80, '5 metros', 0),
+(231, 80, '30 metros', 1),
+(232, 80, '60 metros', 0),
+(233, 81, 'Los vehículos', 1),
+(234, 81, 'Los peatones', 0),
+(235, 81, 'Es indistinto', 0),
+(236, 82, 'El factor humano', 0),
+(237, 82, 'El factor vehicular', 0),
+(238, 82, 'El factor humano, ambiental y vehicular', 1),
+(239, 83, 'Por la derecha', 0),
+(240, 83, 'Por cualquier lado', 0),
+(241, 83, 'Siempre por la izquierda', 1),
+(242, 84, 'a 10 Km/h', 0),
+(243, 84, 'a 40 Km/h', 0),
+(244, 84, 'a 20 Km/h', 1),
+(245, 85, 'Es inmovilizarlo reglamentariamente por un tiempo no mayor que el necesario   para el ascenso y descenso de pasajeros ó carga y descarga de cosas.', 1),
+(246, 85, 'Es inmovilizarlo reglamentariamente por un tiempo mayor que el necesario, para  el ascenso y descenso de pasajeros ó carga y descarga de cosas', 0),
+(247, 86, '15 Km/h', 0),
+(248, 86, '60 Km/h', 0),
+(249, 86, '40 Km/h', 1),
+(250, 87, 'Espera a que el semáforo indique luz verde y entonces continúa', 0),
+(251, 87, 'Obedece la seña del Policía', 1),
+(252, 87, 'Le Indica al Policía que la luz está roja', 0),
+(253, 88, 'El estado del tránsito y las condiciones de la vía', 1),
+(254, 88, 'El límite de velocidad máximo permitido', 0),
+(255, 88, 'El estado de los vehículos', 0),
+(256, 89, 'Sugerencias', 0),
+(257, 89, 'Ordenes impuestas por Leyes y Ordenanzas', 1),
+(258, 89, 'Información general', 0),
+(259, 90, 'Advierten sobre un cambio de normalidad en la vía', 1),
+(260, 90, 'Ordenan y exigen un determinado comportamiento del conductor', 0),
+(261, 90, 'Informan sobre servicios disponibles en la vía', 0);
 
 -- --------------------------------------------------------
 
@@ -397,7 +425,7 @@ CREATE TABLE `preguntas` (
   `tipo_contenido` enum('texto','ilustracion') NOT NULL,
   `activa` tinyint(1) DEFAULT 1,
   `creado_en` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `preguntas`
@@ -441,7 +469,40 @@ INSERT INTO `preguntas` (`id`, `texto`, `tipo`, `tipo_contenido`, `activa`, `cre
 (54, 'El siguiente símbolo indica que se trata de un carril que debe ser liberado cuando se aproxima un vehículo en emergencia.', 'vf', 'ilustracion', 1, '2025-06-11 11:28:02'),
 (55, 'La señal que se muestra es una señal preventiva, de máximo peligro, que anuncia la existencia de un tramo de vía con fuerte pendiente descendente.', 'vf', 'ilustracion', 1, '2025-06-11 11:29:18'),
 (56, '¿Cuál de estas señales es Reglamentaria?', 'unica', 'ilustracion', 1, '2025-06-11 11:32:28'),
-(57, 'Determine qué indica la señal que a continuación se presenta:', 'unica', 'ilustracion', 1, '2025-06-11 11:34:47');
+(57, 'Determine qué indica la señal que a continuación se presenta:', 'unica', 'ilustracion', 1, '2025-06-11 11:34:47'),
+(58, '¿Cuál es la velocidad máxima permitida en una carretera convencional para un turismo sin remolque? opción unica', 'unica', 'texto', 1, '2025-07-24 11:05:33'),
+(59, '¿Qué indica una línea continua en el centro de la calzada? opción única', 'unica', 'texto', 1, '2025-07-24 11:07:01'),
+(60, '¿Qué debe hacer un conductor si un peatón ciego con bastón blanco desea cruzar por un paso de peatones? opción única ', 'unica', 'texto', 1, '2025-07-24 11:08:14'),
+(61, '¿Cuál es la tasa máxima de alcohol permitida para un conductor de motocicleta en mg/l en aire espirado? opción única', 'unica', 'texto', 1, '2025-07-24 11:09:15'),
+(62, 'En una moto, ¿es obligatorio el uso de casco para el pasajero? opción única', 'unica', 'texto', 1, '2025-07-24 11:10:16'),
+(63, '¿Está permitido circular entre los coches en un atasco con una moto? opción única', 'unica', 'texto', 1, '2025-07-24 11:11:18'),
+(64, '¿Cuál es la velocidad máxima permitida para un camión en autopista? opción única ', 'unica', 'texto', 1, '2025-07-24 11:13:42'),
+(65, '¿Qué tipo de freno debe tener obligatoriamente un vehículo de transporte de mercancías pesadas? opción única ', 'unica', 'texto', 1, '2025-07-24 11:15:51'),
+(66, '¿Qué documento específico debe llevar un camión que transporta mercancías peligrosas?', 'unica', 'texto', 1, '2025-07-24 11:16:59'),
+(67, '¿Qué debe hacer un conductor de autobús si un pasajero se encuentra de pie mientras el vehículo está en marcha? opción única', 'unica', 'texto', 1, '2025-07-24 11:18:24'),
+(68, '¿Cuál es el número máximo de horas diarias de conducción permitidas para un conductor profesional de autobús? opción única ', 'unica', 'texto', 1, '2025-07-24 11:19:57'),
+(69, '¿Es obligatorio el tacógrafo en los autobuses de transporte público interurbano? opción única ', 'unica', 'texto', 1, '2025-07-24 11:22:30'),
+(70, '¿Cuáles de estas situaciones obligan a detener el vehículo? opción múltiple ', 'multiple', 'texto', 1, '2025-07-24 11:27:22'),
+(71, '¿Qué documentos son obligatorios para circular con un turismo? opción multiple', 'multiple', 'texto', 1, '2025-07-24 11:29:02'),
+(72, '¿Qué elementos forman parte del equipo obligatorio de un coche? opción múltiple', 'multiple', 'texto', 1, '2025-07-24 11:40:37'),
+(73, '¿Qué elementos son obligatorios en una motocicleta para la seguridad? opción múltiple ', 'multiple', 'texto', 1, '2025-07-24 11:42:58'),
+(74, '¿Qué precauciones debe tomar un motorista en días de lluvia?', 'multiple', 'texto', 1, '2025-07-24 11:44:14'),
+(75, '¿Qué elementos deben revisarse antes de iniciar un viaje con un camión? opción múltiple', 'unica', 'texto', 1, '2025-07-24 11:47:08'),
+(76, '¿Qué circunstancias obligan a detener un camión en carretera? opción múltiple', 'multiple', 'texto', 1, '2025-07-24 11:54:49'),
+(77, '¿Qué obligaciones tiene un conductor de autobús hacia sus pasajeros? opción múltiple', 'multiple', 'texto', 1, '2025-07-24 11:58:11'),
+(78, '¿Qué elementos son obligatorios en un autobús de transporte escolar? opción múltiple', 'multiple', 'texto', 1, '2025-07-24 11:59:55'),
+(79, '¿Qué situaciones pueden aumentar la distancia de frenado de un vehículo? opción múltiple', 'unica', 'texto', 1, '2025-07-24 12:02:15'),
+(80, '¿Cuántos metros, antes de llegar a una intersección,  deberá anunciar la  \r\nmaniobra si se propone girar a la  izquierda ó a la derecha? opción única ', 'unica', 'texto', 1, '2025-07-24 12:21:59'),
+(81, ' ¿Quién tiene prioridad de paso en las carreteras, fuera de las zonas urbanas? opción única ', 'unica', 'texto', 1, '2025-07-24 12:23:50'),
+(82, '¿Cuáles son los factores que intervienen en el tránsito? opción única ', 'unica', 'texto', 1, '2025-07-24 12:25:39'),
+(83, '¿Por qué lugar de la calzada se debe adelantar a otros  vehículos? opción unica', 'unica', 'texto', 1, '2025-07-24 12:27:24'),
+(84, 'Al llegar a una encrucijada o cruce de calle, ¿A qué velocidad se debe  \r\ncircular?', 'unica', 'texto', 1, '2025-07-24 12:30:47'),
+(85, '¿Qué se entiende por detener un vehículo? opción única', 'unica', 'texto', 1, '2025-07-24 12:32:16'),
+(86, '¿Cuál es el límite máximo de velocidad en zona urbana? opción única ', 'unica', 'texto', 1, '2025-07-24 12:34:46'),
+(87, ' ¿Qué debe hacer Usted si llegando a un cruce en el que el semáforo indica \r\nroja, un Policía le hace señas para que siga?', 'unica', 'texto', 1, '2025-07-24 12:36:57'),
+(88, 'La distancia a la que Usted debe mantenerse detrás del vehículo que va  \r\ndelante suyo, depende de:', 'unica', 'texto', 1, '2025-07-24 12:39:09'),
+(89, '¿Qué transmiten las señales reglamentarias? opción única ', 'unica', 'texto', 1, '2025-07-24 12:42:05'),
+(90, '¿Qué transmiten las señales de prevención?', 'unica', 'texto', 1, '2025-07-24 12:44:03');
 
 -- --------------------------------------------------------
 
@@ -453,7 +514,7 @@ CREATE TABLE `pregunta_categoria` (
   `id` int(11) NOT NULL,
   `pregunta_id` int(11) NOT NULL,
   `categoria_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `pregunta_categoria`
@@ -730,7 +791,173 @@ INSERT INTO `pregunta_categoria` (`id`, `pregunta_id`, `categoria_id`) VALUES
 (311, 57, 9),
 (312, 57, 11),
 (313, 57, 10),
-(314, 57, 13);
+(314, 57, 13),
+(315, 58, 4),
+(316, 59, 4),
+(317, 60, 4),
+(318, 61, 1),
+(319, 62, 1),
+(320, 63, 1),
+(321, 64, 6),
+(322, 65, 6),
+(323, 66, 6),
+(324, 67, 9),
+(325, 68, 9),
+(326, 69, 9),
+(327, 70, 4),
+(328, 71, 4),
+(329, 72, 4),
+(330, 73, 1),
+(332, 74, 1),
+(333, 75, 6),
+(334, 76, 6),
+(335, 77, 9),
+(336, 78, 9),
+(337, 79, 1),
+(338, 79, 2),
+(339, 79, 3),
+(340, 79, 12),
+(341, 79, 4),
+(342, 79, 5),
+(343, 79, 6),
+(344, 79, 8),
+(345, 79, 7),
+(346, 79, 9),
+(347, 79, 11),
+(348, 79, 10),
+(349, 79, 13),
+(350, 80, 1),
+(351, 80, 2),
+(352, 80, 3),
+(353, 80, 12),
+(354, 80, 4),
+(355, 80, 5),
+(356, 80, 6),
+(357, 80, 8),
+(358, 80, 7),
+(359, 80, 9),
+(360, 80, 11),
+(361, 80, 10),
+(362, 80, 13),
+(363, 81, 1),
+(364, 81, 2),
+(365, 81, 3),
+(366, 81, 12),
+(367, 81, 4),
+(368, 81, 5),
+(369, 81, 6),
+(370, 81, 8),
+(371, 81, 7),
+(372, 81, 9),
+(373, 81, 11),
+(374, 81, 10),
+(375, 81, 13),
+(376, 82, 1),
+(377, 82, 2),
+(378, 82, 3),
+(379, 82, 12),
+(380, 82, 4),
+(381, 82, 5),
+(382, 82, 6),
+(383, 82, 8),
+(384, 82, 7),
+(385, 82, 9),
+(386, 82, 11),
+(387, 82, 10),
+(388, 82, 13),
+(389, 83, 1),
+(390, 83, 2),
+(391, 83, 3),
+(392, 83, 12),
+(393, 83, 4),
+(394, 83, 5),
+(395, 83, 6),
+(396, 83, 8),
+(397, 83, 7),
+(398, 83, 9),
+(399, 83, 11),
+(400, 83, 10),
+(401, 83, 13),
+(402, 84, 1),
+(403, 84, 2),
+(404, 84, 3),
+(405, 84, 12),
+(406, 84, 4),
+(407, 84, 5),
+(408, 84, 6),
+(409, 84, 8),
+(410, 84, 7),
+(411, 84, 9),
+(412, 84, 11),
+(413, 84, 10),
+(414, 84, 13),
+(415, 85, 4),
+(416, 85, 5),
+(417, 86, 1),
+(418, 86, 2),
+(419, 86, 3),
+(420, 86, 12),
+(421, 86, 4),
+(422, 86, 5),
+(423, 86, 6),
+(424, 86, 8),
+(425, 86, 7),
+(426, 86, 9),
+(427, 86, 11),
+(428, 86, 10),
+(429, 86, 13),
+(430, 87, 1),
+(431, 87, 2),
+(432, 87, 3),
+(433, 87, 12),
+(434, 87, 4),
+(435, 87, 5),
+(436, 87, 6),
+(437, 87, 8),
+(438, 87, 7),
+(439, 87, 9),
+(440, 87, 11),
+(441, 87, 10),
+(442, 87, 13),
+(443, 88, 1),
+(444, 88, 2),
+(445, 88, 3),
+(446, 88, 12),
+(447, 88, 4),
+(448, 88, 5),
+(449, 88, 6),
+(450, 88, 8),
+(451, 88, 7),
+(452, 88, 9),
+(453, 88, 11),
+(454, 88, 10),
+(455, 88, 13),
+(456, 89, 1),
+(457, 89, 2),
+(458, 89, 3),
+(459, 89, 12),
+(460, 89, 4),
+(461, 89, 5),
+(462, 89, 6),
+(463, 89, 8),
+(464, 89, 7),
+(465, 89, 9),
+(466, 89, 11),
+(467, 89, 10),
+(468, 89, 13),
+(469, 90, 1),
+(470, 90, 2),
+(471, 90, 3),
+(472, 90, 12),
+(473, 90, 4),
+(474, 90, 5),
+(475, 90, 6),
+(476, 90, 8),
+(477, 90, 7),
+(478, 90, 9),
+(479, 90, 11),
+(480, 90, 10),
+(481, 90, 13);
 
 -- --------------------------------------------------------
 
@@ -743,42 +970,9 @@ CREATE TABLE `respuestas_estudiante` (
   `examen_pregunta_id` int(11) NOT NULL,
   `opcion_id` int(11) DEFAULT NULL,
   `fecha_respuesta` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Volcado de datos para la tabla `respuestas_estudiante`
---
 
-INSERT INTO `respuestas_estudiante` (`id`, `examen_pregunta_id`, `opcion_id`, `fecha_respuesta`) VALUES
-(302, 89, 55, '2025-06-11 11:41:07'),
-(303, 90, 72, '2025-06-11 11:41:26'),
-(304, 90, 73, '2025-06-11 11:41:26'),
-(305, 90, 75, '2025-06-11 11:41:26'),
-(306, 94, 142, '2025-06-11 12:23:02'),
-(307, 95, 45, '2025-06-11 12:23:17'),
-(308, 96, 52, '2025-06-11 12:23:26'),
-(309, 97, 152, '2025-06-11 12:23:54'),
-(310, 98, 61, '2025-06-11 12:24:22'),
-(311, 99, 142, '2025-06-14 10:05:16'),
-(312, 100, 52, '2025-06-14 10:05:25'),
-(313, 101, 54, '2025-06-14 10:05:32'),
-(314, 102, 116, '2025-06-14 10:05:49'),
-(315, 102, 117, '2025-06-14 10:05:49'),
-(316, 102, 118, '2025-06-14 10:05:49'),
-(317, 103, 72, '2025-06-14 10:06:02'),
-(318, 103, 73, '2025-06-14 10:06:02'),
-(319, 103, 75, '2025-06-14 10:06:02'),
-(320, 104, 50, '2025-06-14 10:06:08'),
-(321, 105, 57, '2025-06-14 10:06:20'),
-(322, 106, 152, '2025-06-14 10:06:28'),
-(323, 107, 66, '2025-06-14 10:06:48'),
-(324, 108, 150, '2025-06-14 10:06:59');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `usuarios`
---
 
 CREATE TABLE `usuarios` (
   `id` int(11) NOT NULL,
@@ -788,7 +982,7 @@ CREATE TABLE `usuarios` (
   `rol` enum('admin','examinador','secretaria') NOT NULL,
   `creado_en` datetime DEFAULT current_timestamp(),
   `activo` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `usuarios`
@@ -830,9 +1024,8 @@ ALTER TABLE `estudiantes`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `dni` (`dni`),
   ADD UNIQUE KEY `usuario` (`usuario`),
-  ADD UNIQUE KEY `email` (`email`),
-  ADD UNIQUE KEY `email_2` (`email`),
   ADD KEY `escuela_id` (`escuela_id`);
+ALTER TABLE `estudiantes` ADD FULLTEXT KEY `email_3` (`email`);
 
 --
 -- Indices de la tabla `estudiante_categorias`
@@ -923,31 +1116,31 @@ ALTER TABLE `correos_enviados`
 -- AUTO_INCREMENT de la tabla `escuelas_conduccion`
 --
 ALTER TABLE `escuelas_conduccion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `estudiantes`
 --
 ALTER TABLE `estudiantes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT de la tabla `estudiante_categorias`
 --
 ALTER TABLE `estudiante_categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT de la tabla `examenes`
 --
 ALTER TABLE `examenes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT de la tabla `examen_preguntas`
 --
 ALTER TABLE `examen_preguntas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=109;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=129;
 
 --
 -- AUTO_INCREMENT de la tabla `imagenes_pregunta`
@@ -959,25 +1152,25 @@ ALTER TABLE `imagenes_pregunta`
 -- AUTO_INCREMENT de la tabla `opciones_pregunta`
 --
 ALTER TABLE `opciones_pregunta`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=154;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=262;
 
 --
 -- AUTO_INCREMENT de la tabla `preguntas`
 --
 ALTER TABLE `preguntas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
 
 --
 -- AUTO_INCREMENT de la tabla `pregunta_categoria`
 --
 ALTER TABLE `pregunta_categoria`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=315;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=482;
 
 --
 -- AUTO_INCREMENT de la tabla `respuestas_estudiante`
 --
 ALTER TABLE `respuestas_estudiante`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=325;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=340;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
@@ -1051,6 +1244,3 @@ ALTER TABLE `respuestas_estudiante`
   ADD CONSTRAINT `respuestas_estudiante_ibfk_2` FOREIGN KEY (`opcion_id`) REFERENCES `opciones_pregunta` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

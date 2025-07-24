@@ -271,7 +271,7 @@ foreach ($examenes as $ex) {
 
           <div class="col-md-6">
             <label for="total_preguntas" class="form-label">Total de Preguntas</label>
-            <input type="number" class="form-control" id="total_preguntas" value="5" name="total_preguntas" min="5"
+            <input type="number" class="form-control" id="total_preguntas" value="30" name="total_preguntas" min="5"
               required readonly>
             <span id="preguntas_disponibles" class="text-fs-2"></span>
           </div>

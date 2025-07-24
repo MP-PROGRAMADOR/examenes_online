@@ -4,11 +4,13 @@
    
   </div>
   <!-- Bootstrap Bundle JS (necesario para componentes interactivos) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../js/bootstrap.bundle.min.js"></script>
+<script src="../js/chart.js"></script>
+
+
 
 <!-- MDB JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"></script>
+<script src="../js/mdb.min.js"></script>
 <script src="../js/alerta.js"></script>
  
   <script>
