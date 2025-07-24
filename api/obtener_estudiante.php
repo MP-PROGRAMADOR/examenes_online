@@ -10,6 +10,7 @@ header('Content-Type: application/json');
 $response = [
     'status' => false,
     'message' => 'Error desconocido.'
+    
 ];
 
 // Verifica si se proporcionó el ID del estudiante en la URL.

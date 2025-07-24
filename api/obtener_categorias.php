@@ -29,6 +29,7 @@ try {
            'data' => 'sin categorias'
         ]);
         exit;
+        
 
     }
     // Devolver JSON

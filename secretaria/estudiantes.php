@@ -591,6 +591,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
       configurarSubmitEstudiante();
     }
 
+    
     // Editar estudiante (obtiene datos y abre modal)
     async function editarEstudiante(id) {
       try {
