@@ -43,7 +43,6 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
             <tr>
               <th>ID</th>
               <th>Nombre</th>
-              <th>Estado</th>
               <th>DNI</th>
               <th>Escuela</th>
               <th>Email</th>
@@ -51,8 +50,9 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
               <th>Teléfono</th>
               <th>Dirección</th>
               <th>Categoría</th>
-              <th>Usuario</th>
+             
               <th>Documento</th>
+              <th>Estado</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -348,6 +348,14 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
                         <tr>
                             <td class="text-center">${est.id}</td>
                             <td>${htmlspecialchars(est.apellidos)} ${htmlspecialchars(est.nombre)}</td>
+                            <td>${htmlspecialchars(est.dni)}</td>
+                            <td>${htmlspecialchars(est.escuela_nombre || '—')}</td> <td>${htmlspecialchars(est.email)}</td>
+                            <td>${htmlspecialchars(est.fecha_nacimiento)}</td>
+                            <td>${htmlspecialchars(est.telefono)}</td>
+                            <td>${htmlspecialchars(est.direccion)}</td>
+                            <td>${htmlspecialchars(est.categoria_nombre || '—')}</td> 
+                            
+                            <td>${htmlspecialchars(est.Doc)}</td>
                             <td class="text-center">
                                 ${est.estado === 'activo' ? `
                                     <button class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
@@ -363,13 +371,6 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
                                     </button>`
             }
                             </td>
-                            <td>${htmlspecialchars(est.dni)}</td>
-                            <td>${htmlspecialchars(est.escuela_nombre || '—')}</td> <td>${htmlspecialchars(est.email)}</td>
-                            <td>${htmlspecialchars(est.fecha_nacimiento)}</td>
-                            <td>${htmlspecialchars(est.telefono)}</td>
-                            <td>${htmlspecialchars(est.direccion)}</td>
-                            <td>${htmlspecialchars(est.categoria_nombre || '—')}</td> <td>${htmlspecialchars(est.usuario)}</td>
-                            <td>${htmlspecialchars(est.Doc)}</td>
                             <td class="text-center">
                                 <button class="btn btn-sm btn-outline-warning me-1" title="Editar"
                                     onclick="editarEstudiante(${est.id})">
