@@ -408,13 +408,14 @@ LIMIT :inicio, :limite
           </table>
         </div>
       </div>
-    </div>
+    </div> 
   </div>
 </div>
 
 
 <!-- Scripts -->
-<script src="../js/jquery.min.js"></script>
+ <script src="../js/jquery-3.7.1.min.js"></script>
+
 <script>
   $(document).ready(function () {
     function filterTable() {

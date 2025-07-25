@@ -253,8 +253,9 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
     </div>
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+   <script src="../js/jquery-3.7.1.min.js"></script>
+   <script src="../js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
@@ -592,7 +593,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
       configurarSubmitEstudiante();
     }
 
-    
+
     // Editar estudiante (obtiene datos y abre modal)
     async function editarEstudiante(id) {
       try {
