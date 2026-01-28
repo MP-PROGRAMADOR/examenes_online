@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -16,19 +17,23 @@
       border-bottom-left-radius: 1rem;
     }
 
-    body, html {
+    body,
+    html {
       margin: 0;
       padding: 0;
       min-height: 100vh;
-      background: #f8f9fa; /* Fondo claro */
+      background: #f8f9fa;
+      /* Fondo claro */
     }
 
-    .container-fluid, #toast-container {
+    .container-fluid,
+    #toast-container {
       position: relative;
       z-index: 2;
     }
   </style>
 </head>
+
 <body class="bg-light min-vh-100 d-flex align-items-center justify-content-center">
 
   <!-- Alerta -->
@@ -80,9 +85,9 @@
 
   <script src="js/alerta.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
       const form = document.getElementById('formLogin');
-      form.addEventListener('submit', function (e) {
+      form.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const formData = new FormData();
@@ -91,25 +96,26 @@
         formData.append('password', document.getElementById('password').value);
 
         fetch('api/login.php', {
-          method: 'POST',
-          body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.status) {
-            mostrarToast('success', data.message);
-            setTimeout(() => window.location.href = data.redirect || 'dashboard.php', 1200);
-          } else {
-            mostrarToast('danger', data.message || 'Credenciales incorrectas');
-          }
-        })
-        .catch(error => {
-          console.error('Error en la solicitud:', error);
-          mostrarToast('danger', 'Ocurrió un error al procesar el login.');
-        });
+            method: 'POST',
+            body: formData
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status) {
+              mostrarToast('success', data.message);
+              setTimeout(() => window.location.href = data.redirect || 'dashboard.php', 1200);
+            } else {
+              mostrarToast('danger', data.message || 'Credenciales incorrectas');
+            }
+          })
+          .catch(error => {
+            console.error('Error en la solicitud:', error);
+            mostrarToast('danger', 'Ocurrió un error al procesar el login.');
+          });
       });
     });
   </script>
 
 </body>
+
 </html>

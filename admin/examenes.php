@@ -105,63 +105,61 @@ foreach ($examenes as $ex) {
               <th><i class="bi bi-gear-fill me-1"></i> Acciones</th>
             </tr>
           </thead>
-         <tbody>
-<?php foreach ($agrupados as $estudiante => $categorias): ?>
-  <tr class="table-primary text-dark fw-bold">
-    <td colspan="10">
-      <button class="btn btn-link text-dark text-decoration-none fw-bold" 
-              data-bs-toggle="collapse" 
-              data-bs-target="#estudiante-<?= md5($estudiante) ?>" 
-              aria-expanded="false">
-        <i class="bi bi-person-fill me-2"></i><?= htmlspecialchars($estudiante) ?>
-      </button>
-    </td>
-  </tr>
-  <tbody id="estudiante-<?= md5($estudiante) ?>" class="collapse">
-    <?php foreach ($categorias as $categoria => $examenes_cat): ?>
-      <tr class="table-secondary fw-semibold">
-        <td colspan="10">
-          <button class="btn btn-link text-dark text-decoration-none fw-semibold" 
-                  data-bs-toggle="collapse" 
-                  data-bs-target="#categoria-<?= md5($estudiante . $categoria) ?>" 
-                  aria-expanded="false">
-            <i class="bi bi-tags-fill me-2"></i><?= htmlspecialchars($categoria) ?>
-          </button>
-        </td>
-      </tr>
-      <tbody id="categoria-<?= md5($estudiante . $categoria) ?>" class="collapse">
-        <?php foreach ($examenes_cat as $examen): ?>
-          <tr>
-            <td class="text-center"><?= $examen['id'] ?></td>
-            <td><?= htmlspecialchars($examen['usuario'] ?? '—') ?></td>
-            <td><?= htmlspecialchars($examen['fecha_asignacion']) ?></td>
-            <td class="text-center"><?= $examen['total_preguntas'] ?></td>
-            <td class="text-center">
-              <span class="badge bg-<?= $examen['estado'] === 'pendiente' ? 'warning' :
-                                      ($examen['estado'] === 'en_progreso' ? 'primary' :
-                                      ($examen['estado'] === 'inicio' ? 'info' : 'success')) ?>">
-                <?= strtoupper($examen['estado']) ?>
-              </span>
-            </td>
-            <td class="text-center"><?= $examen['calificacion'] ?? '—' ?></td>
-            <td class="text-center"><code><?= htmlspecialchars($examen['codigo_acceso']) ?></code></td>
-            <td class="text-center">
-              <div class="d-flex gap-2 justify-content-center flex-wrap">
-                <button class="btn btn-sm btn-outline-primary" onclick="verExamen(<?= $examen['id'] ?>)">
-                  <i class="bi bi-eye-fill me-1"></i> Ver
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="eliminarExamen(<?= $examen['id'] ?>)">
-                  <i class="bi bi-trash-fill me-1"></i> Eliminar
-                </button>
-              </div>
-            </td>
-          </tr>
+          <tbody>
+            <?php foreach ($agrupados as $estudiante => $categorias): ?>
+              <tr class="table-primary text-dark fw-bold">
+                <td colspan="10">
+                  <button class="btn btn-link text-dark text-decoration-none fw-bold"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#estudiante-<?= md5($estudiante) ?>"
+                    aria-expanded="false">
+                    <i class="bi bi-person-fill me-2"></i><?= htmlspecialchars($estudiante) ?>
+                  </button>
+                </td>
+              </tr>
+          <tbody id="estudiante-<?= md5($estudiante) ?>" class="collapse">
+            <?php foreach ($categorias as $categoria => $examenes_cat): ?>
+              <tr class="table-secondary fw-semibold">
+                <td colspan="10">
+                  <button class="btn btn-link text-dark text-decoration-none fw-semibold"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#categoria-<?= md5($estudiante . $categoria) ?>"
+                    aria-expanded="false">
+                    <i class="bi bi-tags-fill me-2"></i><?= htmlspecialchars($categoria) ?>
+                  </button>
+                </td>
+              </tr>
+          <tbody id="categoria-<?= md5($estudiante . $categoria) ?>" class="collapse">
+            <?php foreach ($examenes_cat as $examen): ?>
+              <tr>
+                <td class="text-center"><?= $examen['id'] ?></td>
+                <td><?= htmlspecialchars($examen['usuario'] ?? '—') ?></td>
+                <td><?= htmlspecialchars($examen['fecha_asignacion']) ?></td>
+                <td class="text-center"><?= $examen['total_preguntas'] ?></td>
+                <td class="text-center">
+                  <span class="badge bg-<?= $examen['estado'] === 'pendiente' ? 'warning' : ($examen['estado'] === 'en_progreso' ? 'primary' : ($examen['estado'] === 'inicio' ? 'info' : 'success')) ?>">
+                    <?= strtoupper($examen['estado']) ?>
+                  </span>
+                </td>
+                <td class="text-center"><?= $examen['calificacion'] ?? '—' ?></td>
+                <td class="text-center"><code><?= htmlspecialchars($examen['codigo_acceso']) ?></code></td>
+                <td class="text-center">
+                  <div class="d-flex gap-2 justify-content-center flex-wrap">
+                    <button class="btn btn-sm btn-outline-primary" onclick="verExamen(<?= $examen['id'] ?>)">
+                      <i class="bi bi-eye-fill me-1"></i> Ver
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="eliminarExamen(<?= $examen['id'] ?>)">
+                      <i class="bi bi-trash-fill me-1"></i> Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
         <?php endforeach; ?>
+        </tbody>
+      <?php endforeach; ?>
       </tbody>
-    <?php endforeach; ?>
-  </tbody>
-<?php endforeach; ?>
-</tbody>
 
         </table>
       </div>
@@ -189,12 +187,12 @@ foreach ($examenes as $ex) {
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
-  $(document).ready(function () {
+  $(document).ready(function() {
     function filterTable() {
       const search = $("#customSearch").val().toLowerCase();
       let count = 0;
 
-      $("table tbody tr").each(function () {
+      $("table tbody tr").each(function() {
         // Ignorar fila de "No resultados" para no contarla ni mostrarla
         if ($(this).attr('id') === 'no-results') return;
 
@@ -228,7 +226,7 @@ foreach ($examenes as $ex) {
     $("#customSearch").on("input", filterTable);
 
     // Redirige al cambiar la cantidad
-    $('#container-length').on('change', function () {
+    $('#container-length').on('change', function() {
       const selectedLimit = $(this).val();
       // Cambia la URL para página 1 y límite seleccionado
       window.location.href = `?pagina=1&limite=${selectedLimit}`;
@@ -271,7 +269,7 @@ foreach ($examenes as $ex) {
 
           <div class="col-md-6">
             <label for="total_preguntas" class="form-label">Total de Preguntas</label>
-            <input type="number" class="form-control" id="total_preguntas" value="30" name="total_preguntas" min="5"
+            <input type="number" class="form-control" id="total_preguntas" value="5" name="total_preguntas" min="5"
               required readonly>
             <span id="preguntas_disponibles" class="text-fs-2"></span>
           </div>
@@ -325,8 +323,6 @@ foreach ($examenes as $ex) {
 
 
 <script>
-
-
   function editarExamen(id) {
     const modal = new bootstrap.Modal(document.getElementById('modalExamenVer'));
     const contenido = document.getElementById('modalExamenContenido');
@@ -407,9 +403,9 @@ foreach ($examenes as $ex) {
     modalExamen.show()
 
     fetch('../api/ver_examen.php', {
-      method: 'POST',
-      body: formData
-    })
+        method: 'POST',
+        body: formData
+      })
       .then(res => res.text())
       .then(html => {
         document.getElementById('modalExamenContenido').innerHTML = html
@@ -428,9 +424,9 @@ foreach ($examenes as $ex) {
     formData.append('id', id)
 
     fetch('../api/eliminar_examen.php', {
-      method: 'POST',
-      body: formData
-    })
+        method: 'POST',
+        body: formData
+      })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
@@ -444,7 +440,6 @@ foreach ($examenes as $ex) {
         mostrarToast('danger', 'Error al eliminar examen')
       })
   }
-
 </script>
 
 
@@ -555,7 +550,7 @@ foreach ($examenes as $ex) {
 
       // Cuando se selecciona un estudiante
       contenedor.querySelectorAll('input[name="estudiante_radio"]').forEach(radio => {
-        radio.addEventListener('change', function () {
+        radio.addEventListener('change', function() {
           document.getElementById('estudiante_id').value = this.value;
           cargarCategorias(this.value); // Cargar categorías para el estudiante seleccionado
         });
@@ -569,7 +564,7 @@ foreach ($examenes as $ex) {
           estudiantesData = data.data;
         });
 
-      document.getElementById("buscador_estudiantes").addEventListener("input", function () {
+      document.getElementById("buscador_estudiantes").addEventListener("input", function() {
         renderEstudiantes(this.value);
       });
     }
@@ -796,7 +791,7 @@ foreach ($examenes as $ex) {
     });
   }
 
-  window.eliminarSeleccionado = function (index) {
+  window.eliminarSeleccionado = function(index) {
     listaTemporal.splice(index, 1);
     actualizarListaVisual();
   };
