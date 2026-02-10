@@ -50,7 +50,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
               <th>Teléfono</th>
               <th>Dirección</th>
               <th>Categoría</th>
-             
+
               <th>Documento</th>
               <th>Estado</th>
               <th>Acciones</th>
@@ -254,8 +254,8 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
   </div>
 
 
-   <script src="../js/jquery-3.7.1.min.js"></script>
-   <script src="../js/bootstrap.bundle.min.js"></script>
+  <script src="../js/jquery-3.7.1.min.js"></script>
+  <script src="../js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
@@ -319,7 +319,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
         url: url,
         method: 'GET',
         dataType: 'json',
-        success: function (response) {
+        success: function(response) {
           if (response.status) {
             renderizarTabla(response.data);
             renderizarPaginacion(response.total_paginas, response.pagina_actual);
@@ -329,7 +329,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
             renderizarPaginacion(0, 1);
           }
         },
-        error: function (xhr, status, error) {
+        error: function(xhr, status, error) {
           console.error("Error al cargar estudiantes:", status, error, xhr.responseText);
           mostrarToast('error', 'Error de Conexión: No se pudo conectar con el servidor para obtener los estudiantes.');
           renderizarTabla([]); // Vaciar tabla en caso de error de conexión
@@ -344,7 +344,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
       tbody.empty(); // Limpiar la tabla existente
 
       if (estudiantes.length > 0) {
-        estudiantes.forEach(function (est) {
+        estudiantes.forEach(function(est) {
           const row = `
                         <tr>
                             <td class="text-center">${est.id}</td>
@@ -359,30 +359,36 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
                             <td>${htmlspecialchars(est.Doc)}</td>
                             <td class="text-center">
                                 ${est.estado === 'activo' ? `
-                                    <button class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
+                                    <button class="btn btn-sm d-flex align-items-center gap-2 px-3 py-1 text-success"
                                         title="Haz clic para desactivar"
                                         onclick="cambiarEstadoEstudiante(${est.id}, 'inactivo')">
                                         <i class="bi bi-toggle-on fs-5"></i>
                                         Activo
                                     </button>` : `
-                                    <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
+                                    <button class="btn btn-sm d-flex align-items-center gap-2 px-3 py-1 text-danger"
                                         title="Haz clic para activar" onclick="cambiarEstadoEstudiante(${est.id}, 'activo')">
                                         <i class="bi bi-toggle-off fs-5"></i>
                                         Inactivo
                                     </button>`
             }
                             </td>
-                            <td class="text-center">
-                                <button class="btn btn-sm btn-outline-warning me-1" title="Editar"
-                                    onclick="editarEstudiante(${est.id})">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2 shadow-sm"
-                                    onclick="abrirModalCategorias(${est.id}, '${htmlspecialchars(est.nombre, 'js')}', '${htmlspecialchars(est.fecha_nacimiento, 'js')}')"
-                                    title="Ver detalles de categorias del estudiante">
-                                    <i class="bi bi-eye"></i> Categorias
-                                </button>
-                            </td>
+                            <td class="text-center align-middle">
+                              <div class="d-flex justify-content-center align-items-center gap-2">
+                                  <button class="btn btn-sm btn-warning d-flex align-items-center justify-content-center" 
+                                      style="width: 32px; height: 32px;"
+                                      title="Editar"
+                                      onclick="editarEstudiante(${est.id})">
+                                      <i class="bi bi-pencil-square"></i>
+                                  </button>
+
+                                  <button class="btn btn-sm btn-primary d-flex align-items-center gap-2 shadow-sm"
+                                      onclick="abrirModalCategorias(${est.id}, '${htmlspecialchars(est.nombre, 'js')}', '${htmlspecialchars(est.fecha_nacimiento, 'js')}')"
+                                      title="Ver detalles de categorias del estudiante">
+                                      <i class="bi bi-eye-fill"></i> 
+                                      <span>Categorías</span>
+                                  </button>
+                              </div>
+                          </td>
                         </tr>
                     `;
           tbody.append(row);
@@ -471,23 +477,23 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
 
     // --- Event Listeners para la interacción ---
 
-    $(document).ready(function () {
+    $(document).ready(function() {
       // Evento para el buscador en tiempo real
-      $("#customSearch").on("input", function () {
+      $("#customSearch").on("input", function() {
         currentSearchTerm = $(this).val();
         currentPage = 1; // Resetear a la primera página en cada búsqueda
         cargarEstudiantes();
       });
 
       // Evento para el selector de "Mostrar X entradas"
-      $('#container-length').on('change', function () {
+      $('#container-length').on('change', function() {
         currentLimit = parseInt($(this).val());
         currentPage = 1; // Resetear a la primera página cuando cambia el límite
         cargarEstudiantes();
       });
 
       // Evento para los enlaces de paginación (delegación para elementos generados dinámicamente)
-      $(document).on('click', '.pagination .page-link', function (e) {
+      $(document).on('click', '.pagination .page-link', function(e) {
         e.preventDefault(); // Prevenir el comportamiento por defecto del enlace
         const newPage = $(this).data('page');
         // Solo cambiar de página si es una página válida y no es la actual o está deshabilitada
@@ -562,7 +568,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
     }
 
     // Escuchar cambios en el campo de fecha de nacimiento del modal de registro/edición
-    document.getElementById("fecha_nacimiento").addEventListener("change", function () {
+    document.getElementById("fecha_nacimiento").addEventListener("change", function() {
       const edad = calcularEdad(this.value);
       if (!isNaN(edad)) {
         filtrarCategoriasPorEdad(edad);
@@ -663,7 +669,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
     function configurarSubmitEstudiante() {
       const form = document.getElementById('formularioEstudiante');
 
-      form.onsubmit = async function (e) {
+      form.onsubmit = async function(e) {
         e.preventDefault();
         if (!form.checkValidity()) {
           form.classList.add('was-validated');
@@ -911,7 +917,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
 
 
     // Manejar el submit del formulario para asignar nueva categoría
-    document.getElementById('formNuevaCategoria').addEventListener('submit', async function (e) {
+    document.getElementById('formNuevaCategoria').addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const form = e.target;

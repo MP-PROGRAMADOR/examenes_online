@@ -69,60 +69,63 @@ try {
             throw new Exception('Código de acceso requerido.');
         }
 
+        // Buscamos el examen solo por código para saber en qué estado está realmente
         $stmt = $pdo->prepare("
             SELECT 
                 e.id AS examen_id,
                 e.estudiante_id,
-                e.categoria_id,
-                e.asignado_por,
-                e.fecha_asignacion,
-                e.duracion,
-                e.total_preguntas,
                 e.estado AS estado_examen,
-                e.calificacion,
                 e.codigo_acceso,
-
-                s.id AS estudiante_id,
-                s.dni,
                 s.nombre AS estudiante_nombre,
-                s.apellidos,
-                s.email,
-                s.telefono,
-                s.fecha_nacimiento,
-                s.escuela_id,
-                s.direccion,
-                s.Doc,
-                s.estado AS estado_estudiante,
-                s.creado_en,
-
-                c.nombre AS categoria_nombre,
-                c.descripcion AS categoria_descripcion,
-                c.edad_minima
-
+                s.apellidos
             FROM examenes e
             INNER JOIN estudiantes s ON s.id = e.estudiante_id
-            INNER JOIN categorias c ON c.id = e.categoria_id
             WHERE e.codigo_acceso = :codigo_acceso
-              AND e.estado IN ('pendiente', 'INICIO')
-               
             LIMIT 1
         ");
+        
         $stmt->execute(['codigo_acceso' => $codigo]);
         $examen = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // 1. Validar si el código existe
         if (!$examen) {
-            throw new Exception('Código inválido o examen no disponible.');
+            throw new Exception('El código de acceso no existe en nuestra base de datos.');
         }
 
-        $_SESSION['estudiante_id'] = $examen['estudiante_id'];
-        $_SESSION['estudiante_nombre'] = $examen['estudiante_nombre'] . ' ' . $examen['apellidos'];
-        $_SESSION['estudiante'] = $examen;
+        // 2. Validar el estado del examen con mensajes específicos
+        // Convertimos a minúsculas para evitar problemas de consistencia
+        $estado = strtolower($examen['estado_examen']);
 
-        $response = [
-            'status' => true,
-            'message' => 'Bienvenido/a ' . htmlspecialchars($examen['estudiante_nombre']),
-            'redirect' => 'politicas.php'
-        ];
+        switch ($estado) {
+            case 'pendiente':
+                // Único estado que permite el ingreso
+                $_SESSION['estudiante_id'] = $examen['estudiante_id'];
+                $_SESSION['estudiante_nombre'] = $examen['estudiante_nombre'] . ' ' . $examen['apellidos'];
+                $_SESSION['estudiante'] = $examen;
+
+                $response = [
+                    'status' => true,
+                    'message' => 'Acceso concedido. Bienvenido/a ' . htmlspecialchars($examen['estudiante_nombre']),
+                    'redirect' => 'politicas.php'
+                ];
+                break;
+
+            case 'inicio':
+                throw new Exception('El examen aun no se ha activado');
+                break;
+
+            case 'finalizado':
+                throw new Exception('Este examen ya ha sido completado y calificado.');
+                break;
+
+            case 'expirado':
+                throw new Exception('El tiempo de validez para este código ha expirado.');
+                break;
+
+            default:
+                throw new Exception('El examen se encuentra en un estado no disponible (' . $estado . ').');
+                break;
+        }
     }
 
     else {

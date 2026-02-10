@@ -151,35 +151,42 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td class="text-center text-danger fw-semibold"><?= $examen['fallos'] ?></td>
 
                                 <td class="text-center">
-                                    <?php
-                                    $estado = 'REPROBADO';
-                                    $colorEstado = 'danger';
-                                    if (!is_null($examen['calificacion']) && $examen['calificacion'] >= 80) {
-                                        $estado = 'APROBADO';
-                                        $colorEstado = 'success';
-                                    }
-                                    ?>
-                                    <span class="badge bg-<?= $colorEstado ?>"><?= $estado ?></span>
-                                </td>
+    <?php
+    // Definimos la nota de corte
+    $nota_aprobacion = 50;
+    $calificacion = $examen['calificacion'];
+    
+    // Si la calificación es NULL, asumimos que no se ha realizado o es 0
+    if (is_null($calificacion)) {
+        $estado = 'PENDIENTE';
+        $colorEstado = 'secondary';
+    } else {
+        if ($calificacion >= $nota_aprobacion) {
+            $estado = 'APROBADO';
+            $colorEstado = 'success';
+        } else {
+            $estado = 'REPROBADO';
+            $colorEstado = 'danger';
+        }
+    }
+    ?>
+    <span class="badge bg-<?= $colorEstado ?> px-3 py-2 rounded-pill shadow-sm">
+        <?= $estado ?>
+    </span>
+</td>
 
-                                <td class="text-center">
-                                    <?php if ($examen['calificacion'] !== null): ?>
-                                        <?php
-                                        $calificacion = floatval($examen['calificacion']);
-                                        $porcentaje = round($calificacion); // Asumimos que ya está en porcentaje. Si no, multiplícalo por 100
-                                        $color = 'text-danger';
-
-                                        if ($porcentaje >= 80) {
-                                            $color = 'text-primary';
-                                        } elseif ($porcentaje >= 60) {
-                                            $color = 'text-success';
-                                        }
-                                        ?>
-                                        <span class="<?= $color ?> fw-semibold"><?= $porcentaje ?>%</span>
-                                    <?php else: ?>
-                                        —
-                                    <?php endif; ?>
-                                </td>
+<td class="text-center">
+    <?php if ($calificacion !== null): ?>
+        <?php
+        $porcentaje = round(floatval($calificacion)); 
+        // Color del texto según la misma lógica de 50
+        $colorTexto = ($porcentaje >= $nota_aprobacion) ? 'text-success' : 'text-danger';
+        ?>
+        <span class="<?= $colorTexto ?> fw-bold fs-6"><?= $porcentaje ?>%</span>
+    <?php else: ?>
+        <span class="text-muted small">Sin calificar</span>
+    <?php endif; ?>
+</td>
                           
 
                             </tr>

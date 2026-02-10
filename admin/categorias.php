@@ -8,24 +8,31 @@ try {
     $pagina = isset($_GET['pagina']) ? (int) $_GET['pagina'] : 1;
     $inicio = ($pagina - 1) * $limite;
 
-    // Contar total de registros
+    // Contar total de registros para la paginación
     $total_sql = "SELECT COUNT(*) FROM categorias";
     $total_stmt = $pdo->query($total_sql);
     $total_registros = $total_stmt->fetchColumn();
     $total_paginas = ceil($total_registros / $limite);
 
-    // Obtener las categorías para la página actual
-    $sql = "SELECT * FROM categorias LIMIT :inicio, :limite";
+    // SQL MEJORADO: Unimos con la tabla intermedia pregunta_categoria
+    // Usamos LEFT JOIN para no excluir categorías que tengan 0 preguntas
+    $sql = "SELECT c.*, COUNT(pc.pregunta_id) AS total_preguntas 
+            FROM categorias c
+            LEFT JOIN pregunta_categoria pc ON c.id = pc.categoria_id
+            GROUP BY c.id
+            LIMIT :inicio, :limite";
+
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':inicio', $inicio, PDO::PARAM_INT);
     $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
     $stmt->execute();
     $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    error_log("Error en la consulta de categorías: " . $e->getMessage());
+    error_log("Error: " . $e->getMessage());
     $categorias = [];
 }
 ?>
+
 <main class="main-content" id="content">
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 rounded-top">
@@ -51,7 +58,6 @@ try {
             </div>
         </div>
 
-        <!-- TABLA -->
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-striped table-bordered align-middle mb-0">
@@ -61,6 +67,8 @@ try {
                             <th><i class="bi bi-tag-fill"></i> Nombre</th>
                             <th><i class="bi bi-card-text"></i> Descripción</th>
                             <th><i class="bi bi-person"></i> Edad Mínima</th>
+                            <th><i class="bi bi-person"></i> Cantidad Preguntas</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -71,6 +79,11 @@ try {
                                     <td><?= htmlspecialchars($categoria['nombre']) ?></td>
                                     <td><?= htmlspecialchars($categoria['descripcion']) ?></td>
                                     <td><?= htmlspecialchars($categoria['edad_minima']) ?> años</td>
+                                   <td class="text-center">
+                                        <span class="badge rounded-pill bg-info text-dark">
+                                            <?= (int)$categoria['total_preguntas'] ?>
+                                        </span>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -106,15 +119,14 @@ try {
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             function filterTable() {
                 const search = $("#customSearch").val().toLowerCase();
                 let count = 0;
 
-                $("table tbody tr").each(function () {
+                $("table tbody tr").each(function() {
                     const rowText = $(this).text().toLowerCase();
                     if (rowText.includes(search)) {
                         $(this).show();
@@ -141,11 +153,9 @@ try {
                 }
             }
 
-            // Filtro en tiempo real
             $("#customSearch").on("input", filterTable);
 
-            // Redirige al cambiar la cantidad
-            $('#container-length').on('change', function () {
+            $('#container-length').on('change', function() {
                 const selectedLimit = $(this).val();
                 window.location.href = `?pagina=1&limite=${selectedLimit}`;
             });
@@ -153,6 +163,6 @@ try {
             filterTable();
         });
     </script>
-</div>
+</main>
 
 <?php include_once('../includes/footer.php'); ?>

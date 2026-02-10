@@ -91,40 +91,46 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
               <tr>
                 <td class="text-center"><?= htmlspecialchars($examen['id']) ?></td>
                 <td><?= htmlspecialchars($examen['estudiante']) ?></td>
-                <td class="text-center">
-                  <?php if ($examen['estado'] === 'INICIO'): ?>
-                    <button
-                      class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                      title="Haz clic para activar"
-                      onclick="cambiarEstadoEstudiante(<?= (int) $examen['id'] ?>, '<?= htmlspecialchars($examen['estudiante']) ?>', 'pendiente')">
-                      <i class="bi bi-toggle-off fs-5"></i>
-                      Inactivo
+
+
+                <td class="text-center align-middle">
+                  <?php
+                  $tieneCalificacion = !empty($examen['calificacion']) ? 'true' : 'false';
+
+                  if ($examen['estado'] === 'INICIO'): ?>
+                    <button class="btn btn-link text-decoration-none d-inline-flex align-items-center gap-2 p-1 border-0"
+                      title="Click para activar"
+                      style="color: #dc3545;"
+                      onclick="cambiarEstadoEstudiante(<?= (int)$examen['id'] ?>, '<?= addslashes($examen['estudiante']) ?>', 'pendiente', <?= $tieneCalificacion ?>)">
+                      <i class="bi bi-toggle-off fs-4"></i>
+                      <span class="fw-bold">Inactivo</span>
+                    </button>
+                  <?php elseif ($examen['estado'] === 'pendiente'): ?>
+                    <button class="btn btn-link text-decoration-none d-inline-flex align-items-center gap-2 p-1 border-0"
+                      title="Click para desactivar"
+                      style="color: #198754;"
+                      onclick="cambiarEstadoEstudiante(<?= (int)$examen['id'] ?>, '<?= addslashes($examen['estudiante']) ?>', 'INICIO', <?= $tieneCalificacion ?>)">
+                      <i class="bi bi-toggle-on fs-4"></i>
+                      <span class="fw-bold">Activo</span>
                     </button>
                   <?php else: ?>
-                    <button
-                      class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                      title="Haz clic para activar"
-                      onclick="cambiarEstadoEstudiante(<?= (int) $examen['id'] ?>, '<?= htmlspecialchars($examen['estudiante']) ?>', 'INICIO')">
-                      <i class="bi bi-toggle-on fs-5"></i>
-                      Activo
-                    </button>
+                    <span class="badge bg-info"><?= $examen['estado'] ?></span>
                   <?php endif; ?>
                 </td>
+
+
                 <td><?= htmlspecialchars($examen['categoria']) ?></td>
                 <td><?= htmlspecialchars($examen['fecha_asignacion']) ?></td>
                 <td class="text-center"><?= htmlspecialchars($examen['total_preguntas']) ?></td>
                 <td class="text-center"><code><?= htmlspecialchars($examen['codigo_acceso']) ?></code></td>
 
 
-
-
                 <td class="text-center">
                   <a href="../libreria/imprimir_codigo.php?id=<?= $examen['id'] ?>"
-                    class="btn btn-sm btn-outline-secondary">
+                    class="btn btn-sm btn-outline-secondary" target="_blank"
+                    rel="noopener noreferrer">
                     <i class="bi bi-printer-fill me-1"></i> Imprimir
                   </a>
-
-
                 </td>
               </tr>
             <?php endforeach; ?>
@@ -164,12 +170,12 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
-  $(document).ready(function () {
+  $(document).ready(function() {
     function filterTable() {
       const search = $("#customSearch").val().toLowerCase();
       let count = 0;
 
-      $("table tbody tr").each(function () {
+      $("table tbody tr").each(function() {
         // Ignorar fila de "No resultados" para no contarla ni mostrarla
         if ($(this).attr('id') === 'no-results') return;
 
@@ -203,7 +209,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $("#customSearch").on("input", filterTable);
 
     // Redirige al cambiar la cantidad
-    $('#container-length').on('change', function () {
+    $('#container-length').on('change', function() {
       const selectedLimit = $(this).val();
       // Cambia la URL para página 1 y límite seleccionado
       window.location.href = `?pagina=1&limite=${selectedLimit}`;
@@ -213,7 +219,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
   });
 </script>
 </div>
- 
+
 <!-- Modal -->
 <div class="modal fade" id="modalExamen" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -290,44 +296,51 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </div>
 </div>
- 
+
 <script>
-  let estudiantesData = []; // <- Aquí guardaremos los estudiantes
+  let estudiantesData = [];
 
-  function cambiarEstadoEstudiante(id, nombre, nuevoEstado) {
-    console.log(id)
-    console.log(nuevoEstado)
+  function cambiarEstadoEstudiante(id, nombre, nuevoEstado, tieneCalificacion = false) {
+    if (nuevoEstado === "pendiente" && tieneCalificacion) {
+      mostrarToast('warning', `No se puede desactivar el examen de ${nombre} porque ya tiene una calificación registrada.`);
+      return;
+    }
+
+    const esActivando = (nuevoEstado === "INICIO");
+    const textoAccion = esActivando ? "DESACTIVAR" : "ACTIVAR";
+    const colorAccion = esActivando ? "#dc3545" : "#198754";
+
     mostrarConfirmacionToast(
-      `¿Estás seguro de que deseas ${nuevoEstado == "INICIO" ? "activar" : "desactivar"} el examen del estudiante: ${nombre} ?`,
+      `¿Estás seguro de que deseas <strong style="color: ${colorAccion};">${textoAccion}</strong> el examen del estudiante: <strong>${nombre}</strong>?`,
       () => {
-
         const formData = new FormData();
         formData.append('id', id);
         formData.append('estado', nuevoEstado);
 
         fetch('../api/activar_examen.php', {
-          method: 'POST',
-          body: formData
-        })
+            method: 'POST',
+            body: formData
+          })
           .then(res => res.json())
           .then(data => {
             if (data.status) {
-              // Recargar la página o actualizar solo el botón
-              mostrarToast('success', data.message)
-              setTimeout((e) => { location.reload(); }, 500)
+              mostrarToast('success', `Examen ${esActivando ? 'activado' : 'desactivado'} correctamente.`);
+              setTimeout(() => {
+                location.reload();
+              }, 600);
             } else {
               mostrarToast('warning', 'Error: ' + (data.message || 'No se pudo cambiar el estado.'));
             }
           })
           .catch(error => {
             console.error('Error AJAX:', error);
-            mostrarToast('danger', 'Ocurrió un error al cambiar el estado.');
+            mostrarToast('danger', 'Ocurrió un error al conectar con el servidor.');
           });
-      })
+      }
+    );
   }
-
 </script>
- 
+
 
 <script>
   function abrirModalExamen(examen = null) {
@@ -345,10 +358,6 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       document.getElementById('codigo_acceso').value = examen.codigo_acceso;
     }
 
-
-
-
-
     if (examen) {
       // Esperar a que se carguen los estudiantes antes de marcar el seleccionado
       setTimeout(() => {
@@ -360,31 +369,17 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       }, 300); // Ajusta si tu AJAX es más lento
     }
 
-
-
-
-
     modal.show();
   }
 
-
-
-
   document.addEventListener("DOMContentLoaded", () => {
-
-
 
     const estudianteSelect = document.getElementById("estudiante_id");
     const categoriaSelect = document.getElementById("categoria_id");
     const totalPreguntasInput = document.getElementById("total_preguntas");
     const fechaExamen = document.getElementById('fecha_examen').value;
 
-
-
     configurarBuscadorEstudiantes();
-
-    // Cargar estudiantes al cargar la página
-
 
 
     function renderEstudiantes(filtro = '') {
@@ -416,15 +411,9 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       });
 
 
-
-
-
-
-
-
       // Cuando se selecciona un estudiante
       contenedor.querySelectorAll('input[name="estudiante_radio"]').forEach(radio => {
-        radio.addEventListener('change', function () {
+        radio.addEventListener('change', function() {
           document.getElementById('estudiante_id').value = this.value;
           cargarCategorias(this.value); // Cargar categorías para el estudiante seleccionado
         });
@@ -438,17 +427,10 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
           estudiantesData = data.data;
         });
 
-      document.getElementById("buscador_estudiantes").addEventListener("input", function () {
+      document.getElementById("buscador_estudiantes").addEventListener("input", function() {
         renderEstudiantes(this.value);
       });
     }
-
-
-
-
-
-
-
 
 
 
@@ -502,19 +484,9 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 
-
-
-
-
-
-
-
-
-
-
       // Generar código único
       formData.append("codigo_acceso", generarCodigo());
-      formData.append("lista_seleccionados",)
+      formData.append("lista_seleccionados", )
 
       try {
         const res = await fetch("../api/guardar_examen.php", {
@@ -522,7 +494,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
           body: formData
         });
 
-        const data = await res.json(); // Asegúrate de usar "data", no "result"
+        const data = await res.json();
 
         if (data.status) {
           mostrarToast('success', data.message || "Examen guardado correctamente");
@@ -542,13 +514,6 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       return "EXAM" + Date.now().toString().slice(-6);
     }
   });
-
-
-
-
-
-
-
 
 
 
@@ -575,11 +540,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         });
         const data = await res.json();
 
-
-
         console.log(data);
-
-
 
         if (data.status) {
           mostrarToast('success', data.message || 'Examen guardado correctamente');
@@ -597,17 +558,6 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       return 'EXAM' + Date.now().toString().slice(-6);
     }
   });
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -631,7 +581,7 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       });
   }
 </script>
- 
+
 <script>
   const btnAnadir = document.getElementById('btn_anadir_estudiante');
   const listaSeleccionados = document.getElementById('lista_seleccionados');
@@ -640,8 +590,6 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   btnAnadir.addEventListener('click', () => {
     const estudianteId = document.querySelector('input[name="estudiante_radio"]:checked')?.value;
-
-
 
     // Buscar el estudiante
     const estudiante = estudiantesData.find(e => e.id == estudianteId);
@@ -705,21 +653,15 @@ $examenes = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </button>
     `;
 
-
-
-
-
       listaSeleccionados.appendChild(li);
     });
   }
 
-  window.eliminarSeleccionado = function (index) {
+  window.eliminarSeleccionado = function(index) {
     listaTemporal.splice(index, 1);
     actualizarListaVisual();
   };
 </script>
-
-
 
 
 <?php include_once('../includes/footer.php'); ?>

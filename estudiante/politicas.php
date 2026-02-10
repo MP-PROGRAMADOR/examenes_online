@@ -19,6 +19,7 @@ $duracion = $examen['duracion'] ?? 50;
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Panel del Estudiante</title>
@@ -41,7 +42,8 @@ $duracion = $examen['duracion'] ?? 50;
             background-color: #084298;
         }
 
-        .navbar-brand, .navbar .nav-link {
+        .navbar-brand,
+        .navbar .nav-link {
             color: #fff !important;
             font-weight: 500;
         }
@@ -50,7 +52,7 @@ $duracion = $examen['duracion'] ?? 50;
             background: #ffffff;
             border-radius: 16px;
             padding: 40px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease-in-out;
         }
 
@@ -107,78 +109,148 @@ $duracion = $examen['duracion'] ?? 50;
         }
     </style>
 </head>
+
 <body>
 
-<nav class="navbar navbar-expand-lg fixed-top shadow-sm">
-    <div class="container-fluid px-4">
-        <a class="navbar-brand" href="#">
-            <i class="bi bi-mortarboard-fill me-2 fs-4"></i> CÓDIGO: <strong><?= htmlspecialchars($codigo) ?></strong>
-        </a>
-        <div class="collapse navbar-collapse justify-content-end">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <span class="nav-link"><i class="bi bi-person-circle"></i> <?= htmlspecialchars($nombre) ?></span>
-                </li>
-            </ul>
+    <nav class="navbar navbar-expand-lg fixed-top shadow-sm">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-mortarboard-fill me-2 fs-4"></i> CÓDIGO: <strong><?= htmlspecialchars($codigo) ?></strong>
+            </a>
+            <button class="navbar-toggler border-white" type="button" data-bs-toggle="collapse" data-bs-target="#navEstudiante">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-end" id="navEstudiante">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item">
+                        <span class="nav-link"><i class="bi bi-person-circle"></i> <?= htmlspecialchars($nombre) ?></span>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-outline-light btn-sm px-3 rounded-pill" href="#" data-bs-toggle="modal" data-bs-target="#confirmLogoutModal">
+                            <i class="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
-<main class="container">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="info-card mt-5">
-                <h2 class="mb-3">Información del Examen</h2>
-                <p class="text-muted mb-4">Lee cuidadosamente las siguientes reglas y condiciones antes de comenzar:</p>
+    <main class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="info-card mt-5">
+                    <h2 class="mb-3">Información del Examen</h2>
+                    <p class="text-muted mb-4">Lee cuidadosamente las siguientes reglas y condiciones antes de comenzar:</p>
 
-                <h5 class="text-primary mb-2">Políticas</h5>
-                <ul>
-                    <li><strong>Duración:</strong> <span id="exam-duration">--</span></li>
-                    <li><strong>Preguntas:</strong> <span id="exam-questions">--</span></li>
-                    <li><strong>Navegación:</strong> Puedes avanzar y retroceder libremente.</li>
-                    <li><strong>Finalización:</strong> El examen se cierra automáticamente al finalizar.</li>
-                    <li><strong>Intentos:</strong> <span id="exam-attempts">--</span></li>
-                    <li><strong>Internet:</strong> Conexión estable es obligatoria.</li>
-                </ul>
+                    <h5 class="text-primary mb-2">Políticas</h5>
+                    <ul>
+                        <li><strong>Duración:</strong> <span id="exam-duration">--</span></li>
+                        <li><strong>Preguntas:</strong> <span id="exam-questions">--</span></li>
+                        <li><strong>Navegación:</strong> Puedes avanzar y retroceder libremente.</li>
+                        <li><strong>Finalización:</strong> El examen se cierra automáticamente al finalizar.</li>
+                        <li><strong>Intentos:</strong> <span id="exam-attempts">--</span></li>
+                        <li><strong>Internet:</strong> Conexión estable es obligatoria.</li>
+                    </ul>
 
-                <h5 class="text-primary mt-4 mb-2">Condiciones</h5>
-                <ul>
-                    <li><strong>Calificación mínima:</strong> 90% de respuestas correctas (varía por categoría).</li>
-                    <li><strong>Envío de resultados:</strong> Automáticamente a tu autoescuela.</li>
-                    <li><strong>Reclamos:</strong> Solo ante la Dirección General de Tráfico.</li>
-                    <li><strong>Confidencialidad:</strong> El contenido del examen es privado.</li>
-                </ul>
+                    <h5 class="text-primary mt-4 mb-2">Condiciones</h5>
+                    <ul>
+                        <li><strong>Calificación mínima:</strong> 90% de respuestas correctas (varía por categoría).</li>
+                        <li><strong>Envío de resultados:</strong> Automáticamente a tu autoescuela.</li>
+                        <li><strong>Reclamos:</strong> Solo ante la Dirección General de Tráfico.</li>
+                        <li><strong>Confidencialidad:</strong> El contenido del examen es privado.</li>
+                    </ul>
 
-                <div class="important-note">
-                    Al iniciar el examen, aceptas todas las condiciones establecidas. No compartas tu contenido ni repitas el intento.
+                    <div class="important-note">
+                        Al iniciar el examen, aceptas todas las condiciones establecidas. No compartas tu contenido ni repitas el intento.
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="button" class="btn btn-primary btn-lg rounded-pill px-5 shadow" data-bs-toggle="modal" data-bs-target="#confirmarExamenModal">
+                            Comenzar Examen
+                        </button>
+                    </div>
+
+                    <div class="modal fade" id="confirmarExamenModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg">
+                                <div class="modal-header bg-primary text-white border-0">
+                                    <h5 class="modal-title"><i class="bi bi-info-circle me-2"></i> Confirmación de Intento</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body p-4 text-center">
+                                    <p class="fs-5">¿Estás seguro de que deseas comenzar el examen ahora?</p>
+                                    <div class="alert alert-warning border-0 small">
+                                        <i class="bi bi-exclamation-triangle-fill"></i>
+                                        Solo tienes <strong>1 intento</strong> disponible. Si sales o cierras la ventana, el examen se dará por finalizado.
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-0 justify-content-center pb-4">
+                                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" onclick="irAExamen()" class="btn btn-primary rounded-pill px-4 shadow">
+                                        Sí, Comenzar ahora
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        function irAExamen() {
+                            // 1. Obtener la instancia del modal de Bootstrap
+                            const modalElement = document.getElementById('confirmarExamenModal');
+                            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+
+                            // 2. Cerrar el modal visualmente
+                            if (modalInstance) {
+                                modalInstance.hide();
+                            }
+
+                            // 3. Redirigir al examen
+                            window.location.href = "evaluacion.php?examen_id=<?= htmlspecialchars($examen_id) ?>";
+                        }
+                    </script>
                 </div>
+            </div>
+        </div>
+    </main>
 
-                <div class="text-center mt-4">
-                    <a href="evaluacion.php?examen_id=<?= htmlspecialchars($examen_id )?>" class="btn btn-start">
-                        <i class="bi bi-play-circle-fill me-2"></i> Comenzar Examen
-                    </a>
+    <footer class="text-center text-muted py-4">
+        &copy; <?= date('Y') ?> Autoescuela Online. Todos los derechos reservados.
+    </footer>
+
+    <div class="modal fade" id="confirmLogoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="logoutModalLabel">
+                        <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>¿Cerrar sesión?
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p class="mb-0">¿Estás seguro de que deseas salir del panel? Si cierras sesión, tendrás que volver a introducir tu código de acceso para realizar el examen.</p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+                    <a href="cerrar_sesion.php" class="btn btn-danger px-4 rounded-pill">Sí, salir</a>
                 </div>
             </div>
         </div>
     </div>
-</main>
 
-<footer class="text-center text-muted py-4">
-    &copy; <?= date('Y') ?> Autoescuela Online. Todos los derechos reservados.
-</footer>
+    <!-- Scripts -->
+    <script src="../js/bootstrap.bundle.min.js"></script>
 
-<!-- Scripts -->
-<script src="../js/bootstrap.bundle.min.js"></script>
+    <script>
+        const totalPreguntas = <?= json_encode((int)$preguntas) ?>;
+        const totalTiempo = <?= json_encode((int)$duracion) ?>;
+        document.getElementById('exam-questions').textContent = totalPreguntas + ' preguntas';
 
-<script>
-  
-    const totalPreguntas = <?= json_encode((int)$preguntas) ?>;
-    const totalTiempo = <?= json_encode((int)$duracion) ?>;
-    document.getElementById('exam-questions').textContent = totalPreguntas + ' preguntas';
- 
-    document.getElementById('exam-duration').textContent = ((totalTiempo * 50) / 60).toFixed(2) + ' minutos';
-    
-    document.getElementById('exam-attempts').textContent = '1 intento';
-</script>
+        document.getElementById('exam-duration').textContent = ((totalTiempo * 50) / 60).toFixed(2) + ' minutos';
+
+        document.getElementById('exam-attempts').textContent = '1 intento';
+    </script>
 </body>
+
 </html>

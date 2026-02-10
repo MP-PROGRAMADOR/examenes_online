@@ -308,11 +308,11 @@ include_once("../includes/sidebar.php");
                     </td>
                     <td>
                         ${pregunta.activa == 1 ? `
-                            <button class="btn btn-outline-success btn-sm rounded-pill shadow-sm px-3 py-1"
+                            <button class="btn text-success btn-sm px-3 py-1"
                                 onclick="cambiarEstadoPregunta(${pregunta.id}, false)" title="Desactivar">
                                 <i class="bi bi-toggle-on fs-5"></i> Activa
                             </button>` : `
-                            <button class="btn btn-outline-danger btn-sm rounded-pill shadow-sm px-3 py-1"
+                            <button class="btn text-danger btn-sm px-3 py-1"
                                 onclick="cambiarEstadoPregunta(${pregunta.id}, true)" title="Activar">
                                 <i class="bi bi-toggle-off fs-5"></i> Inactiva
                             </button>`

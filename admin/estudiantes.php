@@ -47,8 +47,6 @@ LIMIT :inicio, :limite
       $estudiantes[$id]['categorias'][] = $row['categoria'];
     }
   }
-
-
 } catch (PDOException $e) {
   error_log("Error al obtener estudiantes: " . $e->getMessage());
   $estudiantes = [];
@@ -79,8 +77,8 @@ LIMIT :inicio, :limite
           </select>
         </div>
 
-        <button class="btn btn-light fw-semibold shadow-sm" onclick="abrirModalRegistroEstudiante()">
-          <i class="bi bi-person-plus-fill me-1"></i>Nuevo
+        <button class="btn btn-success fw-semibold shadow-sm" onclick="abrirModalRegistroEstudiante()">
+          <i class="bi bi-person-plus-fill me-1"></i>Nuevo Estudiante
         </button>
       </div>
     </div>
@@ -114,16 +112,17 @@ LIMIT :inicio, :limite
                   <td><?= htmlspecialchars($est['dni']) ?></td>
                   <td><?= htmlspecialchars($est['escuela'] ?? '—') ?></td>
                   <td><?= htmlspecialchars($est['email'] ?? '-') ?></td>
-                  <td><?= htmlspecialchars($est['fecha_nacimiento']) ?></td>
+                  <td class="text-nowrap"><?= htmlspecialchars($est['fecha_nacimiento']) ?></td>
                   <td><?= htmlspecialchars($est['telefono']) ?></td>
                   <td><?= htmlspecialchars($est['direccion']) ?></td>
+
                   <td>
                     <?php if (!empty($est['categorias'])): ?>
-                      <ul class="list-unstyled mb-0">
+                      <div class="d-flex flex-wrap gap-1">
                         <?php foreach ($est['categorias'] as $cat): ?>
-                          <li><i class="bi bi-bookmark-check-fill text-success me-1"></i> <?= htmlspecialchars($cat) ?></li>
+                          <small class="text-muted"><i class="bi bi-bookmark-check-fill text-success"></i><?= htmlspecialchars($cat) ?></small>
                         <?php endforeach; ?>
-                      </ul>
+                      </div>
                     <?php else: ?>
                       <span class="text-muted">—</span>
                     <?php endif; ?>
@@ -132,72 +131,56 @@ LIMIT :inicio, :limite
                   <td><?= htmlspecialchars($est['usuario']) ?></td>
 
                   <td class="text-center">
-                    <?php if ($est['estado'] === 'activo'): ?>
-                      <button
-                        class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                        title="Haz clic para desactivar"
-                        onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, '<?= $est['nombre'] ?>', 'inactivo')">
-                        <i class="bi bi-toggle-on fs-5"></i>
-                        Activo
-                      </button>
-                    <?php else: ?>
-                      <button
-                        class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                        title="Haz clic para activar"
-                        onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, '<?= $est['nombre'] ?>', 'activo')">
-                        <i class="bi bi-toggle-off fs-5"></i>
-                        Inactivo
-                      </button>
-                    <?php endif; ?>
+                    <div class="d-flex justify-content-center">
+                      <?php if ($est['estado'] === 'activo'): ?>
+                        <button class="btn btn-link text-success text-decoration-none d-flex align-items-center gap-1 p-0 border-0"
+                          onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, '<?= addslashes($est['nombre']) ?>', 'inactivo')">
+                          <i class="bi bi-toggle-on fs-4"></i>
+                          <span class="fw-bold">Activo</span>
+                        </button>
+                      <?php else: ?>
+                        <button class="btn btn-link text-danger text-decoration-none d-flex align-items-center gap-1 p-0 border-0"
+                          onclick="cambiarEstadoEstudiante(<?= $est['id'] ?>, '<?= addslashes($est['nombre']) ?>', 'activo')">
+                          <i class="bi bi-toggle-off fs-4"></i>
+                          <span class="fw-bold">Inactivo</span>
+                        </button>
+                      <?php endif; ?>
+                    </div>
                   </td>
 
                   <td class="text-center">
-                    <button class="btn btn-sm btn-outline-warning me-1" title="Editar"
-                      onclick='abrirModalEdicionEstudiante(<?= json_encode($est, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'">
-                                  <i class=" bi bi-pencil-square"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" title="Eliminar"
-                      onclick="eliminarEstudiante(<?= $est['id'] ?>)">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2   shadow-sm"
-                      onclick="abrirModalCategorias(<?= $est['id'] ?>, '<?= htmlspecialchars($est['nombre'], ENT_QUOTES, 'UTF-8') ?>',  '<?= htmlspecialchars($est['fecha_nacimiento'], ENT_QUOTES, 'UTF-8') ?>')"
-                      title="Ver detalles de categorias del estudiante">
-                      <i class="bi bi-eye "></i> Categorias
-                    </button>
+                    <div class="d-flex justify-content-center align-items-center gap-2">
+                      <button type="button" class="btn btn-sm btn-outline-warning d-flex align-items-center justify-content-center"
+                        style="width: 28px; height: 28px; border-width: 1px;"
+                        title="Editar"
+                        onclick='abrirModalEdicionEstudiante(<?= json_encode($est, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>
+                        <i class="bi bi-pencil-square"></i>
+                      </button>
+
+                      <button type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center"
+                        style="width: 28px; height: 28px; border-width: 1px;"
+                        title="Eliminar"
+                        onclick="eliminarEstudiante(<?= (int)$est['id'] ?>)">
+                        <i class="bi bi-trash"></i>
+                      </button>
+
+                      <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 px-2 fw-bold text-nowrap"
+                        style="height: 28px; font-size: 0.75rem; border-width: 1px;"
+                        onclick="abrirModalCategorias(<?= (int)$est['id'] ?>, '<?= addslashes(htmlspecialchars($est['nombre'])) ?>', '<?= $est['fecha_nacimiento'] ?>')">
+                        <i class="bi bi-eye"></i> Categorias
+                      </button>
+                    </div>
                   </td>
                 </tr>
               <?php endforeach; ?>
             <?php else: ?>
               <tr>
-                <td colspan="12">
-                  <div class="alert alert-warning text-center m-0 rounded-0">
-                    <i class="bi bi-exclamation-circle-fill me-2"></i>No hay estudiantes registrados.
-                  </div>
-                </td>
+                <td colspan="12" class="text-center py-3">No hay estudiantes registrados.</td>
               </tr>
             <?php endif; ?>
           </tbody>
         </table>
       </div>
-
-      <?php if ($total_paginas > 1): ?>
-        <nav aria-label="Paginación de estudiantes" class="my-3">
-          <ul class="pagination justify-content-center">
-            <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
-              <a class="page-link" href="?pagina=<?= $pagina - 1 ?>&limite=<?= $limite ?>">Anterior</a>
-            </li>
-            <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
-              <li class="page-item <?= $pagina == $i ? 'active' : '' ?>">
-                <a class="page-link" href="?pagina=<?= $i ?>&limite=<?= $limite ?>"><?= $i ?></a>
-              </li>
-            <?php endfor; ?>
-            <li class="page-item <?= $pagina >= $total_paginas ? 'disabled' : '' ?>">
-              <a class="page-link" href="?pagina=<?= $pagina + 1 ?>&limite=<?= $limite ?>">Siguiente</a>
-            </li>
-          </ul>
-        </nav>
-      <?php endif; ?>
     </div>
   </div>
 
@@ -408,21 +391,21 @@ LIMIT :inicio, :limite
           </table>
         </div>
       </div>
-    </div> 
+    </div>
   </div>
 </div>
 
 
 <!-- Scripts -->
- <script src="../js/jquery-3.7.1.min.js"></script>
+<script src="../js/jquery-3.7.1.min.js"></script>
 
 <script>
-  $(document).ready(function () {
+  $(document).ready(function() {
     function filterTable() {
       const search = $("#customSearch").val().toLowerCase();
       let count = 0;
 
-      $("table tbody tr").each(function () {
+      $("table tbody tr").each(function() {
         const rowText = $(this).text().toLowerCase();
         if (rowText.includes(search)) {
           $(this).show();
@@ -451,7 +434,7 @@ LIMIT :inicio, :limite
 
     $("#customSearch").on("input", filterTable);
 
-    $('#container-length').on('change', function () {
+    $('#container-length').on('change', function() {
       const selectedLimit = $(this).val();
       window.location.href = `?pagina=1&limite=${selectedLimit}`;
     });
@@ -515,7 +498,7 @@ LIMIT :inicio, :limite
   }
 
   // Escuchar cambios en el campo de fecha de nacimiento
-  document.getElementById("fecha_nacimiento").addEventListener("change", function () {
+  document.getElementById("fecha_nacimiento").addEventListener("change", function() {
     const edad = calcularEdad(this.value);
     if (!isNaN(edad)) {
       filtrarCategoriasPorEdad(edad);
@@ -583,7 +566,7 @@ LIMIT :inicio, :limite
   function configurarSubmitEstudiante() {
     const form = document.getElementById('formularioEstudiante');
 
-    form.onsubmit = async function (e) {
+    form.onsubmit = async function(e) {
       e.preventDefault();
       if (!form.checkValidity()) {
         form.classList.add('was-validated');
@@ -623,9 +606,9 @@ LIMIT :inicio, :limite
         formData.append('id', id);
 
         fetch('../api/eliminar_estudiante.php', {
-          method: 'POST',
-          body: formData
-        })
+            method: 'POST',
+            body: formData
+          })
           .then(res => res.json())
           .then(data => {
             if (data.status) {
@@ -734,11 +717,16 @@ LIMIT :inicio, :limite
 
   function estadoColor(estado) {
     switch (estado) {
-      case 'aprobado': return 'success';
-      case 'pendiente': return 'primary';
-      case 'rechazado': return 'danger';
-      case 'en_proceso': return 'warning';
-      default: return 'secondary';
+      case 'aprobado':
+        return 'success';
+      case 'pendiente':
+        return 'primary';
+      case 'rechazado':
+        return 'danger';
+      case 'en_proceso':
+        return 'warning';
+      default:
+        return 'secondary';
     }
   }
 
@@ -792,16 +780,16 @@ LIMIT :inicio, :limite
 
 
 
-  document.getElementById('formNuevaCategoria').addEventListener('submit', function (e) {
+  document.getElementById('formNuevaCategoria').addEventListener('submit', function(e) {
     e.preventDefault();
 
     const form = e.target;
     const formData = new FormData(form);
     console.log(form);
     fetch('../api/guardar_categoria_estudiante.php', {
-      method: 'POST',
-      body: formData
-    })
+        method: 'POST',
+        body: formData
+      })
       .then(res => res.json())
       .then(data => {
         if (data.status) {
@@ -823,9 +811,11 @@ LIMIT :inicio, :limite
   function eliminarCategoriaAsignada(asignacion_id, estudiante_id) {
     mostrarConfirmacionToast(`¿Estás seguro de eliminar esta asignación?`, () => {
       fetch('../api/eliminar_categoria_estudiante.php', {
-        method: 'POST',
-        body: new URLSearchParams({ asignacion_id })
-      })
+          method: 'POST',
+          body: new URLSearchParams({
+            asignacion_id
+          })
+        })
         .then(res => res.json())
         .then(data => {
           if (data.status) {
@@ -851,15 +841,17 @@ LIMIT :inicio, :limite
         formData.append('estado', nuevoEstado);
 
         fetch('../api/cambiar_estado_estudiante.php', {
-          method: 'POST',
-          body: formData
-        })
+            method: 'POST',
+            body: formData
+          })
           .then(res => res.json())
           .then(data => {
             if (data.status) {
               // Recargar la página o actualizar solo el botón
               mostrarToast('success', data.message)
-              setTimeout((e) => { location.reload(); }, 500)
+              setTimeout((e) => {
+                location.reload();
+              }, 500)
             } else {
               mostrarToast('warning', 'Error: ' + (data.message || 'No se pudo cambiar el estado.'));
             }
@@ -870,7 +862,6 @@ LIMIT :inicio, :limite
           });
       })
   }
-
 </script>
 
 

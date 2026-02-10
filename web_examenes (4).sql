@@ -176,7 +176,7 @@ CREATE TABLE `examenes` (
   `fecha_asignacion` datetime DEFAULT current_timestamp(),
   `duracion` tinyint(1) DEFAULT 0,
   `total_preguntas` int(11) NOT NULL,
-  `estado` enum('pendiente','en_progreso','finalizado','INICIO') DEFAULT 'pendiente',
+  `estado` enum('pendiente','expirado','finalizado','INICIO') DEFAULT 'pendiente',
   `calificacion` decimal(5,2) DEFAULT NULL,
   `codigo_acceso` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

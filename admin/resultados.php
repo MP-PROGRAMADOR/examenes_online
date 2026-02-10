@@ -1,84 +1,70 @@
 <?php
 include_once("../includes/header.php");
 include_once("../includes/sidebar.php");
+require_once '../includes/conexion.php'; 
+
+// Lógica de expiración automática al cargar
+$sqlExpirar = "UPDATE examenes 
+               SET estado = 'EXPIRADO' 
+               WHERE fecha_asignacion < CURRENT_DATE() 
+               AND estado NOT IN ('finalizado', 'EXPIRADO')";
+$pdo->exec($sqlExpirar);
 ?>
 
 <main class="main-content" id="content">
     <div class="card shadow border-0 rounded-4">
-        <div class="content-wrapper">
-            <section class="content">
-                <div class="card">
-                    <div class="card-header bg-primary">
-                        <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
-                            <h3 class="card-title text-white"><i class="bi bi-clipboard-check"></i>
-                                Listado de Estudiantes con Exámenes Realizados</h3>
-                            <div class="d-flex align-items-center ms-auto w-30">
-                                <label for="customSearch" class="me-2 text-white fw-medium mb-0">Buscar:</label>
-                                <input type="text" id="customSearch" class="form-control form-control-sm shadow-sm"
-                                    placeholder="Buscar estudiante...">
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <label for="container-length" class="me-2 text-white fw-medium mb-0">Mostrar:</label>
-                                <select id="container-length" class="form-select w-auto shadow-sm">
-                                    <option value="5">5 registros</option>
-                                    <option value="10" selected>10 registros</option>
-                                    <option value="15">15 registros</option>
-                                    <option value="20">20 registros</option>
-                                    <option value="25">25 registros</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>DNI</th>
-                                        <th>Nombre Completo</th>
-                                        <th>Email</th>
-                                        <th>Teléfono</th>
-                                        <th>Última Categoría</th>
-                                        <th>Fecha Últ. Examen</th>
-                                        <th>Calificación Últ. Examen</th>
-                                        <th>Estado Últ. Examen</th>
-                                        <th class="text-center">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="estudiantes-examenes-table-body">
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
-                            <div id="pagination-info" class="text-white"></div>
-                            <nav>
-                                <ul class="pagination mb-0" id="pagination-controls">
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
+        <div class="card-header bg-primary text-white p-3">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <h3 class="card-title mb-0"><i class="bi bi-clipboard-check"></i> Listado General de Exámenes</h3>
+                <div class="ms-auto d-flex gap-2">
+                    <input type="text" id="customSearch" class="form-control form-control-sm shadow-sm" placeholder="Buscar por DNI, Nombre o Código...">
+                    <select id="container-length" class="form-select form-select-sm w-auto shadow-sm">
+                        <option value="10" selected>10 registros</option>
+                        <option value="25">25 registros</option>
+                        <option value="50">50 registros</option>
+                    </select>
                 </div>
-            </section>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Código Acceso</th>
+                            <th>DNI</th>
+                            <th>Estudiante</th>
+                            <th>Categoría</th>
+                            <th>Fecha</th>
+                            <th class="text-center">Nota</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="estudiantes-examenes-table-body"></tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div id="pagination-info" class="text-muted fw-bold small"></div>
+                <nav><ul class="pagination pagination-sm mb-0" id="pagination-controls"></ul></nav>
+            </div>
         </div>
     </div>
 </main>
-<div class="modal fade" id="modalVerExamen" tabindex="-1" aria-labelledby="modalVerExamenLabel" aria-hidden="true">
+
+<div class="modal fade" id="modalVerExamen" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalVerExamenLabel">Detalle del Examen</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">Detalle del Examen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div id="examen-detalle-header" class="mb-4">
-                </div>
-                <div id="examen-preguntas-container">
-                </div>
+                <div id="examen-detalle-header" class="mb-4"></div>
+                <div id="examen-preguntas-container"></div>
                 <div class="d-flex justify-content-end mt-3">
-                    <p class="mb-0"><strong>Calificación Final: </strong> <span id="calificacion-final"></span></p>
+                    <p class="mb-0"><strong>Calificación Final: </strong> <span id="calificacion-final" class="badge bg-primary fs-6"></span></p>
                 </div>
             </div>
             <div class="modal-footer">
@@ -92,290 +78,145 @@ include_once("../includes/sidebar.php");
 
 <script>
     let currentPage = 1;
-    let recordsPerPage = parseInt(document.getElementById('container-length').value);
+    let recordsPerPage = 10;
     let searchTerm = '';
     let totalPages = 1;
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', () => {
         fetchEstudiantesConExamenes();
-
-        const customSearchInput = document.getElementById('customSearch');
-        let searchTimeout;
-        customSearchInput.addEventListener('keyup', function () {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                searchTerm = this.value;
-                currentPage = 1;
-                fetchEstudiantesConExamenes();
-            }, 300);
+        
+        document.getElementById('customSearch').addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            currentPage = 1;
+            fetchEstudiantesConExamenes();
         });
 
-        document.getElementById('container-length').addEventListener('change', function () {
-            recordsPerPage = parseInt(this.value);
+        document.getElementById('container-length').addEventListener('change', (e) => {
+            recordsPerPage = e.target.value;
             currentPage = 1;
             fetchEstudiantesConExamenes();
         });
     });
 
+    // Función PDF
+    window.imprimirExamen = (id) => window.open(`../libreria/imprimir_detalles_examen.php?id=${id}`, '_blank');
+
     async function fetchEstudiantesConExamenes() {
         const tableBody = document.getElementById('estudiantes-examenes-table-body');
-        const paginationInfo = document.getElementById('pagination-info');
-        const paginationControls = document.getElementById('pagination-controls');
-
-        tableBody.innerHTML = `<tr><td colspan="10" class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Cargando...</span>
-            </div>
-            <p class="mt-2">Cargando estudiantes...</p>
-        </td></tr>`;
-        paginationInfo.textContent = '';
-        paginationControls.innerHTML = '';
+        tableBody.innerHTML = '<tr><td colspan="9" class="text-center py-4"><div class="spinner-border text-primary"></div></td></tr>';
 
         try {
-            const response = await fetch(`../api/obtener_estudiantes_con_examenes.php?page=${currentPage}&limit=${recordsPerPage}&search=${encodeURIComponent(searchTerm)}`);
-            const data = await response.json();
-
+            const resp = await fetch(`../api/obtener_estudiantes_con_examenes.php?page=${currentPage}&limit=${recordsPerPage}&search=${encodeURIComponent(searchTerm)}`);
+            const data = await resp.json();
+            
             if (data.status) {
                 totalPages = data.totalPages;
-                renderEstudiantesTable(data.estudiantes);
+                renderTable(data.estudiantes);
                 renderPagination(data.currentPage, data.totalPages, data.totalRecords, data.perPage);
-            } else {
-                tableBody.innerHTML = `<tr><td colspan="10"><div class="alert alert-danger text-center mt-3 mb-3">${data.message || 'Error al cargar los datos de los estudiantes.'}</div></td></tr>`;
-                paginationInfo.textContent = '';
-                paginationControls.innerHTML = '';
             }
-        } catch (error) {
-            console.error('Error al obtener estudiantes con exámenes:', error);
-            tableBody.innerHTML = `<tr><td colspan="10"><div class="alert alert-danger text-center mt-3 mb-3">Error de conexión al servidor. Inténtelo de nuevo.</div></td></tr>`;
-            paginationInfo.textContent = '';
-            paginationControls.innerHTML = '';
+        } catch (e) { 
+            tableBody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error de carga</td></tr>';
         }
     }
 
-    function renderEstudiantesTable(estudiantes) {
+    function renderTable(data) {
         const tableBody = document.getElementById('estudiantes-examenes-table-body');
         tableBody.innerHTML = '';
 
-        if (estudiantes.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="10"><div class="alert alert-warning text-center mt-3 mb-3">
-                <i class="bi bi-exclamation-circle-fill me-2"></i>⚠️ No se encontraron estudiantes con exámenes realizados.
-            </div></td></tr>`;
+        if (data.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="9" class="text-center">Sin resultados</td></tr>';
             return;
         }
 
-        estudiantes.forEach(estudiante => {
-            const row = `
+        data.forEach(est => {
+            const estado = (est.ultimo_estado_examen || 'pendiente').toUpperCase();
+            let badgeColor = '#6c757d'; let txtColor = 'white';
+
+            switch (estado) {
+                case 'FINALIZADO': badgeColor = '#198754'; break;
+                case 'EXPIRADO':   badgeColor = '#dc3545'; break;
+                case 'PENDIENTE':  badgeColor = '#ffc107'; txtColor = 'black'; break;
+                case 'INICIO':
+                case 'PROCESO':    badgeColor = '#0dcaf0'; txtColor = 'black'; break;
+            }
+
+            const nota = est.ultima_calificacion_examen !== null ? parseFloat(est.ultima_calificacion_examen).toFixed(2) : '--';
+            const notaClase = est.ultima_calificacion_examen >= 50 ? 'text-success' : 'text-danger';
+
+            tableBody.innerHTML += `
                 <tr>
-                    <td>${estudiante.estudiante_id}</td>
-                    <td>${escapeHTML(estudiante.dni)}</td>
-                    <td>${escapeHTML(estudiante.estudiante_nombre)} ${escapeHTML(estudiante.apellidos)}</td>
-                    <td>${escapeHTML(estudiante.email || '')}</td>
-                    <td>${escapeHTML(estudiante.telefono || '')}</td>
-                    <td>${escapeHTML(estudiante.ultima_categoria_examen || 'N/A')}</td>
-                    <td>${estudiante.ultima_fecha_examen ? new Date(estudiante.ultima_fecha_examen).toLocaleString() : 'N/A'}</td>
-                    <td>${estudiante.ultima_calificacion_examen !== null ? parseFloat(estudiante.ultima_calificacion_examen).toFixed(2) : 'N/A'}</td>
-                    <td>${escapeHTML(estudiante.ultimo_estado_examen || 'N/A')}</td>
+                    <td class="text-muted small">#${est.ultimo_examen_id}</td>
+                    <td><code class="fw-bold fs-6 text-primary">${est.codigo_acceso}</code></td>
+                    <td class="font-monospace small">${est.dni}</td>
+                    <td><strong>${est.estudiante_nombre} ${est.apellidos}</strong></td>
+                    <td><span class="badge bg-light text-dark border">${est.ultima_categoria_examen}</span></td>
+                    <td class="small">${new Date(est.ultima_fecha_examen).toLocaleDateString()}</td>
+                    <td class="text-center fw-bold ${notaClase}">${nota}</td>
                     <td class="text-center">
-                        <button class="btn btn-sm btn-outline-info" onclick="abrirModalVerExamen(${estudiante.ultimo_examen_id})">
-                            <i class="bi bi-eye me-1"></i> Ver Examen
-                        </button>
-                    
-                            <button class="btn btn-sm btn-outline-warning mb-1"
-                                 onclick="imprimirExamen(${estudiante.ultimo_examen_id})">
-                                 <i class="bi bi-printer-fill me-1"></i> PDF
-                             </button> 
+                        <span class="badge rounded-pill" style="background-color:${badgeColor}; color:${txtColor}; min-width:85px">
+                            ${estado}
+                        </span>
                     </td>
-                </tr>
-            `;
-            tableBody.insertAdjacentHTML('beforeend', row);
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="abrirModalVerExamen(${est.ultimo_examen_id})"><i class="bi bi-eye-fill"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="imprimirExamen(${est.ultimo_examen_id})"><i class="bi bi-file-earmark-pdf-fill"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
         });
     }
-    window.imprimirExamen = function (examenId) {
-        // Aquí puedes redirigir a una página para generar el PDF del examen
-        window.open(`../libreria/imprimir_detalles_examen.php?id=${examenId}`, '_blank');
-    };
-    // Funciones de paginación (copiar de escuelas.php)
-    function renderPagination(currPage, totalPages, totalRecords, perPage) {
-        const paginationInfo = document.getElementById('pagination-info');
-        const paginationControls = document.getElementById('pagination-controls');
-        paginationControls.innerHTML = '';
 
-        if (totalRecords === 0) {
-            paginationInfo.textContent = 'Mostrando 0 de 0 registros';
-            return;
-        }
-
-        const startRecord = (currPage - 1) * perPage + 1;
-        const endRecord = Math.min(currPage * perPage, totalRecords);
-        paginationInfo.textContent = `Mostrando ${startRecord} a ${endRecord} de ${totalRecords} registros`;
-
-        const prevLi = document.createElement('li');
-        prevLi.className = `page-item ${currPage === 1 ? 'disabled' : ''}`;
-        prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous" onclick="changePage(${currPage - 1})"><span aria-hidden="true">&laquo;</span></a>`;
-        paginationControls.appendChild(prevLi);
-
-        const maxPagesToShow = 5;
-        let startPage = Math.max(1, currPage - Math.floor(maxPagesToShow / 2));
-        let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-
-        if (endPage - startPage + 1 < maxPagesToShow) {
-            startPage = Math.max(1, totalPages - maxPagesToShow + 1);
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            const li = document.createElement('li');
-            li.className = `page-item ${i === currPage ? 'active' : ''}`;
-            li.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
-            paginationControls.appendChild(li);
-        }
-
-        const nextLi = document.createElement('li');
-        nextLi.className = `page-item ${currPage === totalPages ? 'disabled' : ''}`;
-        nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next" onclick="changePage(${currPage + 1})"><span aria-hidden="true">&raquo;</span></a>`;
-        paginationControls.appendChild(nextLi);
-    }
-
-    function changePage(page) {
-        if (page >= 1 && page <= totalPages) {
-            currentPage = page;
-            fetchEstudiantesConExamenes();
-        }
-    }
-
-    // --- Lógica del Modal de Detalle de Examen ---
     async function abrirModalVerExamen(examenId) {
-        const modalVerExamen = new bootstrap.Modal(document.getElementById('modalVerExamen'));
-        const examenDetalleHeader = document.getElementById('examen-detalle-header');
-        const examenPreguntasContainer = document.getElementById('examen-preguntas-container');
-        const calificacionFinalSpan = document.getElementById('calificacion-final');
-
-        // Limpiar contenido previo y mostrar carga
-        examenDetalleHeader.innerHTML = `
-            <div class="d-flex justify-content-center align-items-center" style="min-height: 100px;">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Cargando...</span>
-                </div>
-                <p class="ms-2 mb-0">Cargando detalles del examen...</p>
-            </div>
-        `;
-        examenPreguntasContainer.innerHTML = '';
-        calificacionFinalSpan.textContent = '';
-
-        modalVerExamen.show();
+        const modal = new bootstrap.Modal(document.getElementById('modalVerExamen'));
+        const header = document.getElementById('examen-detalle-header');
+        const container = document.getElementById('examen-preguntas-container');
+        header.innerHTML = '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
+        container.innerHTML = '';
+        modal.show();
 
         try {
-            const response = await fetch(`../api/obtener_detalle_examen.php?examen_id=${examenId}`);
-            const data = await response.json();
-
+            const resp = await fetch(`../api/obtener_detalle_examen.php?examen_id=${examenId}`);
+            const data = await resp.json();
             if (data.status) {
-                const examen = data.examen;
-                document.getElementById('modalVerExamenLabel').textContent = `Detalle del Examen: ${escapeHTML(examen.estudiante_nombre)} ${escapeHTML(examen.estudiante_apellidos)}`;
-
-                // Renderizar el encabezado del examen
-                examenDetalleHeader.innerHTML = `
-                    <p><strong>Estudiante:</strong> ${escapeHTML(examen.estudiante_nombre)} ${escapeHTML(examen.estudiante_apellidos)} (${escapeHTML(examen.estudiante_dni)})</p>
-                    <p><strong>Categoría:</strong> ${escapeHTML(examen.categoria_nombre)}</p>
-                    <p><strong>Fecha de Asignación:</strong> ${new Date(examen.fecha_asignacion).toLocaleString()}</p>
-                    <p><strong>Código de Acceso:</strong> ${escapeHTML(examen.codigo_acceso)}</p>
-                    <p><strong>Estado:</strong> ${escapeHTML(examen.estado)}</p>
-                    ${examen.asignado_por_nombre ? `<p><strong>Asignado por:</strong> ${escapeHTML(examen.asignado_por_nombre)}</p>` : ''}
-                `;
-
-                // Renderizar las preguntas
-                renderExamenPreguntas(examen.preguntas, examenPreguntasContainer);
-
-                // Mostrar calificación final
-                calificacionFinalSpan.textContent = examen.calificacion !== null ? parseFloat(examen.calificacion).toFixed(2) : 'N/A';
-
-            } else {
-                examenDetalleHeader.innerHTML = `<div class="alert alert-danger">${data.message || 'Error al cargar el detalle del examen.'}</div>`;
-                examenPreguntasContainer.innerHTML = '';
+                const ex = data.examen;
+                header.innerHTML = `<p><strong>Estudiante:</strong> ${ex.estudiante_nombre} ${ex.estudiante_apellidos}</p>
+                                    <p><strong>Categoría:</strong> ${ex.categoria_nombre} | <strong>Estado:</strong> ${ex.estado}</p>`;
+                document.getElementById('calificacion-final').textContent = ex.calificacion || '0.00';
+                renderExamenPreguntas(ex.preguntas, container);
             }
-        } catch (error) {
-            console.error('Error al obtener detalle del examen:', error);
-            examenDetalleHeader.innerHTML = `<div class="alert alert-danger">Error de conexión al servidor al cargar el examen.</div>`;
-            examenPreguntasContainer.innerHTML = '';
-        }
+        } catch (e) { header.innerHTML = 'Error al cargar.'; }
     }
 
-    function renderExamenPreguntas(preguntas, containerElement) {
-        containerElement.innerHTML = ''; // Limpiar el contenedor
-
-        if (preguntas.length === 0) {
-            containerElement.innerHTML = '<div class="alert alert-info">Este examen no contiene preguntas.</div>';
-            return;
-        }
-
-        preguntas.forEach((pregunta, index) => {
-            const preguntaCard = document.createElement('div');
-            preguntaCard.classList.add('card', 'mb-3');
-
-            // Determinar si la pregunta fue respondida correctamente o incorrectamente
-            const cardBorderClass = pregunta.acierto ? 'border-success' : 'border-danger';
-            const aciertoIcon = pregunta.acierto ? '<i class="bi bi-check-circle-fill text-success me-2"></i>Acierto' : '<i class="bi bi-x-circle-fill text-danger me-2"></i>Error';
-
-            preguntaCard.innerHTML = `
-                <div class="card-header d-flex justify-content-between align-items-center ${cardBorderClass}">
-                    <h6 class="mb-0">Pregunta ${index + 1}: <span class="badge bg-secondary">${escapeHTML(pregunta.tipo.charAt(0).toUpperCase() + pregunta.tipo.slice(1))}</span></h6>
-                    <div>${aciertoIcon}</div>
-                </div>
-                <div class="card-body">
-                    <p class="card-text"><strong>${escapeHTML(pregunta.texto)}</strong></p>
-                    ${pregunta.imagen_ruta ? `<img src="../api/${escapeHTML(pregunta.imagen_ruta)}" class="img-fluid mb-3" alt="Imagen de pregunta" style="max-height: 200px;">` : ''}
-                    <ul class="list-group">
-                        ${pregunta.opciones.map(opcion => {
-                let itemClass = 'list-group-item';
-                let icon = '';
-                let selectedBadge = '';
-
-                // Si el estudiante seleccionó esta opción
-                if (pregunta.respuestas_estudiante_ids.includes(opcion.id)) {
-                    selectedBadge = '<span class="badge bg-primary ms-2">Tu respuesta</span>';
-                    if (opcion.es_correcta) {
-                        itemClass += ' list-group-item-success'; // Respuesta correcta seleccionada
-                        icon = '<i class="bi bi-check-circle-fill text-success me-2"></i>';
-                    } else {
-                        itemClass += ' list-group-item-danger'; // Respuesta incorrecta seleccionada
-                        icon = '<i class="bi bi-x-circle-fill text-danger me-2"></i>';
-                    }
-                } else if (opcion.es_correcta) {
-                    // Si no fue seleccionada por el estudiante pero era correcta
-                    itemClass += ' list-group-item-info'; // Opción correcta no seleccionada
-                    icon = '<i class="bi bi-star-fill text-info me-2"></i>'; // Indicador de la respuesta correcta
-                }
-
-                return `
-                                <li class="${itemClass}">
-                                    ${icon} ${escapeHTML(opcion.texto)} ${selectedBadge}
-                                </li>
-                            `;
-            }).join('')}
-                    </ul>
-                </div>
-            `;
-            containerElement.appendChild(preguntaCard);
+    function renderExamenPreguntas(preguntas, container) {
+        preguntas.forEach((p, idx) => {
+            const card = document.createElement('div');
+            card.className = `card mb-3 border-${p.acierto ? 'success' : 'danger'}`;
+            card.innerHTML = `<div class="card-header d-flex justify-content-between">
+                <span>Pregunta ${idx + 1}</span><span>${p.acierto ? '✅' : '❌'}</span>
+            </div>
+            <div class="card-body">
+                <p><strong>${p.texto}</strong></p>
+                <ul class="list-group">${p.opciones.map(opt => {
+                    let cls = p.respuestas_estudiante_ids.includes(opt.id) ? (opt.es_correcta ? 'list-group-item-success' : 'list-group-item-danger') : (opt.es_correcta ? 'list-group-item-info' : '');
+                    return `<li class="list-group-item ${cls}">${opt.texto} ${p.respuestas_estudiante_ids.includes(opt.id) ? '<b>(Tuya)</b>' : ''}</li>`;
+                }).join('')}</ul>
+            </div>`;
+            container.appendChild(card);
         });
     }
 
-    // Función de utilidad para escapar HTML (prevención XSS)
-    function escapeHTML(str) {
-        const div = document.createElement('div');
-        div.appendChild(document.createTextNode(str));
-        return div.innerHTML;
+    function renderPagination(curr, total, count, per) {
+        const info = document.getElementById('pagination-info');
+        const controls = document.getElementById('pagination-controls');
+        info.textContent = `Mostrando ${(curr-1)*per+1} a ${Math.min(count, curr*per)} de ${count}`;
+        controls.innerHTML = `<li class="page-item ${curr===1?'disabled':''}"><a class="page-link" href="#" onclick="changePage(${curr-1})">&laquo;</a></li>`;
+        for (let i=1; i<=total; i++) {
+            if (i >= curr-2 && i <= curr+2) 
+                controls.innerHTML += `<li class="page-item ${i===curr?'active':''}"><a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+        }
+        controls.innerHTML += `<li class="page-item ${curr===total?'disabled':''}"><a class="page-link" href="#" onclick="changePage(${curr+1})">&raquo;</a></li>`;
     }
 
-    // Inicialización de Bootstrap Validation (si aplica para otros formularios en esta página)
-    (() => {
-        'use strict';
-        const forms = document.querySelectorAll('.needs-validation');
-        Array.from(forms).forEach(form => {
-            form.addEventListener('submit', event => {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            }, false);
-        });
-    })();
+    function changePage(p) { if(p>0 && p<=totalPages) { currentPage = p; fetchEstudiantesConExamenes(); } }
 </script>
