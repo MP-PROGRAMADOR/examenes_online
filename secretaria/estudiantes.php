@@ -5,6 +5,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
 <span class="mt-5"></span>
 <span class="mt-5"></span>
 <main class="main-content" id="content">
+  <!-- Tabla -->
   <div class="card shadow-sm mb-4">
     <div
       class="card-header bg-gradient-primary text-white d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 rounded-top">
@@ -69,6 +70,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
     </div>
   </div>
 
+  <!-- Modal de Registro/Edicion de Estudiante -->
   <div class="modal fade" id="modalEstudiante" tabindex="-1" aria-labelledby="modalEstudianteLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content border-0 shadow rounded-4">
@@ -82,6 +84,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
         <form id="formularioEstudiante" method="POST" class="needs-validation" novalidate>
           <div class="row modal-body p-4 ">
             <input type="hidden" name="estudiante_id" id="estudiante_id">
+            <input type="hidden" name="usuario" id="usuario_estudiante_input">
 
             <div class="mb-3 col-12 col-md-6">
               <label for="dni_estudiante" class="form-label fw-semibold">
@@ -169,12 +172,14 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
             </div>
 
 
+
             <div class="form-check form-switch mb-3 col-12 col-md-6 d-none" id="activo-estudiante-container">
               <input class="form-check-input" type="checkbox" id="activo_estudiante" name="estado" value="activo">
               <label class="form-check-label fw-semibold" for="activo_estudiante">Estudiante
                 activo</label>
             </div>
           </div>
+
 
           <div class="modal-footer bg-light p-3">
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -189,6 +194,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
     </div>
   </div>
 
+  <!--Modal Asignar Categoria  -->
   <div class="modal fade" id="modalAsignarCategoria" tabindex="-1" aria-labelledby="modalLabelCategoria"
     aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -427,7 +433,6 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
             `);
 
       // Números de página
-      // Lógica para mostrar un rango limitado de páginas (ej. 2 antes, 2 después de la actual)
       const maxPagesToShow = 5; // Número máximo de botones de página a mostrar
       let startPage = Math.max(1, paginaActual - Math.floor(maxPagesToShow / 2));
       let endPage = Math.min(totalPaginas, startPage + maxPagesToShow - 1);
@@ -481,7 +486,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
       // Evento para el buscador en tiempo real
       $("#customSearch").on("input", function() {
         currentSearchTerm = $(this).val();
-        currentPage = 1; // Resetear a la primera página en cada búsqueda
+        currentPage = 1; 
         cargarEstudiantes();
       });
 
@@ -507,7 +512,6 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
       cargarEstudiantes();
     });
 
-    // --- Funciones auxiliares y de manejo de modales (tus funciones existentes adaptadas) ---
 
     // Helper para escapar HTML en JS, previene XSS
     function htmlspecialchars(str, type = 'html') {
@@ -587,6 +591,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
       document.getElementById('activo-estudiante-container').classList.add('d-none');
       // Restablecer la validez del formulario
       document.getElementById('formularioEstudiante').classList.remove('was-validated');
+      document.getElementById('usuario_estudiante').value = estudiante.usuario || '';
 
       // Asegurarse de que el select de categorías esté deshabilitado hasta que se ingrese una fecha
       document.getElementById("categorias_id").innerHTML = "<option value=''>Seleccione una categoría</option>";
@@ -603,7 +608,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
     // Editar estudiante (obtiene datos y abre modal)
     async function editarEstudiante(id) {
       try {
-        const response = await fetch(`../api/obtener_estudiante.php?id=${id}`); // Necesitarás crear este endpoint
+        const response = await fetch(`../api/obtener_estudiante.php?id=${id}`); 
         const result = await response.json();
 
         if (result.status) {
@@ -612,6 +617,7 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
           document.getElementById('modalEstudianteBotonTexto').textContent = 'Actualizar';
 
           document.getElementById('estudiante_id').value = estudiante.id || '';
+          document.getElementById('usuario_estudiante_input').value = estudiante.usuario || '';
           document.getElementById('dni_estudiante').value = estudiante.dni || '';
           document.getElementById('nombre_estudiante').value = estudiante.nombre || '';
           document.getElementById('apellidos_estudiante').value = estudiante.apellidos || '';
@@ -619,11 +625,11 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
           document.getElementById('telefono_estudiante').value = estudiante.telefono || '';
           document.getElementById('fecha_nacimiento').value = estudiante.fecha_nacimiento || '';
           document.getElementById('direccion_estudiante').value = estudiante.direccion || '';
-          document.getElementById('num').value = estudiante.Doc || ''; // Asumiendo que 'Doc' es el campo 'num' en tu formulario
+          document.getElementById('num').value = estudiante.Doc || ''; 
 
           // Cargar y seleccionar escuela
           if (estudiante.escuela_id) {
-            $('#escuela_id').val(estudiante.escuela_id); // Usar jQuery para select en caso de que lo uses
+            $('#escuela_id').val(estudiante.escuela_id); 
           }
 
           // Mostrar switch de estado
@@ -633,19 +639,12 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
           // Cargar categorías disponibles y seleccionar la del estudiante si aplica
           if (estudiante.fecha_nacimiento) {
             const edad = calcularEdad(estudiante.fecha_nacimiento);
-            await filtrarCategoriasPorEdad(edad); // Espera a que las categorías se carguen
-            // Después de cargar, selecciona la categoría si el estudiante la tiene
-            // Nota: Tu PHP de lista principal solo trae UNA categoría si hay multiples.
-            // Para editar, idealmente necesitarías traer TODAS las categorías asignadas al estudiante
-            // para una gestión completa. Por ahora, solo selecciona la primera o la principal.
-            // Si 'categoria_id' es el ID de la categoría principal o la primera.
-            if (estudiante.categoria_id) { // Asumiendo que obtienes el ID de la categoría para edición
+            await filtrarCategoriasPorEdad(edad); 
+            if (estudiante.categoria_id) { 
               document.getElementById('categorias_id').value = estudiante.categoria_id;
             }
           }
 
-          // No estás pidiendo el campo usuario para editar, solo para mostrar.
-          // document.getElementById('usuario_estudiante').value = estudiante.usuario || '';
 
           // Restablecer la validez del formulario
           document.getElementById('formularioEstudiante').classList.remove('was-validated');
@@ -683,10 +682,6 @@ require_once 'header.php'; // Asegúrate de que esta ruta sea correcta
         } else {
           formData.set('estado', 'activo'); // Asegurarse de que el valor sea 'activo'
         }
-
-        // Si el campo usuario no está en el formulario, es posible que debas añadirlo manualmente aquí
-        // o revisar si tu API lo espera de otra forma.
-        // formData.append('usuario', document.getElementById('usuario_estudiante').value); 
 
 
         try {

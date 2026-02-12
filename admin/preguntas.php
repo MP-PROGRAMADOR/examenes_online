@@ -32,8 +32,8 @@ include_once("../includes/sidebar.php");
                         <option value="25">25 registros</option>
                     </select>
                 </div>
-                <button class="btn btn-light text-primary fw-semibold shadow-sm" onclick="abrirModalRegistro()">
-                    <i class="bi bi-plus-circle-fill me-2"></i>Nueva Pregunta
+                <button class="btn btn-success fw-semibold shadow-sm" onclick="abrirModalRegistro()">
+                    <i class="bi bi-plus-circle-fill me-2"></i> Nueva Pregunta
                 </button>
             </div>
         </div>

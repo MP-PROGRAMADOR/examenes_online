@@ -186,9 +186,9 @@ $duracion = $examen['duracion'] ?? 50;
                                     </div>
                                 </div>
                                 <div class="modal-footer border-0 justify-content-center pb-4">
-                                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Cancelar</button>
                                     <button type="button" onclick="irAExamen()" class="btn btn-primary rounded-pill px-4 shadow">
-                                        Sí, Comenzar ahora
+                                        <i class="bi bi-check-lg"></i> Sí, Comenzar ahora
                                     </button>
                                 </div>
                             </div>
@@ -232,8 +232,8 @@ $duracion = $examen['duracion'] ?? 50;
                     <p class="mb-0">¿Estás seguro de que deseas salir del panel? Si cierras sesión, tendrás que volver a introducir tu código de acceso para realizar el examen.</p>
                 </div>
                 <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cancelar</button>
-                    <a href="cerrar_sesion.php" class="btn btn-danger px-4 rounded-pill">Sí, salir</a>
+                    <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal"> <i class="bi bi-x-lg"></i> Cancelar</button>
+                    <a href="cerrar_sesion.php" class="btn btn-danger px-4 rounded-pill"><i class="bi bi-check-lg"></i> Sí, salir</a>
                 </div>
             </div>
         </div>

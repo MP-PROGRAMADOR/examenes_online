@@ -45,7 +45,7 @@ try {
                                 <option value="25">25 registros</option>
                             </select>
                         </div>
-                        <button class="btn btn-primary" onclick="abrirModalRegistro()">
+                        <button class="btn btn-success" onclick="abrirModalRegistro()">
                             <i class="bi bi-person-plus-fill me-2"></i>Crear Nueva
                         </button>
                     </div>
@@ -325,11 +325,11 @@ try {
                     <td class="text-center">
                         <div class="d-flex gap-1 justify-content-center flex-wrap">
                             <button class="btn btn-sm btn-outline-warning" onclick='abrirModalEdicion(${JSON.stringify(escuela)})'>
-                                <i class="bi bi-pencil-square me-1"></i> 
+                                <i class="bi bi-pencil-square"></i> 
                             </button>
                             ${userRole === 'admin' ? `
                             <button class="btn btn-sm btn-outline-danger" onclick="eliminarEscuela(${escuela.id}, '${escapeHTML(escuela.nombre)}')">
-                                <i class="bi bi-trash me-1"></i> 
+                                <i class="bi bi-trash"></i> 
                             </button>
                             ` : ''}
                         </div>

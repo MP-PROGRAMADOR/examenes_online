@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         } else {
             // Actualización
-            $sql = "UPDATE estudiantes SET dni = ?, nombre = ?, apellidos = ?, email = ?, usuario = ?, telefono = ?, fecha_nacimiento = ?, direccion = ?, escuela_id = ?, estado = ? WHERE id = ?";
+            $sql = "UPDATE estudiantes SET dni = ?, nombre = ?, apellidos = ?, email = ?, usuario = ?, telefono = ?, fecha_nacimiento = ?, direccion = ?, escuela_id = ?, estado = ?, Doc = ? WHERE id = ?";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 $dni,
@@ -96,6 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $direccion,
                 $escuela_id,
                 $estado,
+                $num,
                 $estudiante_id
             ]);
         }

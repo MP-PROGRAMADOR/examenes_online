@@ -13,22 +13,19 @@ try {
   $total_registros = $total_stmt->fetchColumn();
   $total_paginas = ceil($total_registros / $limite);
 
-  // Consulta paginada con joins
-  // Consulta con categorías agrupadas
   $sql = "
-  SELECT 
-    e.*, 
-    esc.nombre AS escuela, 
-    c.nombre AS categoria, 
-    ec.categoria_id
-FROM estudiantes e
-LEFT JOIN escuelas_conduccion esc ON e.escuela_id = esc.id
-LEFT JOIN estudiante_categorias ec ON ec.estudiante_id = e.id
-LEFT JOIN categorias c ON ec.categoria_id = c.id
-ORDER BY e.creado_en DESC
-LIMIT :inicio, :limite
-
-";
+    SELECT 
+      e.*, 
+      esc.nombre AS escuela, 
+      c.nombre AS categoria, 
+      ec.categoria_id
+  FROM estudiantes e
+  LEFT JOIN escuelas_conduccion esc ON e.escuela_id = esc.id
+  LEFT JOIN estudiante_categorias ec ON ec.estudiante_id = e.id
+  LEFT JOIN categorias c ON ec.categoria_id = c.id
+  ORDER BY e.creado_en DESC
+  LIMIT :inicio, :limite
+  ";
   $stmt = $pdo->prepare($sql);
   $stmt->bindValue(':inicio', $inicio, PDO::PARAM_INT);
   $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
@@ -186,6 +183,7 @@ LIMIT :inicio, :limite
 
 </main>
 
+
 <!-- Modal Registro / Edición Estudiante -->
 <div class="modal fade" id="modalEstudiante" tabindex="-1" aria-labelledby="modalEstudianteLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -287,7 +285,7 @@ LIMIT :inicio, :limite
 
 
           <div class="mb-3 col-12 col-md-6">
-            <label for="categorias_id" class="form-label fw-semibold">
+            <label for="num" class="form-label fw-semibold">
               <i class="bi bi-file-earmark-text me-2 text-primary"></i>Número de Registro del Documento <span
                 class="text-danger">*</span>
             </label>
@@ -297,13 +295,13 @@ LIMIT :inicio, :limite
 
 
           <!-- Usuario -->
-          <!--  <div class="mb-3 col-12 col-md-6">
+          <div class="mb-3 col-12 col-md-6">
             <label for="usuario_estudiante" class="form-label fw-semibold">
               <i class="bi bi-person-badge-fill me-2 text-primary"></i>Usuario <span class="text-danger">*</span>
             </label>
-            <input type="text" class="form-control shadow-sm" id="usuario_estudiante" name="usuario" required>
+            <input type="hidden" id="usuario_estudiante" name="usuario">
             <div class="invalid-feedback">Por favor asigna un nombre de usuario único.</div>
-          </div> -->
+          </div>
 
 
           <!-- Estado (solo en edición) -->
@@ -325,6 +323,9 @@ LIMIT :inicio, :limite
     </div>
   </div>
 </div>
+
+
+
 
 <!-- MODAL listado de categorías asignadas al estudiante basado en su ID -->
 <div class="modal fade" id="modalAsignarCategoria" tabindex="-1" aria-labelledby="modalLabelCategoria"
@@ -480,7 +481,7 @@ LIMIT :inicio, :limite
         });
 
         if (tieneOpciones) {
-          select.disabled = false; //habilitar si existen categias para la edad ingresada en el campo fecha de nacimiento
+          select.disabled = false;
 
         } else {
           select.disabled = true; //deshabilitar el campo categorias si no hay edad
@@ -533,6 +534,9 @@ LIMIT :inicio, :limite
     document.getElementById('telefono_estudiante').value = estudiante.telefono || '';
     document.getElementById('fecha_nacimiento').value = estudiante.fecha_nacimiento || '';
     document.getElementById('direccion_estudiante').value = estudiante.direccion || '';
+    document.getElementById('num').value = estudiante.Doc || estudiante.num || '';
+    document.getElementById('usuario_estudiante').value = estudiante.usuario || '';
+
 
 
     // Seleccionar escuela si está presente
@@ -546,11 +550,20 @@ LIMIT :inicio, :limite
       document.getElementById('activo_estudiante').checked = estudiante.estado === 'activo' || estudiante.estado === 1;
     }
 
-    // Mostrar opciones de categoría según edad si fecha está presente
+    const selectCategoria = document.getElementById('categorias_id');
+    selectCategoria.disabled = false;
+
     if (estudiante.fecha_nacimiento) {
       const edad = calcularEdad(estudiante.fecha_nacimiento);
       filtrarCategoriasPorEdad(edad);
     }
+    setTimeout(() => {
+      const valorCategoria = estudiante.categoria_id || estudiante.categorias_id;
+      if (valorCategoria) {
+        selectCategoria.value = valorCategoria;
+        console.log("Categoría asignada:", valorCategoria);
+      }
+    }, 150);
 
     if (estudiante.escuela_id) {
       document.getElementById('escuela_id').value = estudiante.escuela_id;
@@ -654,7 +667,6 @@ LIMIT :inicio, :limite
   }
 
 
-
   // Ejecutar al cargar la página
   document.addEventListener('DOMContentLoaded', cargarEscuelas, cargarCategoriasEstudiante);
 
@@ -686,22 +698,20 @@ LIMIT :inicio, :limite
         if (data.status && data.data.length > 0) {
           data.data.forEach(cat => {
             tbody.innerHTML += `
-                            <tr>
-                              <td>${cat.id}</td>
-                              <td>${cat.categoria}</td>
-                              <td><span class="badge bg-${estadoColor(cat.estado)}">${cat.estado}</span></td>
-                              <td>${cat.fecha_asignacion}</td> 
+              <tr>
+                <td>${cat.id}</td>
+                <td>${cat.categoria}</td>
+                <td><span class="badge bg-${estadoColor(cat.estado)}">${cat.estado}</span></td>
+                <td>${cat.fecha_asignacion}</td> 
                               
-                              <td class="text-center">
-                                
-                                
-                                <button class="btn btn-sm btn-outline-danger" title="Eliminar asignación"
-                                  onclick="eliminarCategoriaAsignada(${cat.id}, ${cat.estudiante_id})">
-                                  <i class="bi bi-trash"></i>
-                                </button>
-                              </td>
-                            </tr>
-                            `;
+                <td class="text-center">
+                  <button class="btn btn-sm btn-outline-danger" title="Eliminar asignación"
+                    onclick="eliminarCategoriaAsignada(${cat.id}, ${cat.estudiante_id})">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              `;
 
           });
         } else {
@@ -863,9 +873,6 @@ LIMIT :inicio, :limite
       })
   }
 </script>
-
-
-
 
 
 <?php include_once('../includes/footer.php'); ?>

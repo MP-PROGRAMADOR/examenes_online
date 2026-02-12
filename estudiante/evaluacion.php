@@ -22,6 +22,8 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
     <title>Examen en Curso</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <style>
         body {
             background-color: #f0f2f5;
@@ -201,80 +203,100 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
         </div>
     </div>
 
-   <script src="../js/bootstrap.bundle.min.js"></script>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+        <div id="toastFinalizado" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-check-circle me-2"></i>
+                    <span id="mensajeToast">Examen finalizado. Redirigiendo...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 
     <script>
+        // --- 1. CONFIGURACIÓN Y VARIABLES GLOBALES ---
         const params = new URLSearchParams(window.location.search);
         let examenId = params.get('examen_id');
         let preguntaActual = 0;
         let totalPreguntas = 0;
         let listaPreguntas = [];
         let seleccionUsuario = null;
-        // Temporizador General
-        let tiempoRestanteGeneral = 0; // Duración total del examen en segundos
-        let intervaloTemporizadorGeneral; // ID del intervalo para el temporizador general
-        // Elementos del DOM
-        const btnSiguiente = document.getElementById('btnSiguiente');
-        const preguntaContenido = document.getElementById('preguntaContenido');
-        const modalSalir = new bootstrap.Modal(document.getElementById('modalSalir'));
-        const confirmarSalir = document.getElementById('confirmarSalir');
-        const progresoBarra = document.getElementById('progresoBarra');
-        const temporizadorGeneralDisplay = document.getElementById('temporizadorGeneral');
-        // Evitar navegación/salida
-        window.onbeforeunload = () => "¿Seguro que quieres salir? El examen se cancelará.";
-        // Detectar cambio de pestaña o minimización - CONSIDERACIÓN: Podrías hacer que el examen finalice automáticamente aquí
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden') {
-                // Opcional: Finalizar examen si el usuario cambia de pestaña
-                clearInterval(intervaloTemporizadorGeneral);
-                window.onbeforeunload = null;
-            }
-        });
-        // Evitar recargar con Ctrl+R o F5
-        document.addEventListener('keydown', e => {
-            if ((e.ctrlKey && (e.key === 'r' || e.key === 'R')) || e.key === 'F5') {
-                e.preventDefault();
-                modalSalir.show();
-            }
-        });
-        // Confirmar salida desde el modal
-        confirmarSalir.addEventListener('click', () => {
-            clearInterval(intervaloTemporizadorGeneral);
-            window.onbeforeunload = null;
-            window.location.href = 'cerrar_sesion.php';
-        });
-        // 🚫 Bloqueo para dispositivos pequeños
-        const esDispositivoPequenio = window.innerWidth <= 768 || /android|iphone|ipad/.test(navigator.userAgent.toLowerCase());
-        if (esDispositivoPequenio) {
-            alert('Este examen no está disponible para dispositivos pequeños. Por favor, usa una pantalla más grande.');
-            window.location.href = 'cerrar_sesion.php?motivo=Dispositivo_no_permitido';
-        }
+        let tiempoRestanteGeneral = 0;
+        let intervaloTemporizadorGeneral;
+        let finalizandoProceso = false;
 
-        // --- Funciones de Temporizador ---
-        function formatTime(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = seconds % 60;
-            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-        }
+        // --- 2. ELEMENTOS DEL DOM ---
+        const UI = {
+            btnSiguiente: document.getElementById('btnSiguiente'),
+            preguntaContenido: document.getElementById('preguntaContenido'),
+            preguntaTitulo: document.getElementById('preguntaTitulo'),
+            progresoBarra: document.getElementById('progresoBarra'),
+            temporizadorDisplay: document.getElementById('temporizadorGeneral'),
+            confirmarSalir: document.getElementById('confirmarSalir'),
+            modalSalir: new bootstrap.Modal(document.getElementById('modalSalir')),
+            toast: new bootstrap.Toast(document.getElementById('toastFinalizado'))
+        };
 
-        function iniciarTemporizadorGeneral() {
-            clearInterval(intervaloTemporizadorGeneral); // Asegura que no haya intervalos duplicados
-            temporizadorGeneralDisplay.innerText = formatTime(tiempoRestanteGeneral);
+        // --- 3. SEGURIDAD Y BLOQUEOS ---
+        const inicializarSeguridad = () => {
+            // Bloqueo de navegación
+            window.onbeforeunload = () => "¿Seguro que quieres salir? El examen se cancelará.";
 
-            intervaloTemporizadorGeneral = setInterval(() => {
-                tiempoRestanteGeneral--;
-                temporizadorGeneralDisplay.innerText = formatTime(tiempoRestanteGeneral);
+            // Evitar botón atrás del navegador
+            history.pushState(null, null, location.href);
+            window.onpopstate = () => {
+                history.go(1);
+                UI.modalSalir.show();
+            };
 
-                if (tiempoRestanteGeneral <= 0) {
+            // Detectar cambio de pestaña
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') {
                     clearInterval(intervaloTemporizadorGeneral);
-                    finalizarExamenPorTiempo();
+                    window.onbeforeunload = null;
                 }
-            }, 1000);
-        }
-        // --- Lógica del Examen ---
-        function cargarPreguntas() {
+            });
+
+            // Evitar F5 / Ctrl+R
+            document.addEventListener('keydown', e => {
+                if ((e.ctrlKey && (e.key === 'r' || e.key === 'R')) || e.key === 'F5') {
+                    e.preventDefault();
+                    UI.modalSalir.show();
+                }
+            });
+
+            // Bloqueo dispositivos pequeños
+            const esMovil = window.innerWidth <= 768 || /android|iphone|ipad/.test(navigator.userAgent.toLowerCase());
+            if (esMovil) {
+                alert('Este examen requiere una pantalla más grande.');
+                window.location.href = 'cerrar_sesion.php?motivo=Dispositivo_no_permitido';
+            }
+        };
+
+        // --- 4. TEMPORIZADOR ---
+        const temporizador = {
+            formatear: (s) => `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`,
+            iniciar: () => {
+                clearInterval(intervaloTemporizadorGeneral);
+                UI.temporizadorDisplay.innerText = temporizador.formatear(tiempoRestanteGeneral);
+                intervaloTemporizadorGeneral = setInterval(() => {
+                    tiempoRestanteGeneral--;
+                    UI.temporizadorDisplay.innerText = temporizador.formatear(tiempoRestanteGeneral);
+                    if (tiempoRestanteGeneral <= 0) {
+                        clearInterval(intervaloTemporizadorGeneral);
+                        finalizarExamenPorTiempo();
+                    }
+                }, 1000);
+            }
+        };
+
+        // --- 5. LÓGICA DEL EXAMEN (CARGA Y RENDERIZADO) ---
+        async function cargarPreguntas() {
             if (!examenId || isNaN(examenId)) {
-                alert("Examen inválido (ID no definido en URL).");
                 window.location.href = 'cerrar_sesion.php';
                 return;
             }
@@ -282,131 +304,92 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
             const datos = new FormData();
             datos.append('examen_id', examenId);
 
-            fetch('../api/obtener_preguntas.php', {
-                method: 'POST',
-                body: datos
-            })
-                .then(res => {
-                    if (!res.ok) {
-                        throw new Error(`HTTP error! status: ${res.status}`);
-                    }
-                    return res.json();
-                })
-                .then(res => {
-                    if (!res.status) {
-                        console.error("Error al cargar preguntas:", res.message);
-                        alert("No se pudieron cargar las preguntas: " + res.message);
-                        window.location.href = 'cerrar_sesion.php';
-                    } else {
-                        listaPreguntas = res.preguntas;
-                        totalPreguntas = res.preguntas.length;
-                        tiempoRestanteGeneral = res.duracion;
-
-                        if (totalPreguntas > 0 && tiempoRestanteGeneral > 0) {
-                            mostrarPregunta();
-                            iniciarTemporizadorGeneral(); // Inicia el temporizador general
-                        } else {
-                            alert("El examen no tiene preguntas o la duración es inválida.");
-                            window.location.href = 'cerrar_sesion.php';
-                        }
-                    }
-                })
-                .catch(err => {
-                    alert('Error inesperado al cargar preguntas: ' + err.message);
-                    console.error(err);
-                    // window.location.href = 'cerrar_sesion.php';
+            try {
+                const res = await fetch('../api/obtener_preguntas.php', {
+                    method: 'POST',
+                    body: datos
                 });
+                const data = await res.json();
+
+                if (!data.status) throw new Error(data.message);
+
+                listaPreguntas = data.preguntas;
+                totalPreguntas = data.preguntas.length;
+                tiempoRestanteGeneral = data.duracion;
+
+                if (totalPreguntas > 0 && tiempoRestanteGeneral > 0) {
+                    mostrarPregunta();
+                    temporizador.iniciar();
+                } else {
+                    throw new Error("Sin preguntas o duración inválida.");
+                }
+            } catch (err) {
+                alert("Error: " + err.message);
+                window.location.href = 'cerrar_sesion.php';
+            }
         }
 
         function mostrarPregunta() {
-            if (preguntaActual >= totalPreguntas) {
-                return finalizarExamen(); // Finaliza el examen si no hay más preguntas
-            }
-            const pregunta = listaPreguntas[preguntaActual];
-            seleccionUsuario = null; // Reiniciar selección
-            btnSiguiente.disabled = true;
-            // Actualizar barra de progreso
+            if (preguntaActual >= totalPreguntas) return finalizarExamen();
+
+            const p = listaPreguntas[preguntaActual];
+            seleccionUsuario = null;
+            UI.btnSiguiente.disabled = true;
+
+            // Actualizar Progreso
             const progreso = Math.round(((preguntaActual + 1) / totalPreguntas) * 100);
-            progresoBarra.style.width = `${progreso}%`;
-            progresoBarra.innerText = `Pregunta ${preguntaActual + 1} de ${totalPreguntas}`;
-            // Actualizar título de la pregunta
-            document.getElementById('preguntaTitulo').innerHTML = `
-                <h5 class="fw-semibold mb-0 text-primary d-flex align-items-start">
-                    <i class="bi bi-question-circle me-2"></i> ${pregunta.texto}
-                </h5>`;
+            UI.progresoBarra.style.width = `${progreso}%`;
+            UI.progresoBarra.innerText = `Pregunta ${preguntaActual + 1} de ${totalPreguntas}`;
 
-            // Renderizar imagen (si existe)
-            const imagenHTML = (pregunta.imagenes && pregunta.imagenes.length > 0 && pregunta.imagenes[0].ruta_imagen)
-                ? `<div class="text-center border border-2 mb-4 p-3 rounded-3 bg-light">
-                        <img src="../api/${pregunta.imagenes[0].ruta_imagen}"
-                            class="img-fluid rounded-3 shadow-sm"
-                            style="max-width: 400px; max-height: 300px; object-fit: contain;"
-                            alt="Imagen relacionada">
-                    </div>`
-                : '';
+            // Título e Imagen
+            UI.preguntaTitulo.innerHTML = `<h5 class="fw-semibold mb-0 text-primary"><i class="bi bi-question-circle me-2"></i> ${p.texto}</h5>`;
+            const imgHTML = (p.imagenes?.[0]?.ruta_imagen) ?
+                `<div class="text-center mb-4"><img src="../api/${p.imagenes[0].ruta_imagen}" class="img-fluid rounded shadow-sm" style="max-height: 250px;"></div>` : '';
 
-            // Renderizar opciones
+            // Opciones
             let opcionesHTML = '';
-            const crearOpcion = (id, texto, tipo) => `
-                <div class="opcion p-3 border rounded-3 mb-3 bg-light shadow-sm d-flex justify-content-between align-items-center fs-5" data-option-id="${id}">
-                    <label class="mb-0 flex-grow-1" for="opcion-${id}">${texto}</label>
-                    <input class="form-check-input fs-4 ms-3" type="${tipo}" name="opciones" value="${id}" id="opcion-${id}">
-                </div>`;
+            const items = p.tipo === 'vf' ? [{
+                id: "1",
+                texto: "Verdadero"
+            }, {
+                id: "0",
+                texto: "Falso"
+            }] : p.opciones;
+            const tipoInput = (p.tipo === 'multiple') ? 'checkbox' : 'radio';
 
-            if (pregunta.tipo === 'vf') {
-                opcionesHTML += crearOpcion("1", "Verdadero", "radio");
-                opcionesHTML += crearOpcion("0", "Falso", "radio");
-            } else {
-                pregunta.opciones.forEach(op => {
-                    const tipoInput = pregunta.tipo === 'multiple' ? 'checkbox' : 'radio';
-                    opcionesHTML += crearOpcion(op.id, op.texto, tipoInput);
-                });
-            }
-
-            document.getElementById('preguntaContenido').innerHTML = `
-                ${imagenHTML}
-                <form id="formPregunta" class="mt-3">${opcionesHTML}</form>
-            `;
-
-            // Event Listeners para opciones
-            document.querySelectorAll('.opcion').forEach(opcionDiv => {
-                opcionDiv.addEventListener('click', function () {
-                    const input = this.querySelector('input[name="opciones"]');
-                    if (input) {
-                        // Para radios, desmarcar otros y marcar este
-                        if (input.type === 'radio') {
-                            document.querySelectorAll('input[name="opciones"]').forEach(radio => radio.checked = false);
-                        }
-                        input.checked = !input.checked; // Alternar para checkboxes, marcar para radios
-
-                        // Asegurarse de que el botón Siguiente se habilite si hay alguna selección
-                        seleccionUsuario = Array.from(document.querySelectorAll('input[name="opciones"]:checked')).length > 0;
-                        btnSiguiente.disabled = !seleccionUsuario;
-                    }
-                });
+            items.forEach(op => {
+                opcionesHTML += `
+            <div class="opcion p-3 border rounded-3 mb-3 bg-light d-flex justify-content-between align-items-center cursor-pointer" onclick="seleccionarOpcion(this, '${tipoInput}')">
+                <label class="mb-0 flex-grow-1 cursor-pointer">${op.texto}</label>
+                <input class="form-check-input fs-4 ms-3" type="${tipoInput}" name="opciones" value="${op.id}">
+            </div>`;
             });
-            // Asegurar que el cambio en el input también actualice el estado
-            document.querySelectorAll('input[name="opciones"]').forEach(input => {
-                input.addEventListener('change', () => {
-                    seleccionUsuario = Array.from(document.querySelectorAll('input[name="opciones"]:checked')).length > 0;
-                    btnSiguiente.disabled = !seleccionUsuario;
-                });
-            });
+
+            UI.preguntaContenido.innerHTML = `${imgHTML}<form id="formPregunta">${opcionesHTML}</form>`;
         }
 
-        async function guardarRespuestaYContinuar() {
-            const seleccionados = Array.from(document.querySelectorAll('input[name="opciones"]:checked'))
-                .map(input => input.value);
+        // Helper para selección
+        window.seleccionarOpcion = (el, tipo) => {
+            const input = el.querySelector('input');
+            if (tipo === 'radio') {
+                document.querySelectorAll('input[name="opciones"]').forEach(r => r.checked = false);
+            }
+            input.checked = !input.checked;
+            UI.btnSiguiente.disabled = !document.querySelector('input[name="opciones"]:checked');
+        };
 
+        // --- 6. GUARDADO Y FINALIZACIÓN ---
+        async function guardarRespuestaYContinuar() {
+            const seleccionados = Array.from(document.querySelectorAll('input[name="opciones"]:checked')).map(i => i.value);
             const datos = new FormData();
             datos.append('examen_id', examenId);
             datos.append('pregunta_id', listaPreguntas[preguntaActual].pregunta_id);
             datos.append('tipo_pregunta', listaPreguntas[preguntaActual].tipo);
-            // Si no hay selección, envía un array vacío o un valor nulo, según tu API
+
             if (seleccionados.length > 0) {
                 seleccionados.forEach(id => datos.append('opciones[]', id));
             } else {
-                datos.append('opciones[]', ''); // O enviar un indicador de "sin respuesta" si tu API lo espera
+                datos.append('opciones[]', '');
             }
 
             try {
@@ -414,89 +397,111 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
                     method: 'POST',
                     body: datos
                 });
-
                 const data = await res.json();
 
-                if (data.status) {
-                    if (data.finalizado) {
-                        finalizarExamen()
-                    } else {
-                        console.log("Respuesta guardada:", data.data);
-                        preguntaActual++;
-                        mostrarPregunta(); // Muestra la siguiente pregunta o finaliza
-                    }
-
+                if (data.status && data.finalizado) {
+                    finalizarExamen();
                 } else {
-                    console.error("Error al guardar la respuesta:", data.message);
-                    // Decide cómo manejar un error al guardar la respuesta. Podrías continuar o alertar.
-                    // Por ahora, solo logueamos el error y continuamos para no detener el examen.
                     preguntaActual++;
                     mostrarPregunta();
                 }
             } catch (error) {
-                console.error('Error en la solicitud de guardar respuesta:', error);
-                alert('Hubo un problema al guardar tu respuesta. Por favor, verifica tu conexión o contacta soporte.');
-                // En un escenario real, podrías querer pausar el examen o forzar la salida
-                preguntaActual++; // Intentar avanzar a la siguiente pregunta a pesar del error
+                console.error("Error guardando:", error);
+                preguntaActual++;
                 mostrarPregunta();
             }
         }
 
-        // Listener para el botón "Siguiente"
-        btnSiguiente.addEventListener('click', () => {
-            guardarRespuestaYContinuar();
-        });
+        async function procesarFinalizacion() {
+            if (finalizandoProceso) return;
+            finalizandoProceso = true;
 
-        function finalizarExamen() {
-            clearInterval(intervaloTemporizadorGeneral);
-            window.onbeforeunload = null; // Quitar el aviso de salida
-            alert('¡Has finalizado el examen!');
-            window.location.href = `cerrar_sesion.php?examen_id=${examenId}&estado=finalizado`;
-        }
-
-        async function finalizarExamenPorTiempo() {
             clearInterval(intervaloTemporizadorGeneral);
             window.onbeforeunload = null;
-            // Verifica si estás en la última pregunta sin responder aún
-            if (preguntaActual < totalPreguntas) {
-                await guardarRespuestaYContinuar(); // Espera a que se guarde la última respuesta
-            }
-            alert('¡Se ha agotado el tiempo para el examen! El examen ha finalizado.');
-            // Redirigir al final
-            window.location.href = `cerrar_sesion.php?examen_id=${examenId}&estado=tiempo_agotado`;
-        }
 
-        // Iniciar la carga de preguntas al cargar la página
-        cargarPreguntas();
-
-        function finalizarExamenPorFraude() {
+            const seleccionados = Array.from(document.querySelectorAll('input[name="opciones"]:checked')).map(i => i.value);
             const datos = new FormData();
             datos.append('examen_id', examenId);
-            datos.append('accion', 'fraude');
+            datos.append('forzar_finalizacion', 'true');
 
-            fetch('../api/guardar_respuesta.php', {
-                method: 'POST',
-                body: datos
-            })
-                .then(res => {
-                    if (!res.ok) {
-                        throw new Error(`HTTP error! status: ${res.status}`);
-                    }
-                    return res.json();
-                })
-                .then(res => {
-                    if (res.status) {
-                        console.error("Fraude ", res.message);
-                        alert("FRAUDE: " + res.message);
-                        window.location.href = 'cerrar_sesion.php';
-                    }
-                })
-                .catch(err => {
-                    alert('Error inesperado al finalizar examen: ' + err.message);
-                    console.error(err);
-                    // window.location.href = 'cerrar_sesion.php';
+            if (seleccionados.length > 0 && listaPreguntas[preguntaActual]) {
+                seleccionados.forEach(id => datos.append('opciones[]', id));
+                datos.append('pregunta_id', listaPreguntas[preguntaActual].pregunta_id);
+                datos.append('tipo_pregunta', listaPreguntas[preguntaActual].tipo);
+            } else {
+                // Importante: Enviar opciones vacías si no hay selección para no romper la validación
+                datos.append('opciones[]', '');
+                datos.append('pregunta_id', listaPreguntas[preguntaActual]?.pregunta_id || 0);
+                datos.append('tipo_pregunta', listaPreguntas[preguntaActual]?.tipo || 'unica');
+            }
+
+            try {
+                const res = await fetch('../api/guardar_respuesta.php', {
+                    method: 'POST',
+                    body: datos
                 });
+                const resultado = await res.json();
+
+                // AQUÍ ESTÁ EL CAMBIO PARA EL 100%
+                const nota = (resultado.data && resultado.data.calificacion_final !== undefined) ?
+                    resultado.data.calificacion_final :
+                    0;
+
+                const toastEl = document.getElementById('toastFinalizado');
+                const mensajeToast = document.getElementById('mensajeToast');
+
+                toastEl.classList.remove('bg-danger');
+                toastEl.classList.add('bg-success');
+
+                mensajeToast.innerHTML = `
+            <div class="text-center text-white">
+                <i class="bi bi-check-circle-fill fs-2 mb-2"></i>
+                <h6 class="mb-1">Examen Finalizado</h6>
+                <p class="mb-0">Tu calificación: <b>${nota}%</b></p>
+            </div>`;
+
+                UI.toast.show();
+                setTimeout(() => {
+                    window.location.href = 'cerrar_sesion.php';
+                }, 4000);
+
+            } catch (e) {
+                console.error("Error finalizando:", e);
+                window.location.href = 'cerrar_sesion.php';
+            }
         }
+
+
+
+
+        const finalizarExamen = () => procesarFinalizacion('finalizado');
+
+        async function finalizarExamenPorTiempo() {
+            const haySeleccion = document.querySelector('input[name="opciones"]:checked');
+            if (haySeleccion) await guardarRespuestaYContinuar();
+            procesarFinalizacion('tiempo_agotado');
+        }
+
+        // --- 7. EVENT LISTENERS ---
+        UI.btnSiguiente.addEventListener('click', guardarRespuestaYContinuar);
+        UI.confirmarSalir.addEventListener('click', () => {
+            UI.modalSalir.hide();
+            procesarFinalizacion('abandonado');
+        });
+
+        // --- 8. INICIO ---
+        inicializarSeguridad();
+        cargarPreguntas();
     </script>
+
+
+
+
+
+
+    <script src="../js/bootstrap.bundle.min.js"></script>
+
+
 </body>
+
 </html>

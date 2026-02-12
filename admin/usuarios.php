@@ -185,7 +185,7 @@ include_once("../includes/sidebar.php");
         // Event listener para el campo de búsqueda
         document.getElementById('customSearch').addEventListener('input', (event) => {
             searchTerm = event.target.value.trim().toLowerCase(); // Convertir a minúsculas para búsqueda insensible a mayúsculas/minúsculas
-            currentPage = 1; // Volver a la primera página al realizar una nueva búsqueda
+            currentPage = 1; 
             applyFiltersAndRenderTable(); // Reaplicar filtros y renderizar
         });
 
@@ -267,11 +267,11 @@ include_once("../includes/sidebar.php");
                     <td>${escapeHtml(usuario.creado_en)}</td>
                     <td class="text-center">
                         ${usuario.activo == 1 ? `
-                            <button class="btn btn-outline-success btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
+                            <button class="btn text-success btn-sm d-flex align-items-center gap-2 px-3 shadow-sm"
                                 title="Haz clic para desactivar" onclick="cambiarEstadoUsuario(${usuario.id}, false)">
                                 <i class="bi bi-toggle-on fs-5"></i> Activo
                             </button>` : `
-                            <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
+                            <button class="btn text-danger btn-sm d-flex align-items-center gap-2 px-3 shadow-sm"
                                 title="Haz clic para activar" onclick="cambiarEstadoUsuario(${usuario.id}, true)">
                                 <i class="bi bi-toggle-off fs-5"></i> Inactivo
                             </button>`
@@ -286,13 +286,13 @@ include_once("../includes/sidebar.php");
                                 rol: '${escapeHtml(usuario.rol)}',
                                 activo: ${usuario.activo}
                             })">
-                                <i class="bi bi-pencil-square me-1"></i> Editar
+                                <i class="bi bi-pencil-square"></i> 
                             </button>
                             <?php if (isset($rol) && $rol === 'admin'): ?>
                                 <button class="btn btn-sm btn-outline-danger eliminar-usuario-btn"
                                     onclick="eliminarUsuario(${usuario.id}, '${escapeHtml(usuario.nombre)}')"
                                     title="Eliminar Usuario">
-                                    <i class="bi bi-trash me-1"></i> Eliminar
+                                    <i class="bi bi-trash"></i> 
                                 </button>
                             <?php endif; ?>
                         </div>

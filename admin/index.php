@@ -32,11 +32,8 @@ try {
   foreach ($totales as $key => $sql) {
     $stmt = $pdo->query($sql);
     $$key = $stmt->fetchColumn() ?: 0;
-
-
   }
 
-  
 
 
   $sql = "
@@ -54,32 +51,43 @@ try {
   $balanceCategorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-   $sql = "
+  $sqlExamenes = "
     SELECT 
       estado,
       COUNT(*) AS total,
       AVG(CASE WHEN estado = 'finalizado' THEN calificacion ELSE NULL END) AS promedio
     FROM examenes
     GROUP BY estado
-  ";
-  $stmt = $pdo->query($sql);
-  $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+";
+  $stmtExamenes = $pdo->query($sqlExamenes);
+  $resultadosExamenes = $stmtExamenes->fetchAll(PDO::FETCH_ASSOC);
 
-  foreach ($resultados as $r) {
+  // Inicializamos con todos los estados posibles para evitar errores en JS
+  $estadoExamenes = [
+    'pendiente' => 0,
+    'en_progreso' => 0, // Por si acaso se usa
+    'finalizado' => 0,
+    'expirado' => 0,
+    'INICIO' => 0,
+    'promedio_finalizados' => 0
+  ];
+
+  foreach ($resultadosExamenes as $r) {
     $estado = $r['estado'];
-    $estadoExamenes[$estado] = intval($r['total']);
+    if (array_key_exists($estado, $estadoExamenes)) {
+      $estadoExamenes[$estado] = intval($r['total']);
+    }
     if ($estado === 'finalizado') {
       $estadoExamenes['promedio_finalizados'] = round($r['promedio'] ?? 0, 2);
     }
   }
-  
 } catch (PDOException $e) {
   error_log("Error al cargar resumen del dashboard: " . $e->getMessage());
   // Asignar valores por defecto seguros
   $totalEstudiantes = $totalCategorias = $totalEscuelas = $totalExamenes = 0;
   $totalPreguntas = $totalCorreos = $totalUsuarios = 0;
 }
- 
+
 
 ?>
 
@@ -116,75 +124,75 @@ try {
   </div>
   <hr>
 
-  <div class="row mt-5 mb-4"">
+  <div class="row mt-5 mb-4">
     <div class=" col-12 col-md-4 col-lg-3">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h5 class="card-title mb-3">
-          <i class="bi bi-graph-up-arrow me-2 text-warning"></i>Estado Actual de Exámenes
-        </h5>
-        <canvas id="estadoExamenesChart" height="100"></canvas>
-        <div class="text-end mt-2">
-          <small class="text-muted">
-            Promedio de calificación (finalizados): <strong><?= $estadoExamenes['promedio_finalizados'] ?></strong>
-          </small>
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-3">
+            <i class="bi bi-graph-up-arrow me-2 text-warning"></i>Estado Actual de Exámenes
+          </h5>
+          <canvas id="estadoExamenesChart" height="100"></canvas>
+          <div class="text-end mt-2">
+            <small class="text-muted">
+              Promedio de calificación (finalizados): <strong><?= $estadoExamenes['promedio_finalizados'] ?></strong>
+            </small>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
 
-  <div class="col-12 col-md-4 col-lg-4 mx-auto">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h5 class="card-title mb-3"><i class="bi bi-clipboard-data me-2"></i>Balance por Categoría</h5>
-        <div class="table-responsive">
-          <table class="table table-bordered align-middle text-center">
-            <thead class="table-light">
-              <tr>
-                <th>Categoría</th>
-                <th>Aprobados</th>
-                <th>Reprobados</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($balanceCategorias as $row): ?>
+    <div class="col-12 col-md-4 col-lg-4 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-3"><i class="bi bi-clipboard-data me-2"></i>Balance por Categoría</h5>
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center">
+              <thead class="table-light">
                 <tr>
-                  <td><?= htmlspecialchars($row['categoria']) ?></td>
-                  <td class="text-success fw-bold"><?= intval($row['aprobados']) ?></td>
-                  <td class="text-danger fw-bold"><?= intval($row['reprobados']) ?></td>
+                  <th>Categoría</th>
+                  <th>Aprobados</th>
+                  <th>Reprobados</th>
                 </tr>
-              <?php endforeach; ?>
-              <?php if (empty($balanceCategorias)): ?>
-                <tr>
-                  <td colspan="3">No hay datos registrados</td>
-                </tr>
-              <?php endif; ?>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                <?php foreach ($balanceCategorias as $row): ?>
+                  <tr>
+                    <td><?= htmlspecialchars($row['categoria']) ?></td>
+                    <td class="text-success fw-bold"><?= intval($row['aprobados']) ?></td>
+                    <td class="text-danger fw-bold"><?= intval($row['reprobados']) ?></td>
+                  </tr>
+                <?php endforeach; ?>
+                <?php if (empty($balanceCategorias)): ?>
+                  <tr>
+                    <td colspan="3">No hay datos registrados</td>
+                  </tr>
+                <?php endif; ?>
+              </tbody>
+            </table>
+          </div>
+          <canvas id="categoriaChart" height="100" class="mt-4"></canvas>
         </div>
-        <canvas id="categoriaChart" height="100" class="mt-4"></canvas>
       </div>
     </div>
-  </div>
 
 
-  <div class="col-12 col-md-4 col-lg-3 mx-auto">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h5 class="card-title text-center ">
-          <i class="bi bi-pie-chart-fill me-2 text-primary"></i>Distribución General
-        </h5>
-        <canvas id="resumenChart" height="100"></canvas>
+    <div class="col-12 col-md-4 col-lg-3 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title text-center ">
+            <i class="bi bi-pie-chart-fill me-2 text-primary"></i>Distribución General
+          </h5>
+          <canvas id="resumenChart" height="100"></canvas>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 
 </main>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', function() {
 
 
   });
@@ -192,8 +200,6 @@ try {
   window.addEventListener('resize', () => {
     console.log(`Ancho: ${window.innerWidth}px, Alto: ${window.innerHeight}px`);
   });
-
-
 </script>
 
 
@@ -209,8 +215,7 @@ try {
       type: 'bar',
       data: {
         labels: categoriaLabels,
-        datasets: [
-          {
+        datasets: [{
             label: 'Aprobados',
             backgroundColor: '#198754',
             data: dataAprobados
@@ -279,7 +284,7 @@ try {
             '#ffc107', // warning
             '#dc3545', // danger
             '#6c757d', // secondary
-            '#212529'  // dark
+            '#212529' // dark
           ],
           borderWidth: 1
         }]
@@ -295,7 +300,7 @@ try {
           },
           tooltip: {
             callbacks: {
-              label: function (context) {
+              label: function(context) {
                 const label = context.label || '';
                 const value = context.formattedValue || '0';
                 return `${label}: ${value}`;
@@ -306,46 +311,53 @@ try {
       }
     });
 
-/* ---------------tabla de deteccion de examenes --------------- */
- const estadoCtx = document.getElementById('estadoExamenesChart').getContext('2d');
+    /* ---------------tabla de deteccion de examenes --------------- */
+    /* --------------- tabla de detección de exámenes --------------- */
+    const estadoCtx = document.getElementById('estadoExamenesChart').getContext('2d');
 
-  new Chart(estadoCtx, {
-    type: 'bar',
-    data: {
-      labels: ['Pendientes', 'En Progreso', 'Finalizados'],
-      datasets: [{
-        label: 'Cantidad de Exámenes',
-        data: [
-          <?= $estadoExamenes['pendientes'] ?>,
-          <?= $estadoExamenes['en_progreso'] ?>,
-          <?= $estadoExamenes['finalizados'] ?>
-        ],
-        backgroundColor: ['#ffc107', '#0dcaf0', '#198754'],
-        borderColor: ['#d39e00', '#0bb2d4', '#157347'],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: function (context) {
-              return ` ${context.label}: ${context.parsed.y}`;
+    new Chart(estadoCtx, {
+      type: 'bar',
+      data: {
+        // Añadimos las nuevas etiquetas
+        labels: ['Pendientes', 'En Inicio', 'Finalizados', 'Expirados'],
+        datasets: [{
+          label: 'Cantidad de Exámenes',
+          data: [
+            <?= $estadoExamenes['pendiente'] ?>,
+            <?= $estadoExamenes['INICIO'] ?>,
+            <?= $estadoExamenes['finalizado'] ?>,
+            <?= $estadoExamenes['expirado'] ?>
+          ],
+          // Añadimos colores para los nuevos estados
+          backgroundColor: ['#ffc107', '#0dcaf0', '#198754', '#6c757d'],
+          borderColor: ['#d39e00', '#0bb2d4', '#157347', '#495057'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return ` ${context.label}: ${context.parsed.y}`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1 // Asegura que no salgan decimales en el eje Y
             }
           }
         }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          stepSize: 1
-        }
       }
-    }
-  });
-
+    });
   });
 </script>
 
