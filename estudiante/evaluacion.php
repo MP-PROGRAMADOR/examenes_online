@@ -412,6 +412,8 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
             }
         }
 
+
+
         async function procesarFinalizacion() {
             if (finalizandoProceso) return;
             finalizandoProceso = true;
@@ -419,20 +421,22 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
             clearInterval(intervaloTemporizadorGeneral);
             window.onbeforeunload = null;
 
-            const seleccionados = Array.from(document.querySelectorAll('input[name="opciones"]:checked')).map(i => i.value);
             const datos = new FormData();
             datos.append('examen_id', examenId);
             datos.append('forzar_finalizacion', 'true');
 
-            if (seleccionados.length > 0 && listaPreguntas[preguntaActual]) {
-                seleccionados.forEach(id => datos.append('opciones[]', id));
+            // Capturar lo que sea que haya en la pregunta actual antes de cerrar
+            if (listaPreguntas[preguntaActual]) {
+                const seleccionados = Array.from(document.querySelectorAll('input[name="opciones"]:checked')).map(i => i.value);
                 datos.append('pregunta_id', listaPreguntas[preguntaActual].pregunta_id);
                 datos.append('tipo_pregunta', listaPreguntas[preguntaActual].tipo);
-            } else {
-                // Importante: Enviar opciones vacías si no hay selección para no romper la validación
-                datos.append('opciones[]', '');
-                datos.append('pregunta_id', listaPreguntas[preguntaActual]?.pregunta_id || 0);
-                datos.append('tipo_pregunta', listaPreguntas[preguntaActual]?.tipo || 'unica');
+
+                if (seleccionados.length > 0) {
+                    seleccionados.forEach(id => datos.append('opciones[]', id));
+                } else {
+                    // Enviamos vacío para asegurar que el servidor procese la "no respuesta"
+                    datos.append('opciones[]', '');
+                }
             }
 
             try {
@@ -442,36 +446,24 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
                 });
                 const resultado = await res.json();
 
-                // AQUÍ ESTÁ EL CAMBIO PARA EL 100%
-                const nota = (resultado.data && resultado.data.calificacion_final !== undefined) ?
-                    resultado.data.calificacion_final :
-                    0;
+                if (resultado.status) {
+                    const nota = resultado.data.calificacion_final;
 
-                const toastEl = document.getElementById('toastFinalizado');
-                const mensajeToast = document.getElementById('mensajeToast');
+                    // Si no respondió nada, esto mostrará 0.00%
+                    document.getElementById('mensajeToast').innerHTML = `
+                <div class="text-center p-2">
+                    <h4 class="text-white"> EXAMEN FINALIZADO </h4>
+                </div>`;
 
-                toastEl.classList.remove('bg-danger');
-                toastEl.classList.add('bg-success');
-
-                mensajeToast.innerHTML = `
-            <div class="text-center text-white">
-                <i class="bi bi-check-circle-fill fs-2 mb-2"></i>
-                <h6 class="mb-1">Examen Finalizado</h6>
-                <p class="mb-0">Tu calificación: <b>${nota}%</b></p>
-            </div>`;
-
-                UI.toast.show();
-                setTimeout(() => {
-                    window.location.href = 'cerrar_sesion.php';
-                }, 4000);
-
+                    UI.toast.show();
+                    setTimeout(() => {
+                        window.location.href = 'cerrar_sesion.php';
+                    }, 4000);
+                }
             } catch (e) {
-                console.error("Error finalizando:", e);
                 window.location.href = 'cerrar_sesion.php';
             }
         }
-
-
 
 
         const finalizarExamen = () => procesarFinalizacion('finalizado');
@@ -493,10 +485,6 @@ $codigo = $estudiante['codigo_acceso'] ?? '';
         inicializarSeguridad();
         cargarPreguntas();
     </script>
-
-
-
-
 
 
     <script src="../js/bootstrap.bundle.min.js"></script>
